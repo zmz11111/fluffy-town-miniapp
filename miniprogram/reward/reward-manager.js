@@ -1,10 +1,10 @@
-const { TEST_REWARDS } = require('./catalog');
+const { REWARD_DEFINITIONS } = require('./catalog');
 const { isValidContentId } = require('../game/model');
 const { updateGameState } = require('../game/state');
 
 // 定义只从已登记的奖励目录读取，不接受页面传入任意数量或物品。
 function getRewardDefinition(rewardId) {
-  const reward = TEST_REWARDS.find((item) => item.id === rewardId);
+  const reward = REWARD_DEFINITIONS.find((item) => item.id === rewardId);
   return reward ? JSON.parse(JSON.stringify(reward)) : null;
 }
 
@@ -25,7 +25,7 @@ function requireReward(rewardId) {
     if (!Number.isSafeInteger(reward.amount) || reward.amount < 1) {
       throw new Error('星星奖励数据无效');
     }
-  } else if (['item', 'furniture', 'clothing', 'achievement'].indexOf(reward.type) === -1 ||
+  } else if (['item', 'furniture', 'clothing', 'achievement', 'companion'].indexOf(reward.type) === -1 ||
              !isValidContentId(reward.targetId)) {
     throw new Error('奖励目标数据无效');
   }
@@ -52,8 +52,14 @@ function applyReward(rewardId) {
       addUnique(draft.inventory.furnitureIds, reward.targetId);
     } else if (reward.type === 'clothing') {
       addUnique(draft.inventory.clothingIds, reward.targetId);
-    } else {
+    } else if (reward.type === 'achievement') {
       addUnique(draft.rewards.achievementIds, reward.targetId);
+    } else if (reward.targetId === 'mimi') {
+      draft.companions.mimi.unlocked = true;
+      draft.companions.mimi.storyProgress = 'joined';
+      draft.companions.mimi.friendship = Math.max(1, draft.companions.mimi.friendship);
+    } else {
+      throw new Error('未知伙伴奖励');
     }
 
     draft.rewards.claimedRewardIds.push(reward.id);

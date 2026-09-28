@@ -1,15 +1,23 @@
 const { CHAPTER_001 } = require('./chapters/chapter_001');
 const { SCENE_001 } = require('./scenes/scene_001');
+const { SCENE_002 } = require('./scenes/scene_002');
+const { SCENE_003 } = require('./scenes/scene_003');
+const { SCENE_004 } = require('./scenes/scene_004');
+const { SCENE_005 } = require('./scenes/scene_005');
+const { getTuantuanDialogue } = require('../pets/tuantuan-dialogues');
 const { getGameState, updateGameState } = require('../game/state');
 const { isValidContentId } = require('../game/model');
+const { applyReward } = require('../reward/reward-manager');
 
-// 测试内容集中登记；未来可替换为经过审校的版本化内容包。
+// 当前只登记第一章；内容与孩子的个人进度始终分离。
 const CHAPTERS = Object.create(null);
 const SCENES = Object.create(null);
 CHAPTERS[CHAPTER_001.id] = CHAPTER_001;
-SCENES[SCENE_001.id] = SCENE_001;
+[SCENE_001, SCENE_002, SCENE_003, SCENE_004, SCENE_005].forEach((scene) => {
+  SCENES[scene.id] = scene;
+});
 
-// 返回内容副本，防止页面或其他模块意外修改静态剧情。
+// 返回内容副本，防止页面意外修改剧情定义。
 function copy(value) {
   return JSON.parse(JSON.stringify(value));
 }
@@ -22,47 +30,79 @@ function getScene(sceneId) {
   return SCENES[sceneId] ? copy(SCENES[sceneId]) : null;
 }
 
-// 进入场景和完成场景时只登记任务触发，不等同于完成任务。
-function recordTaskTriggers(gameState, scene, when) {
-  scene.taskTriggers.filter((trigger) => trigger.when === when).forEach((trigger) => {
-    if (gameState.triggeredTaskIds.indexOf(trigger.taskId) === -1) {
-      gameState.triggeredTaskIds.push(trigger.taskId);
+// 团团对白从角色对话池解析，其他角色对白由场景提供。
+function resolveDialogue(line) {
+  if (line.speakerId === 'tuantuan' && line.dialogueKey) {
+    const dialogue = getTuantuanDialogue(line.dialogueKey);
+    if (!dialogue) {
+      throw new Error('团团对白不存在');
     }
-  });
+    return { speakerId: 'tuantuan', text: dialogue.text };
+  }
+  if (!isValidContentId(line.speakerId) || typeof line.text !== 'string' || !line.text.trim()) {
+    throw new Error('角色对白数据无效');
+  }
+  return { speakerId: line.speakerId, text: line.text };
 }
 
-// 校验章节与场景关联，避免错误内容包污染用户进度。
+// 检查场景归属与转场 ID，避免错误内容包破坏进度。
 function requireScene(chapter, sceneId) {
   const scene = SCENES[sceneId];
   if (!scene || scene.chapterId !== chapter.id || chapter.sceneIds.indexOf(sceneId) === -1 ||
       !Array.isArray(scene.dialogues) || scene.dialogues.length === 0 ||
-      !scene.dialogues.every((line) => isValidContentId(line.speakerId) && typeof line.text === 'string') ||
       !Array.isArray(scene.taskTriggers) ||
-      !scene.taskTriggers.every((trigger) => ['enter', 'complete'].indexOf(trigger.when) !== -1 && isValidContentId(trigger.taskId))) {
+      !scene.taskTriggers.every((trigger) => ['enter', 'complete'].indexOf(trigger.when) !== -1 && isValidContentId(trigger.taskId)) ||
+      (scene.requiredTaskId !== null && !isValidContentId(scene.requiredTaskId)) ||
+      (scene.nextSceneId !== null && chapter.sceneIds.indexOf(scene.nextSceneId) === -1)) {
     throw new Error('剧情场景数据无效');
   }
+  scene.dialogues.forEach(resolveDialogue);
   return scene;
 }
 
-// 启动章节时只设置游标与章节进度，不发放任何奖励。
+// 触发任务只表示它已出现；小游戏负责在完成后写入完成记录。
+function recordTaskTriggers(draft, scene, when) {
+  scene.taskTriggers.filter((trigger) => trigger.when === when).forEach((trigger) => {
+    if (draft.triggeredTaskIds.indexOf(trigger.taskId) === -1) {
+      draft.triggeredTaskIds.push(trigger.taskId);
+    }
+  });
+}
+
+// 进入场景时更新游标和团团情绪，并记录米米首次见面。
+function enterScene(draft, chapter, scene) {
+  draft.currentStory = { chapterId: chapter.id, sceneId: scene.id, dialogueIndex: 0 };
+  draft.chapterProgress[chapter.id] = {
+    status: 'in_progress',
+    currentNodeId: scene.id,
+    updatedAt: new Date().toISOString()
+  };
+  draft.companions.tuantuan.emotion = scene.tuantuanEmotion;
+  draft.companions.tuantuan.lastStorySceneId = scene.id;
+  if (scene.id === SCENE_001.id && draft.companions.mimi.storyProgress === 'not_met') {
+    draft.companions.mimi.storyProgress = 'met';
+  }
+  recordTaskTriggers(draft, scene, 'enter');
+}
+
+// 进入第一章时保留已有游标；完成后重进只补发遗漏的奖励。
 function startChapter(chapterId) {
   const chapter = CHAPTERS[chapterId];
   if (!chapter) {
     throw new Error('未知剧情章节');
   }
+  const state = getGameState();
+  if (state.chapterProgress[chapterId] && state.chapterProgress[chapterId].status === 'completed') {
+    return ensureChapterRewards(chapterId);
+  }
+  if (state.currentStory && state.currentStory.chapterId === chapterId) {
+    return state;
+  }
   const scene = requireScene(chapter, chapter.firstSceneId);
-  return updateGameState((draft) => {
-    draft.currentStory = { chapterId, sceneId: scene.id, dialogueIndex: 0 };
-    draft.chapterProgress[chapterId] = {
-      status: 'in_progress',
-      currentNodeId: scene.id,
-      updatedAt: new Date().toISOString()
-    };
-    recordTaskTriggers(draft, scene, 'enter');
-  });
+  return updateGameState((draft) => { enterScene(draft, chapter, scene); });
 }
 
-// 返回当前对白与上下文副本，页面不接触可变的游戏状态对象。
+// 返回当前对白与场景位置，页面只读取展示所需信息。
 function getCurrentStory() {
   const cursor = getGameState().currentStory;
   if (!cursor) {
@@ -79,14 +119,31 @@ function getCurrentStory() {
   return {
     chapter: copy(chapter),
     scene: copy(scene),
-    dialogue: copy(scene.dialogues[cursor.dialogueIndex]),
-    dialogueIndex: cursor.dialogueIndex
+    sceneIndex: chapter.sceneIds.indexOf(scene.id) + 1,
+    dialogue: resolveDialogue(scene.dialogues[cursor.dialogueIndex]),
+    dialogueIndex: cursor.dialogueIndex,
+    isLastDialogue: cursor.dialogueIndex === scene.dialogues.length - 1
   };
 }
 
-// 推进对白；场景结束时触发任务并进入下一场景或完成章节。
+// 第一章完成后按奖励 ID 补发，重复进入不会重复增加星星或角色。
+function ensureChapterRewards(chapterId) {
+  if (chapterId !== CHAPTER_001.id) {
+    throw new Error('未知剧情章节');
+  }
+  const state = getGameState();
+  if (!state.chapterProgress[chapterId] || state.chapterProgress[chapterId].status !== 'completed') {
+    return state;
+  }
+  applyReward('demo-grade-3:reward-chapter-001-stars');
+  applyReward('demo-grade-3:reward-mimi-unlock');
+  return getGameState();
+}
+
+// 推进对白；寻找线索场景必须先完成听音找图任务。
 function advanceStory() {
-  const cursor = getGameState().currentStory;
+  const state = getGameState();
+  const cursor = state.currentStory;
   if (!cursor) {
     throw new Error('当前没有进行中的剧情');
   }
@@ -98,30 +155,23 @@ function advanceStory() {
   if (cursor.dialogueIndex >= scene.dialogues.length) {
     throw new Error('当前对白位置无效');
   }
+  const isLastDialogue = cursor.dialogueIndex === scene.dialogues.length - 1;
+  if (isLastDialogue && scene.requiredTaskId &&
+      state.completedTaskIds.indexOf(scene.requiredTaskId) === -1) {
+    return { status: 'task_required', taskId: scene.requiredTaskId };
+  }
   const nextScene = scene.nextSceneId ? requireScene(chapter, scene.nextSceneId) : null;
 
-  return updateGameState((draft) => {
-    if (draft.currentStory.dialogueIndex + 1 < scene.dialogues.length) {
+  const updated = updateGameState((draft) => {
+    if (!isLastDialogue) {
       draft.currentStory.dialogueIndex += 1;
       return;
     }
-
     recordTaskTriggers(draft, scene, 'complete');
     if (nextScene) {
-      draft.currentStory = {
-        chapterId: chapter.id,
-        sceneId: nextScene.id,
-        dialogueIndex: 0
-      };
-      draft.chapterProgress[chapter.id] = {
-        status: 'in_progress',
-        currentNodeId: nextScene.id,
-        updatedAt: new Date().toISOString()
-      };
-      recordTaskTriggers(draft, nextScene, 'enter');
+      enterScene(draft, chapter, nextScene);
       return;
     }
-
     draft.currentStory = null;
     draft.chapterProgress[chapter.id] = {
       status: 'completed',
@@ -129,6 +179,19 @@ function advanceStory() {
       updatedAt: new Date().toISOString()
     };
   });
+
+  if (updated.chapterProgress[chapter.id].status === 'completed') {
+    ensureChapterRewards(chapter.id);
+    return { status: 'chapter_completed' };
+  }
+  return { status: 'advanced' };
 }
 
-module.exports = { getChapter, getScene, startChapter, getCurrentStory, advanceStory };
+module.exports = {
+  getChapter,
+  getScene,
+  startChapter,
+  getCurrentStory,
+  advanceStory,
+  ensureChapterRewards
+};

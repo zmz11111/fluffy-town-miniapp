@@ -1,0 +1,20 @@
+<!-- 故事页只展示管理器给出的当前对白，页面不写进度。 -->
+<view class="story-page">
+  <view class="chapter-tag">第一章 · {{title}}</view>
+  <view wx:if="{{!completed}}" class="story-card">
+    <view class="scene-count">场景 {{sceneNumber}} / {{sceneTotal}}</view>
+    <view class="scene-title">{{sceneTitle}}</view>
+    <view class="scene-art">🌳 <text>毛茸茸树屋</text> ⭐</view>
+    <view class="speaker">{{speaker}}</view>
+    <view class="dialogue">{{dialogue}}</view>
+    <button class="primary" bindtap="next">继续故事</button>
+  </view>
+  <view wx:else class="story-card finish">
+    <view class="finish-icon">⭐</view>
+    <view class="scene-title">星星饼干找到了！</view>
+    <view class="dialogue">米米加入了冒险。现在有 {{stars}} 颗星星啦！</view>
+    <button class="primary" bindtap="openFriends">去看看米米</button>
+    <button class="secondary" bindtap="backHome">回树屋</button>
+  </view>
+  <view wx:if="{{notice}}" class="notice">{{notice}}</view>
+</view>

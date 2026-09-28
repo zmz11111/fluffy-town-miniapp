@@ -5,7 +5,9 @@
  * @typedef {{chapterId: string, sceneId: string, dialogueIndex: number}|null} CurrentStory
  * @typedef {{itemIds: string[], furnitureIds: string[], clothingIds: string[]}} Inventory
  * @typedef {{claimedRewardIds: string[], achievementIds: string[]}} Rewards
- * @typedef {{playerLevel: number, stars: number, unlockedMapIds: string[], chapterProgress: Object<string, ChapterProgress>, triggeredTaskIds: string[], completedTaskIds: string[], currentStory: CurrentStory, inventory: Inventory, rewards: Rewards}} GameState
+ * @typedef {{gameId: string, roundIndex: number, correctCount: number, wrongAttempts: number}|null} CurrentGame
+ * @typedef {{tuantuan: {emotion: string, lastStorySceneId: string|null}, mimi: {unlocked: boolean, friendship: number, storyProgress: string}}} Companions
+ * @typedef {{playerLevel: number, stars: number, unlockedMapIds: string[], chapterProgress: Object<string, ChapterProgress>, triggeredTaskIds: string[], completedTaskIds: string[], currentStory: CurrentStory, inventory: Inventory, rewards: Rewards, currentGame: CurrentGame, companions: Companions}} GameState
  */
 
 // 创建独立的初始状态，避免多个档案共享可变数组或对象。
@@ -26,6 +28,11 @@ function createInitialGameState() {
     rewards: {
       claimedRewardIds: [],
       achievementIds: []
+    },
+    currentGame: null,
+    companions: {
+      tuantuan: { emotion: 'curious', lastStorySceneId: null },
+      mimi: { unlocked: false, friendship: 0, storyProgress: 'not_met' }
     }
   };
 }
@@ -60,8 +67,8 @@ function isValidLegacyGameState(value) {
   });
 }
 
-// 新版状态在旧字段之外校验剧情游标、背包和奖励记录。
-function isValidGameState(value) {
+// Sprint 1.8 的剧情、背包和奖励字段用于检查旧版档案。
+function isValidV3GameState(value) {
   if (!isValidLegacyGameState(value) ||
       !isValidIdList(value.triggeredTaskIds) ||
       !value.inventory || !isValidIdList(value.inventory.itemIds) ||
@@ -82,9 +89,34 @@ function isValidGameState(value) {
   );
 }
 
+// Sprint 2 再校验角色状态和可恢复的小游戏回合。
+function isValidGameState(value) {
+  if (!isValidV3GameState(value) || !value.companions ||
+      !value.companions.tuantuan || !value.companions.mimi) {
+    return false;
+  }
+  const tuantuan = value.companions.tuantuan;
+  const mimi = value.companions.mimi;
+  if (['curious', 'happy', 'worried', 'excited'].indexOf(tuantuan.emotion) === -1 ||
+      (tuantuan.lastStorySceneId !== null && !isValidContentId(tuantuan.lastStorySceneId)) ||
+      typeof mimi.unlocked !== 'boolean' ||
+      !Number.isInteger(mimi.friendship) || mimi.friendship < 0 ||
+      ['not_met', 'met', 'joined'].indexOf(mimi.storyProgress) === -1) {
+    return false;
+  }
+  const current = value.currentGame;
+  return current === null || Boolean(
+    current && isValidContentId(current.gameId) &&
+    Number.isInteger(current.roundIndex) && current.roundIndex >= 0 &&
+    Number.isInteger(current.correctCount) && current.correctCount >= 0 &&
+    Number.isInteger(current.wrongAttempts) && current.wrongAttempts >= 0
+  );
+}
+
 module.exports = {
   createInitialGameState,
   isValidContentId,
   isValidLegacyGameState,
+  isValidV3GameState,
   isValidGameState
 };

@@ -1,15 +1,17 @@
 /**
- * 奖励定义与用户已领取记录分开保存；以下条目只用于验证五种奖励类型。
- * @typedef {{id: string, type: 'star'|'item'|'furniture'|'clothing'|'achievement', amount?: number, targetId?: string, source: object}} RewardDefinition
+ * 奖励定义与用户已领取记录分开保存；第一章奖励使用稳定 ID。
+ * @typedef {{id: string, type: 'star'|'item'|'furniture'|'clothing'|'achievement'|'companion', amount?: number, targetId?: string, source: object}} RewardDefinition
  */
 
-// 测试奖励不含图片、服装图稿或未经授权的第三方素材。
-const TEST_REWARDS = [
+// 第一章星星与米米解锁是本阶段实际奖励，其余条目用于类型验证。
+const REWARD_DEFINITIONS = [
   { id: 'demo-grade-3:reward-star-001', type: 'star', amount: 2, source: { kind: 'original-test' } },
   { id: 'demo-grade-3:reward-item-001', type: 'item', targetId: 'demo-grade-3:item-001', source: { kind: 'original-test' } },
   { id: 'demo-grade-3:reward-furniture-001', type: 'furniture', targetId: 'demo-grade-3:furniture-001', source: { kind: 'original-test' } },
   { id: 'demo-grade-3:reward-clothing-001', type: 'clothing', targetId: 'demo-grade-3:clothing-001', source: { kind: 'original-test' } },
-  { id: 'demo-grade-3:reward-achievement-001', type: 'achievement', targetId: 'demo-grade-3:achievement-001', source: { kind: 'original-test' } }
+  { id: 'demo-grade-3:reward-achievement-001', type: 'achievement', targetId: 'demo-grade-3:achievement-001', source: { kind: 'original-test' } },
+  { id: 'demo-grade-3:reward-chapter-001-stars', type: 'star', amount: 5, source: { kind: 'original-story' } },
+  { id: 'demo-grade-3:reward-mimi-unlock', type: 'companion', targetId: 'mimi', source: { kind: 'original-story' } }
 ];
 
-module.exports = { TEST_REWARDS };
+module.exports = { REWARD_DEFINITIONS };

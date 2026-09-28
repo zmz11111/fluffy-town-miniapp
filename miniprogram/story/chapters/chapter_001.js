@@ -3,16 +3,22 @@
  * @typedef {{id: string, grade: number, courseId: string, contentVersion: string, title: string, firstSceneId: string, sceneIds: string[], source: object}} StoryChapter
  */
 
-// chapter_001 仅为结构验证数据，不承载正式剧情或教材内容。
+// 第一章为本项目原创试玩剧情，不引用教材或第三方故事。
 const CHAPTER_001 = {
   id: 'demo-grade-3:chapter_001',
   grade: 3,
   courseId: 'demo-grade-3',
-  contentVersion: 'test-1',
-  title: '测试章节 001',
+  contentVersion: 'sprint-2',
+  title: '消失的星星饼干',
   firstSceneId: 'demo-grade-3:scene_001',
-  sceneIds: ['demo-grade-3:scene_001'],
-  source: { kind: 'original-test', reference: null }
+  sceneIds: [
+    'demo-grade-3:scene_001',
+    'demo-grade-3:scene_002',
+    'demo-grade-3:scene_003',
+    'demo-grade-3:scene_004',
+    'demo-grade-3:scene_005'
+  ],
+  source: { kind: 'original-story', reference: null }
 };
 
 module.exports = { CHAPTER_001 };

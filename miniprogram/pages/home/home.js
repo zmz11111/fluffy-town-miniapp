@@ -7,7 +7,7 @@ Page({
     pet: TUANTUAN,
     interactionCount: 0,
     completed: 0,
-    total: 5,
+    total: 6,
     progressPercent: 0
   },
 
@@ -34,8 +34,16 @@ Page({
     }
   },
 
-  // 冒险入口先进入五词预览，后续可替换为章节地图。
+  // 冒险入口进入第一章，词卡仍可单独预览。
   startAdventure() {
+    wx.navigateTo({ url: '/pages/story/story' });
+  },
+
+  openFriends() {
+    wx.navigateTo({ url: '/pages/pets/pets' });
+  },
+
+  openWords() {
     wx.navigateTo({ url: '/pages/learn/learn' });
   }
 });

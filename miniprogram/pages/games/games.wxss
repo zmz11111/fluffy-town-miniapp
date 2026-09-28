@@ -1,0 +1,13 @@
+/* 听音找图采用清晰的大触控目标，方便儿童独立选择。 */
+.game-page { min-height: 100vh; padding: 38rpx 28rpx; background: #f8f3e8; box-sizing: border-box; }
+.header { color: #304d3c; font-size: 40rpx; font-weight: 700; margin-bottom: 26rpx; }
+.game-card { padding: 34rpx 24rpx; border-radius: 30rpx; background: #fffdf7; text-align: center; }
+.round { color: #78936f; font-size: 25rpx; }
+.instruction { margin-top: 15rpx; color: #3b513f; font-size: 33rpx; font-weight: 600; }
+.listen { margin-top: 28rpx; border-radius: 24rpx; background: #5a8f69; color: white; font-size: 30rpx; }
+.fallback { margin-top: 16rpx; color: #8d6245; font-size: 36rpx; font-weight: 700; }
+.options { display: flex; justify-content: space-between; gap: 12rpx; margin-top: 35rpx; }
+.option { display: flex; align-items: center; justify-content: center; flex: 1; height: 190rpx; min-width: 0; padding: 8rpx; border: 4rpx solid #dce8d9; border-radius: 25rpx; background: #f4f9ef; }
+.option image { width: 100%; height: 160rpx; }
+.finish-icon { font-size: 100rpx; }
+.message { margin: 30rpx 10rpx; color: #637764; font-size: 27rpx; line-height: 1.5; }

@@ -1,12 +1,13 @@
 const { DEMO_COURSE_ID } = require('../english/words');
 const { TUANTUAN } = require('../pets/pet');
-const { createInitialGameState, isValidLegacyGameState, isValidGameState } = require('../game/model');
+const { createInitialGameState, isValidLegacyGameState, isValidV3GameState, isValidGameState } = require('../game/model');
 
-// 新键保存剧情与奖励状态；旧键保留，避免升级时丢失学习和互动记录。
-const STORAGE_KEY = 'fluffy-town:local:v3';
-const PREVIOUS_STORAGE_KEY = 'fluffy-town:local:v2';
+// 新键保存第一章角色与小游戏状态；旧键保留以便迁移。
+const STORAGE_KEY = 'fluffy-town:local:v4';
+const PREVIOUS_STORAGE_KEY = 'fluffy-town:local:v3';
+const OLDER_STORAGE_KEY = 'fluffy-town:local:v2';
 const LEGACY_STORAGE_KEY = 'fluffy-town:local:v1';
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 
 /**
  * 生成当前设备的初始档案；不收集真实姓名或其他身份信息。
@@ -57,7 +58,20 @@ function isValidV2State(value) {
   );
 }
 
-// 新版结构还须包含剧情、背包和奖励状态。
+// Sprint 1.8 档案须包含剧情、背包和奖励状态。
+function isValidV3State(value) {
+  return Boolean(
+    value &&
+    value.schemaVersion === 3 &&
+    value.progress &&
+    Array.isArray(value.progress.completedWordIds) &&
+    value.petState &&
+    Array.isArray(value.learningRecords) &&
+    isValidV3GameState(value.gameState)
+  );
+}
+
+// 新版结构还须包含角色和小游戏状态。
 function isValidState(value) {
   return Boolean(
     value &&
@@ -68,6 +82,16 @@ function isValidState(value) {
     Array.isArray(value.learningRecords) &&
     isValidGameState(value.gameState)
   );
+}
+
+// 复制旧版游戏字段，避免迁移时遗漏星星、章节和任务进度。
+function copyOldGameFields(target, source) {
+  target.playerLevel = source.playerLevel;
+  target.stars = source.stars;
+  target.unlockedMapIds = source.unlockedMapIds;
+  target.chapterProgress = source.chapterProgress;
+  target.completedTaskIds = source.completedTaskIds;
+  return target;
 }
 
 // 从 Sprint 1 档案迁移时保留学习与互动记录，补入完整游戏状态。
@@ -85,12 +109,29 @@ function migrateV1State(legacy) {
 // 从 Sprint 1.5 档案迁移时保留等级、星星、地图、章节和任务进度。
 function migrateV2State(previous) {
   const copied = JSON.parse(JSON.stringify(previous));
-  const gameState = createInitialGameState();
-  gameState.playerLevel = copied.gameState.playerLevel;
-  gameState.stars = copied.gameState.stars;
-  gameState.unlockedMapIds = copied.gameState.unlockedMapIds;
-  gameState.chapterProgress = copied.gameState.chapterProgress;
-  gameState.completedTaskIds = copied.gameState.completedTaskIds;
+  const gameState = copyOldGameFields(createInitialGameState(), copied.gameState);
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    progress: copied.progress,
+    petState: copied.petState,
+    learningRecords: copied.learningRecords,
+    gameState
+  };
+}
+
+// 从 Sprint 1.8 档案迁移时保留剧情与奖励，只补充新角色和小游戏游标。
+function migrateV3State(previous) {
+  const copied = JSON.parse(JSON.stringify(previous));
+  const gameState = copyOldGameFields(createInitialGameState(), copied.gameState);
+  gameState.triggeredTaskIds = copied.gameState.triggeredTaskIds;
+  gameState.currentStory = copied.gameState.currentStory;
+  gameState.inventory = copied.gameState.inventory;
+  gameState.rewards = copied.gameState.rewards;
+  // 旧版 chapter_001 只有一幕测试剧情，不能继承为新版五幕章节的完成记录。
+  delete gameState.chapterProgress['demo-grade-3:chapter_001'];
+  if (gameState.currentStory && gameState.currentStory.chapterId === 'demo-grade-3:chapter_001') {
+    gameState.currentStory = null;
+  }
   return {
     schemaVersion: SCHEMA_VERSION,
     progress: copied.progress,
@@ -119,8 +160,13 @@ function loadState() {
     }
 
     const previous = wx.getStorageSync(PREVIOUS_STORAGE_KEY);
-    if (isValidV2State(previous)) {
-      return saveMigratedState(migrateV2State(previous));
+    if (isValidV3State(previous)) {
+      return saveMigratedState(migrateV3State(previous));
+    }
+
+    const older = wx.getStorageSync(OLDER_STORAGE_KEY);
+    if (isValidV2State(older)) {
+      return saveMigratedState(migrateV2State(older));
     }
 
     const legacy = wx.getStorageSync(LEGACY_STORAGE_KEY);
@@ -153,6 +199,7 @@ function updateState(change) {
 module.exports = {
   STORAGE_KEY,
   PREVIOUS_STORAGE_KEY,
+  OLDER_STORAGE_KEY,
   LEGACY_STORAGE_KEY,
   createInitialState,
   loadState,

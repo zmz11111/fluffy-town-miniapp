@@ -44,3 +44,6 @@
 .progress-fill { height: 100%; border-radius: 15rpx; background: #7dab79; }
 .task-hint { display: block; margin-top: 17rpx; color: #7a887a; font-size: 22rpx; }
 .start-button { margin-top: 32rpx; height: 94rpx; border-radius: 30rpx; background: #5a8f69; color: #fff; font-size: 32rpx; font-weight: 700; line-height: 94rpx; }
+/* 入口只负责导航，进度与角色状态由业务模块维护。 */
+.quick-links { display: flex; gap: 20rpx; margin-top: 18rpx; }
+.quick-links button { flex: 1; margin: 0; border-radius: 22rpx; background: #fffdf7; color: #4e7457; font-size: 26rpx; }

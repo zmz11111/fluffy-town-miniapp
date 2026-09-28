@@ -1,0 +1,12 @@
+/* 角色图形为占位展示，后续替换为项目自制素材。 */
+.pets-page { min-height: 100vh; padding: 36rpx 28rpx; background: #f8f3e8; box-sizing: border-box; }
+.heading { color: #304d3c; font-size: 46rpx; font-weight: 700; margin-bottom: 28rpx; }
+.friend-card { margin-bottom: 24rpx; padding: 34rpx; border-radius: 30rpx; background: #fffdf7; }
+.avatar { display: flex; justify-content: center; align-items: center; width: 135rpx; height: 135rpx; border-radius: 50%; font-size: 72rpx; }
+.tuantuan { background: #f3e0ba; }
+.mimi { background: #ffe0ad; }
+.name { margin-top: 18rpx; color: #344a39; font-size: 36rpx; font-weight: 700; }
+.description { margin-top: 7rpx; color: #68766a; font-size: 25rpx; }
+.detail { margin-top: 17rpx; color: #9a7555; font-size: 24rpx; }
+.action { margin-top: 24rpx; border-radius: 22rpx; background: #5a8f69; color: white; font-size: 27rpx; }
+.notice { margin: 20rpx 8rpx; color: #607b62; font-size: 25rpx; }

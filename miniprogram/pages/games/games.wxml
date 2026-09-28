@@ -1,0 +1,25 @@
+<!-- 图片与声音均来自独立内容模块，页面只提交用户选择。 -->
+<view class="game-page">
+  <view class="header">寻找星星饼干的线索</view>
+  <view wx:if="{{status === 'playing'}}" class="game-card">
+    <view class="round">第 {{roundNumber}} / {{total}} 条线索</view>
+    <view class="instruction">听一听，找出对应的图片</view>
+    <button class="listen" bindtap="playWord">🔊 播放单词</button>
+    <view wx:if="{{audioFailed}}" class="fallback">{{fallbackWord}}</view>
+    <view class="options">
+      <button wx:for="{{options}}" wx:key="wordId" class="option" data-word-id="{{item.wordId}}" bindtap="selectImage" aria-label="{{item.altText}}">
+        <image src="{{item.imageSrc}}" mode="aspectFit" />
+      </button>
+    </view>
+  </view>
+  <view wx:elif="{{status === 'completed'}}" class="game-card complete">
+    <view class="finish-icon">⭐</view>
+    <view class="instruction">三条线索都找到了！</view>
+    <button class="listen" bindtap="backStory">继续故事</button>
+  </view>
+  <view wx:else class="game-card">
+    <view class="instruction">小游戏还没有开始</view>
+    <button class="listen" bindtap="openStory">去故事里看看</button>
+  </view>
+  <view class="message">{{message}}</view>
+</view>

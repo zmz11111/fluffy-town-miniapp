@@ -1,7 +1,10 @@
 {
   "pages": [
     "pages/home/home",
-    "pages/learn/learn"
+    "pages/learn/learn",
+    "pages/story/story",
+    "pages/games/games",
+    "pages/pets/pets"
   ],
   "window": {
     "navigationBarTitleText": "团团和它的毛茸茸朋友",

@@ -1,0 +1,16 @@
+/* 第一章场景采用原创文字与简单图形占位。 */
+.story-page { min-height: 100vh; padding: 40rpx 28rpx; background: #f8f3e8; box-sizing: border-box; }
+.chapter-tag { color: #657c59; font-size: 28rpx; margin: 10rpx 8rpx 28rpx; }
+.story-card { padding: 36rpx; border-radius: 32rpx; background: #fffdf7; box-shadow: 0 10rpx 22rpx rgba(63,78,55,.08); }
+.scene-count { color: #8e9e76; font-size: 24rpx; }
+.scene-title { margin-top: 14rpx; color: #304d3c; font-size: 44rpx; font-weight: 700; }
+.scene-art { display: flex; justify-content: center; align-items: center; gap: 28rpx; height: 280rpx; margin: 30rpx 0; border-radius: 28rpx; background: linear-gradient(#d9ece3,#e7dcb4); font-size: 60rpx; }
+.scene-art text { color: #53715a; font-size: 25rpx; }
+.speaker { color: #ad7951; font-size: 28rpx; font-weight: 700; }
+.dialogue { min-height: 130rpx; margin-top: 12rpx; color: #394d3e; font-size: 34rpx; line-height: 1.6; }
+.primary, .secondary { margin-top: 30rpx; border-radius: 24rpx; font-size: 30rpx; }
+.primary { background: #5a8f69; color: white; }
+.secondary { background: #e5eddc; color: #46694e; }
+.finish { text-align: center; }
+.finish-icon { font-size: 100rpx; }
+.notice { margin: 26rpx; color: #a64f41; font-size: 25rpx; }

@@ -3,7 +3,7 @@
   <view class="welcome">
     <text class="eyebrow">欢迎来到毛茸茸小镇</text>
     <text class="headline">团团的树屋</text>
-    <text class="intro">和团团一起，认识今天的新单词。</text>
+    <text class="intro">和团团一起，寻找消失的星星饼干。</text>
   </view>
 
   <view class="scene" aria-label="毛茸茸树屋占位场景">
@@ -47,11 +47,15 @@
       <text class="section-label">今日任务</text>
       <text class="task-count">{{completed}} / {{total}}</text>
     </view>
-    <text class="task-title">认识树屋里的 5 个英语单词</text>
+    <text class="task-title">认识树屋里的 6 个测试单词</text>
     <view class="progress-track"><view class="progress-fill" style="width: {{progressPercent}}%;"></view></view>
     <text class="task-hint" wx:if="{{completed < total}}">每学会一个词，就离小小冒险更近一步。</text>
     <text class="task-hint" wx:else>今天的示例单词都认识啦！</text>
   </view>
 
   <button class="start-button" bindtap="startAdventure">开始冒险</button>
+  <view class="quick-links">
+    <button bindtap="openFriends">伙伴</button>
+    <button bindtap="openWords">单词卡</button>
+  </view>
 </view>
