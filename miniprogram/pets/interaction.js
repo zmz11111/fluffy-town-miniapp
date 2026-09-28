@@ -1,5 +1,10 @@
 const { TUANTUAN } = require('./pet');
-const { updateState } = require('../storage/local');
+const { loadState, updateState } = require('../storage/local');
+
+// 页面通过角色模块读取状态，不依赖本地存储字段的位置。
+function getTuantuanState() {
+  return loadState().petState;
+}
 
 // 点击团团时只更新本地互动状态；不把点击次数转换为学习成绩。
 function interactWithTuantuan() {
@@ -12,4 +17,4 @@ function interactWithTuantuan() {
   return state.petState;
 }
 
-module.exports = { interactWithTuantuan };
+module.exports = { getTuantuanState, interactWithTuantuan };

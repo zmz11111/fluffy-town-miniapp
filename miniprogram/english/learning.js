@@ -8,12 +8,16 @@ const { loadState, updateState } = require('../storage/local');
 
 // 汇总当前示例单元完成数量；真实教材接入时按课程和单元筛选。
 function getLearningSummary() {
-  const state = loadState();
-  const learnedIds = state.progress.completedWordIds;
+  const learnedIds = getLearnedWordIds();
   return {
     completed: WORDS.filter((word) => learnedIds.indexOf(word.id) !== -1).length,
     total: WORDS.length
   };
+}
+
+// 页面只获得已学单词 ID 的副本，不能直接改动存储中的进度。
+function getLearnedWordIds() {
+  return loadState().progress.completedWordIds;
 }
 
 // 标记词条时使用稳定 ID 去重，重复点击不会增加记录。
@@ -42,4 +46,4 @@ function markWordLearned(wordId) {
   });
 }
 
-module.exports = { getLearningSummary, markWordLearned };
+module.exports = { getLearningSummary, getLearnedWordIds, markWordLearned };

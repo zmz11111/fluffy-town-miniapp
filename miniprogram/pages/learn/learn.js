@@ -1,6 +1,5 @@
 const { WORDS } = require('../../english/words');
-const { markWordLearned } = require('../../english/learning');
-const { loadState } = require('../../storage/local');
+const { getLearnedWordIds, markWordLearned } = require('../../english/learning');
 
 Page({
   data: {
@@ -16,7 +15,7 @@ Page({
 
   // 根据本地记录计算按钮状态，避免页面内另存一份进度。
   refreshWords() {
-    const learnedIds = loadState().progress.completedWordIds;
+    const learnedIds = getLearnedWordIds();
     this.setData({
       words: WORDS.map((word) => ({
         id: word.id,

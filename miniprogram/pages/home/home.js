@@ -1,7 +1,6 @@
 const { TUANTUAN } = require('../../pets/pet');
-const { interactWithTuantuan } = require('../../pets/interaction');
+const { getTuantuanState, interactWithTuantuan } = require('../../pets/interaction');
 const { getLearningSummary } = require('../../english/learning');
-const { loadState } = require('../../storage/local');
 
 Page({
   data: {
@@ -14,10 +13,10 @@ Page({
 
   // 页面每次显示时读取本地状态，返回树屋后立即更新今日任务。
   onShow() {
-    const state = loadState();
+    const petState = getTuantuanState();
     const summary = getLearningSummary();
     this.setData({
-      interactionCount: state.petState.interactionCount,
+      interactionCount: petState.interactionCount,
       completed: summary.completed,
       total: summary.total,
       progressPercent: Math.round((summary.completed / summary.total) * 100)

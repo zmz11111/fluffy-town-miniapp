@@ -1,6 +1,6 @@
 /**
- * 宠物资料与状态分开保存，未来可以增加更多宠物而不改变学习记录。
- * @typedef {{id: string, name: string, kind: string, introduction: string}} Pet
+ * Sprint 1 沿用 pets 目录；团团的角色定位是陪伴伙伴，不按宠物养成规则处理。
+ * @typedef {{id: string, name: string, role: string, kind: string, introduction: string}} Companion
  * @typedef {{petId: string, interactionCount: number, mood: string, lastInteractedAt: string|null}} PetState
  */
 
@@ -8,8 +8,9 @@
 const TUANTUAN = Object.freeze({
   id: 'tuantuan',
   name: '团团',
+  role: 'companion',
   kind: '毛茸茸的小熊',
-  introduction: '住在树屋里，喜欢和你一起学习英语。'
+  introduction: '住在树屋里，喜欢和你一起探索新发现。'
 });
 
 module.exports = { TUANTUAN };
