@@ -6,8 +6,8 @@ function getGameState() {
   return loadState().gameState;
 }
 
-// 所有游戏状态写入均经本地仓库和结构校验；此层不决定奖励规则。
-function changeGameState(change) {
+// 所有游戏状态写入均经本地仓库和结构校验；仅供剧情、奖励等业务模块调用。
+function updateGameState(change) {
   const state = updateState((draft) => {
     change(draft.gameState);
     if (!isValidGameState(draft.gameState)) {
@@ -29,20 +29,20 @@ function setPlayerLevel(level) {
   if (!Number.isInteger(level) || level < 1) {
     throw new Error('玩家等级必须是正整数');
   }
-  return changeGameState((draft) => { draft.playerLevel = level; });
+  return updateGameState((draft) => { draft.playerLevel = level; });
 }
 
 function setStars(stars) {
   if (!Number.isInteger(stars) || stars < 0) {
     throw new Error('星星数量必须是非负整数');
   }
-  return changeGameState((draft) => { draft.stars = stars; });
+  return updateGameState((draft) => { draft.stars = stars; });
 }
 
 // 地图与任务使用稳定 ID 去重，重复事件不会重复增加记录。
 function unlockMap(mapId) {
   requireId(mapId);
-  return changeGameState((draft) => {
+  return updateGameState((draft) => {
     if (draft.unlockedMapIds.indexOf(mapId) === -1) {
       draft.unlockedMapIds.push(mapId);
     }
@@ -51,7 +51,7 @@ function unlockMap(mapId) {
 
 function completeTask(taskId) {
   requireId(taskId);
-  return changeGameState((draft) => {
+  return updateGameState((draft) => {
     if (draft.completedTaskIds.indexOf(taskId) === -1) {
       draft.completedTaskIds.push(taskId);
     }
@@ -65,7 +65,7 @@ function setChapterProgress(chapterId, status, currentNodeId) {
       (currentNodeId !== null && !isValidContentId(currentNodeId))) {
     throw new Error('章节进度无效');
   }
-  return changeGameState((draft) => {
+  return updateGameState((draft) => {
     draft.chapterProgress[chapterId] = {
       status,
       currentNodeId,
@@ -76,6 +76,7 @@ function setChapterProgress(chapterId, status, currentNodeId) {
 
 module.exports = {
   getGameState,
+  updateGameState,
   setPlayerLevel,
   setStars,
   unlockMap,

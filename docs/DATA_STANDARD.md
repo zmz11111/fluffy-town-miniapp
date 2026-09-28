@@ -1,6 +1,6 @@
 # 统一数据管理规范
 
-本规范适用于 Sprint 1.5 及后续的角色、英语、剧情、游戏状态和家长端数据。当前仅实现本地示例数据与状态存储；下文标明“规划”的结构尚未成为玩法或页面。
+本规范适用于 Sprint 1.8 及后续的角色、英语、剧情、游戏状态和家长端数据。当前仅实现本地示例数据、测试剧情/奖励目录与状态存储；正式玩法和页面尚未接入这些引擎模块。
 
 ## 1. 数据归属与访问边界
 
@@ -8,7 +8,8 @@
 |---|---|---|
 | 团团资料与互动 | `miniprogram/pets/`，现为 Sprint 1 历史目录 | 调用角色模块的读取/互动函数。 |
 | 英语词条与学习记录 | `miniprogram/english/` | 调用英语模块的查询/记录函数。 |
-| 剧情章节与节点（规划） | 独立的 `story/` 内容模块 | 由剧情用例读取已发布内容，不在页面内写死剧情数据。 |
+| 剧情章节与场景 | `miniprogram/story/`，当前只有 `chapter_001` 测试数据 | 由剧情管理器读取内容，不在页面内写死对白。 |
+| 奖励定义与领取 | `miniprogram/reward/`，当前只有五类测试定义 | 由奖励管理器登记领取，页面不直接更改星星或背包。 |
 | 游戏状态 | `miniprogram/game/` | 由游戏状态模块读取和更新，不在页面内改字段。 |
 | 本地持久化 | `miniprogram/storage/local.js` | 只由业务模块调用；页面不直接使用 `wx.setStorageSync`。 |
 
@@ -36,11 +37,11 @@
 
 PDF 导入流程只产生候选词条：抽取 → 标记来源页码 → 人工审校和授权确认 → 内容版本发布。导入脚本不得直接写入儿童学习记录。
 
-## 5. 剧情数据（规划，尚未实现）
+## 5. 剧情数据（测试结构已实现，正式内容未制作）
 
-- `StoryChapter`：`id`、`grade`、`courseId`、`contentVersion`、`title`、`nodeIds`、`unlockRule`、`source`。
-- `StoryNode`：`id`、`chapterId`、`text`、`mediaAssetIds`、`nextNodeIds`、`learningItemIds`。
-- `unlockRule` 只引用稳定的课程、任务或地图 ID，不在页面模板中写判断逻辑。
+- `StoryChapter`：`id`、`grade`、`courseId`、`contentVersion`、`title`、`firstSceneId`、`sceneIds`、`source`。
+- `StoryScene`：`id`、`chapterId`、`dialogues`、`nextSceneId`、`taskTriggers`。每条对白有 `speakerId` 和 `text`；触发器有 `when` 和 `taskId`。
+- 测试管理器只登记 `triggeredTaskIds`，不把触发等同于完成；未来解锁条件只引用稳定的课程、任务或地图 ID，不在页面模板中写判断逻辑。
 - 剧情文本遵循 [团团角色设计规范](GAME_DESIGN.md)；教材 PDF 导入的文字在授权与人工审校后才能进入剧情内容。
 
 ## 6. 游戏状态
@@ -53,12 +54,16 @@ PDF 导入流程只产生候选词条：抽取 → 标记来源页码 → 人工
 | `stars` | 非负整数 | 星星数量；默认 `0`。本阶段不定义获得或消耗规则。 |
 | `unlockedMapIds` | 字符串数组 | 已解锁地图的稳定 ID；默认空数组。 |
 | `chapterProgress` | 以章节 ID 为键的对象 | 每章保存 `status`、`currentNodeId`、`updatedAt`；默认空对象。 |
+| `triggeredTaskIds` | 字符串数组 | 剧情已触发任务的稳定 ID；默认空数组，与完成任务分开。 |
 | `completedTaskIds` | 字符串数组 | 已完成任务的稳定 ID；默认空数组。 |
+| `currentStory` | 对象或 `null` | 当前章节、场景和对白位置；默认 `null`。 |
+| `inventory` | 对象 | `itemIds`、`furnitureIds`、`clothingIds`；默认均为空数组。 |
+| `rewards` | 对象 | `claimedRewardIds`、`achievementIds`；默认均为空数组。 |
 
-状态模块提供读取、设定等级/星星、地图去重解锁、章节进度保存和任务去重完成接口。接口只管理数据，不触发关卡、评分、奖励或新玩法。将来由独立规则层决定何时调用；云同步时按用户档案隔离并校验数据归属。
+状态模块提供统一读写入口；剧情和奖励管理器在其上完成结构化更新。它不判断关卡成绩或奖励资格；将来由独立规则层决定何时调用，云同步时按用户档案隔离并校验数据归属。五类奖励定义及写入位置详见 [游戏基础引擎](GAME_ENGINE.md)。
 
 ## 7. 本地档案与迁移
 
-当前本地键为 `fluffy-town:local:v2`，根结构为 `schemaVersion: 2`、`progress`、`petState`、`learningRecords`、`gameState`。首次读取旧键 `fluffy-town:local:v1` 时，复制原进度、互动状态和学习记录，补入初始 `gameState` 后写入新键；旧键暂不删除。若写入失败，仍展示可读取的旧进度，并在后续写入时重试。迁移前后的学习记录数量与 ID 应保持一致。
+当前本地键为 `fluffy-town:local:v3`，根结构为 `schemaVersion: 3`、`progress`、`petState`、`learningRecords`、`gameState`。首次读取 v2 时保留原游戏状态和学习/互动记录，补入剧情、背包、奖励字段；首次读取 v1 时复制原学习/互动记录并补入完整 `gameState`。v1、v2 旧键暂不删除。若写入失败，仍展示可读取的旧进度，并在后续写入时重试。迁移前后的学习记录数量与 ID 应保持一致。
 
 未来家长端与云开发应通过业务接口获得经过授权的摘要，不能让页面或云函数直接假设本地键名、内部字段或未发布的剧情结构长期不变。

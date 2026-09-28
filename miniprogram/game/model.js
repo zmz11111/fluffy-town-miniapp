@@ -1,8 +1,11 @@
 /**
- * 游戏状态只记录玩家进度，不在这里定义星星奖励或地图解锁玩法。
+ * 游戏状态只记录玩家进度，不在这里定义剧情内容或奖励发放条件。
  * 章节、地图和任务 ID 必须在内容包中保持稳定，并包含课程命名空间。
  * @typedef {{status: 'not_started'|'in_progress'|'completed', currentNodeId: string|null, updatedAt: string|null}} ChapterProgress
- * @typedef {{playerLevel: number, stars: number, unlockedMapIds: string[], chapterProgress: Object<string, ChapterProgress>, completedTaskIds: string[]}} GameState
+ * @typedef {{chapterId: string, sceneId: string, dialogueIndex: number}|null} CurrentStory
+ * @typedef {{itemIds: string[], furnitureIds: string[], clothingIds: string[]}} Inventory
+ * @typedef {{claimedRewardIds: string[], achievementIds: string[]}} Rewards
+ * @typedef {{playerLevel: number, stars: number, unlockedMapIds: string[], chapterProgress: Object<string, ChapterProgress>, triggeredTaskIds: string[], completedTaskIds: string[], currentStory: CurrentStory, inventory: Inventory, rewards: Rewards}} GameState
  */
 
 // 创建独立的初始状态，避免多个档案共享可变数组或对象。
@@ -12,7 +15,18 @@ function createInitialGameState() {
     stars: 0,
     unlockedMapIds: [],
     chapterProgress: {},
-    completedTaskIds: []
+    triggeredTaskIds: [],
+    completedTaskIds: [],
+    currentStory: null,
+    inventory: {
+      itemIds: [],
+      furnitureIds: [],
+      clothingIds: []
+    },
+    rewards: {
+      claimedRewardIds: [],
+      achievementIds: []
+    }
   };
 }
 
@@ -26,8 +40,8 @@ function isValidIdList(ids) {
   return Array.isArray(ids) && ids.every(isValidContentId) && new Set(ids).size === ids.length;
 }
 
-// 存储读写前检查基础形状，防止无效数据覆盖学习记录。
-function isValidGameState(value) {
+// Sprint 1.5 的五个基础字段用于检查旧版档案并安全迁移。
+function isValidLegacyGameState(value) {
   if (!value || !Number.isInteger(value.playerLevel) || value.playerLevel < 1 ||
       !Number.isInteger(value.stars) || value.stars < 0 ||
       !isValidIdList(value.unlockedMapIds) ||
@@ -46,4 +60,31 @@ function isValidGameState(value) {
   });
 }
 
-module.exports = { createInitialGameState, isValidContentId, isValidGameState };
+// 新版状态在旧字段之外校验剧情游标、背包和奖励记录。
+function isValidGameState(value) {
+  if (!isValidLegacyGameState(value) ||
+      !isValidIdList(value.triggeredTaskIds) ||
+      !value.inventory || !isValidIdList(value.inventory.itemIds) ||
+      !isValidIdList(value.inventory.furnitureIds) ||
+      !isValidIdList(value.inventory.clothingIds) ||
+      !value.rewards || !isValidIdList(value.rewards.claimedRewardIds) ||
+      !isValidIdList(value.rewards.achievementIds)) {
+    return false;
+  }
+
+  const current = value.currentStory;
+  return current === null || Boolean(
+    current &&
+    isValidContentId(current.chapterId) &&
+    isValidContentId(current.sceneId) &&
+    Number.isInteger(current.dialogueIndex) &&
+    current.dialogueIndex >= 0
+  );
+}
+
+module.exports = {
+  createInitialGameState,
+  isValidContentId,
+  isValidLegacyGameState,
+  isValidGameState
+};

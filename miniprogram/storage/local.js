@@ -1,11 +1,12 @@
 const { DEMO_COURSE_ID } = require('../english/words');
 const { TUANTUAN } = require('../pets/pet');
-const { createInitialGameState, isValidGameState } = require('../game/model');
+const { createInitialGameState, isValidLegacyGameState, isValidGameState } = require('../game/model');
 
-// 使用新键保存 Sprint 1.5 数据；保留旧键以迁移已有学习和互动记录。
-const STORAGE_KEY = 'fluffy-town:local:v2';
+// 新键保存剧情与奖励状态；旧键保留，避免升级时丢失学习和互动记录。
+const STORAGE_KEY = 'fluffy-town:local:v3';
+const PREVIOUS_STORAGE_KEY = 'fluffy-town:local:v2';
 const LEGACY_STORAGE_KEY = 'fluffy-town:local:v1';
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 /**
  * 生成当前设备的初始档案；不收集真实姓名或其他身份信息。
@@ -31,8 +32,8 @@ function createInitialState() {
   };
 }
 
-// 旧版结构检查仅用于迁移，绝不修改旧键中的原始数据。
-function isValidLegacyState(value) {
+// Sprint 1 档案结构检查仅用于迁移，不修改旧键中的原始数据。
+function isValidV1State(value) {
   return Boolean(
     value &&
     value.schemaVersion === 1 &&
@@ -43,7 +44,20 @@ function isValidLegacyState(value) {
   );
 }
 
-// 新版结构还须包含独立的游戏状态。
+// Sprint 1.5 档案须带旧版游戏状态，迁移后保留全部既有进度。
+function isValidV2State(value) {
+  return Boolean(
+    value &&
+    value.schemaVersion === 2 &&
+    value.progress &&
+    Array.isArray(value.progress.completedWordIds) &&
+    value.petState &&
+    Array.isArray(value.learningRecords) &&
+    isValidLegacyGameState(value.gameState)
+  );
+}
+
+// 新版结构还须包含剧情、背包和奖励状态。
 function isValidState(value) {
   return Boolean(
     value &&
@@ -56,8 +70,8 @@ function isValidState(value) {
   );
 }
 
-// 只复制旧版已知字段；加入游戏状态时保留原有学习与互动数据。
-function migrateLegacyState(legacy) {
+// 从 Sprint 1 档案迁移时保留学习与互动记录，补入完整游戏状态。
+function migrateV1State(legacy) {
   const copied = JSON.parse(JSON.stringify(legacy));
   return {
     schemaVersion: SCHEMA_VERSION,
@@ -68,6 +82,34 @@ function migrateLegacyState(legacy) {
   };
 }
 
+// 从 Sprint 1.5 档案迁移时保留等级、星星、地图、章节和任务进度。
+function migrateV2State(previous) {
+  const copied = JSON.parse(JSON.stringify(previous));
+  const gameState = createInitialGameState();
+  gameState.playerLevel = copied.gameState.playerLevel;
+  gameState.stars = copied.gameState.stars;
+  gameState.unlockedMapIds = copied.gameState.unlockedMapIds;
+  gameState.chapterProgress = copied.gameState.chapterProgress;
+  gameState.completedTaskIds = copied.gameState.completedTaskIds;
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    progress: copied.progress,
+    petState: copied.petState,
+    learningRecords: copied.learningRecords,
+    gameState
+  };
+}
+
+// 迁移写入失败时仍返回旧进度的内存副本，后续更新会重新尝试落盘。
+function saveMigratedState(migrated) {
+  try {
+    saveState(migrated);
+  } catch (error) {
+    // 存储可能暂时不可用，不清除旧键。
+  }
+  return migrated;
+}
+
 // 读取时返回副本，页面与业务模块不能通过引用修改存储内容。
 function loadState() {
   try {
@@ -76,15 +118,14 @@ function loadState() {
       return JSON.parse(JSON.stringify(stored));
     }
 
+    const previous = wx.getStorageSync(PREVIOUS_STORAGE_KEY);
+    if (isValidV2State(previous)) {
+      return saveMigratedState(migrateV2State(previous));
+    }
+
     const legacy = wx.getStorageSync(LEGACY_STORAGE_KEY);
-    if (isValidLegacyState(legacy)) {
-      const migrated = migrateLegacyState(legacy);
-      try {
-        saveState(migrated);
-      } catch (error) {
-        // 迁移暂时无法落盘时仍展示旧进度，后续写入会再次尝试。
-      }
-      return migrated;
+    if (isValidV1State(legacy)) {
+      return saveMigratedState(migrateV1State(legacy));
     }
   } catch (error) {
     // 存储不可用时仍允许展示初始页面，写入错误由调用方处理。
@@ -109,4 +150,11 @@ function updateState(change) {
   return saveState(next);
 }
 
-module.exports = { STORAGE_KEY, LEGACY_STORAGE_KEY, createInitialState, loadState, updateState };
+module.exports = {
+  STORAGE_KEY,
+  PREVIOUS_STORAGE_KEY,
+  LEGACY_STORAGE_KEY,
+  createInitialState,
+  loadState,
+  updateState
+};
