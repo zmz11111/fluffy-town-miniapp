@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/learn/learn"
+  ],
+  "window": {
+    "navigationBarTitleText": "团团和它的毛茸茸朋友",
+    "navigationBarBackgroundColor": "#f6e6c9",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f8f3e8"
+  },
+  "style": "v2"
+}

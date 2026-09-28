@@ -1,0 +1,11 @@
+/* 全局仅定义基础排版与页面底色，具体场景样式留在页面内。 */
+page {
+  min-height: 100%;
+  background: #f8f3e8;
+  color: #37453d;
+  font-family: sans-serif;
+}
+
+button::after {
+  border: 0;
+}

@@ -1,0 +1,14 @@
+{
+  "description": "团团和它的毛茸茸朋友 Sprint 1 基础项目",
+  "packOptions": { "ignore": [] },
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true
+  },
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "fluffy-town-miniapp",
+  "miniprogramRoot": "miniprogram/"
+}

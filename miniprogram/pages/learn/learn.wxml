@@ -1,0 +1,23 @@
+<!-- 此页是 Sprint 1 的数据与导航预览，不包含正式练习玩法。 -->
+<view class="learn-page">
+  <view class="learn-hero">
+    <text class="hero-kicker">树屋小冒险</text>
+    <text class="hero-title">今天认识这 5 个词</text>
+    <text class="hero-subtitle">轻轻点一下，记下你已经认识的单词。</text>
+    <text class="hero-count">已认识 {{completed}} / {{total}}</text>
+  </view>
+
+  <view class="word-list">
+    <view class="word-card" wx:for="{{words}}" wx:key="id">
+      <view class="word-copy">
+        <text class="word-english">{{item.english}}</text>
+        <text class="word-chinese">{{item.chinese}}</text>
+      </view>
+      <button class="mark-button {{item.learned ? 'is-learned' : ''}}" data-word-id="{{item.id}}" bindtap="markLearned" disabled="{{item.learned}}">
+        {{item.learned ? '已认识' : '我认识了'}}
+      </button>
+    </view>
+  </view>
+
+  <button class="back-button" bindtap="backHome">返回树屋</button>
+</view>

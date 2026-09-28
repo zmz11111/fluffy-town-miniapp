@@ -1,0 +1,57 @@
+<!-- 首页以原生样式绘制占位场景，不使用外部美术素材。 -->
+<view class="home">
+  <view class="welcome">
+    <text class="eyebrow">欢迎来到毛茸茸小镇</text>
+    <text class="headline">团团的树屋</text>
+    <text class="intro">和团团一起，认识今天的新单词。</text>
+  </view>
+
+  <view class="scene" aria-label="毛茸茸树屋占位场景">
+    <view class="sun"></view>
+    <view class="cloud cloud-left"></view>
+    <view class="cloud cloud-right"></view>
+    <view class="hill hill-back"></view>
+    <view class="hill hill-front"></view>
+    <view class="tree-trunk"></view>
+    <view class="tree-canopy canopy-left"></view>
+    <view class="tree-canopy canopy-right"></view>
+    <view class="tree-canopy canopy-top"></view>
+    <view class="tree-house">
+      <view class="house-roof"></view>
+      <view class="house-window"></view>
+      <view class="house-door"></view>
+    </view>
+    <view class="scene-label">毛茸茸树屋 · 场景占位</view>
+  </view>
+
+  <view class="pet-card">
+    <view class="pet-copy">
+      <text class="section-label">你的伙伴</text>
+      <text class="pet-name">{{pet.name}}</text>
+      <text class="pet-intro">{{pet.introduction}}</text>
+      <text class="interaction-count">和团团打个招呼 · 累计互动 {{interactionCount}} 次</text>
+    </view>
+    <button class="pet-button" bindtap="tapPet" aria-label="点击和团团互动">
+      <view class="pet-ear ear-left"></view>
+      <view class="pet-ear ear-right"></view>
+      <view class="pet-face">
+        <view class="pet-eye eye-left"></view>
+        <view class="pet-eye eye-right"></view>
+        <view class="pet-nose"></view>
+      </view>
+    </button>
+  </view>
+
+  <view class="task-card">
+    <view class="task-heading">
+      <text class="section-label">今日任务</text>
+      <text class="task-count">{{completed}} / {{total}}</text>
+    </view>
+    <text class="task-title">认识树屋里的 5 个英语单词</text>
+    <view class="progress-track"><view class="progress-fill" style="width: {{progressPercent}}%;"></view></view>
+    <text class="task-hint" wx:if="{{completed < total}}">每学会一个词，就离小小冒险更近一步。</text>
+    <text class="task-hint" wx:else>今天的示例单词都认识啦！</text>
+  </view>
+
+  <button class="start-button" bindtap="startAdventure">开始冒险</button>
+</view>
