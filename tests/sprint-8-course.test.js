@@ -13,6 +13,14 @@ global.wx = {
     memoryStorage[key] = JSON.parse(JSON.stringify(value));
   },
   setNavigationBarTitle() {},
+  createInnerAudioContext() {
+    return {
+      src: '',
+      onError() {},
+      stop() {},
+      play() {}
+    };
+  },
   navigateTo(options) { navigationRequests.push(options.url); },
   reLaunch() {}
 };
@@ -22,10 +30,10 @@ const { CHAPTER_001 } = require('../miniprogram/story/chapters/chapter_001');
 const { CHAPTER_UNIT1 } = require('../miniprogram/story/chapters/chapter_unit1');
 const { CHAPTER_WELCOME } = require('../miniprogram/story/chapters/chapter_welcome');
 const story = require('../miniprogram/story/story-manager');
-const { getLearningState, getNextCourseEntry } = require('../miniprogram/english/learning-state');
+const { getLearningState, getNextCourseEntry, completeWelcomeSession } = require('../miniprogram/english/learning-state');
 const { getGameState } = require('../miniprogram/game/state');
 const welcomeLearning = require('../miniprogram/english/welcome-learning');
-const { WELCOME_PREVIEW, WELCOME_DAILY_PLAN } = require('../miniprogram/curriculum/welcome/preview-content');
+const { WELCOME_PREVIEW, WELCOME_SESSIONS, WELCOME_DAILY_PLAN } = require('../miniprogram/curriculum/welcome/preview-content');
 const curriculum = require('../miniprogram/curriculum/curriculum-manager');
 const { WELCOME_UNIT_ID, UNIT1_UNIT_ID } = require('../miniprogram/english/learning-state-model');
 
@@ -33,6 +41,13 @@ function resetStorage() {
   Object.keys(memoryStorage).forEach((key) => { delete memoryStorage[key]; });
   memoryStorage[STORAGE_KEY] = createInitialState();
   navigationRequests.length = 0;
+}
+
+// 只有七节任务登记齐全部五项目标后，正式课程规则才允许进入 Unit 1。
+function completeWelcomeForTest() {
+  WELCOME_SESSIONS.forEach((session) => {
+    completeWelcomeSession(session.taskId, session.objectiveIdsToComplete || []);
+  });
 }
 
 function loadPageDefinition(pagePath) {
@@ -96,8 +111,8 @@ test('无参数故事入口按 Welcome → Unit 1 选择课程章节', () => {
 
   page.onLoad({});
   assert.equal(page.chapterId, CHAPTER_WELCOME.id, '首次无参数入口必须进入 Welcome');
-  const { updateState } = require('../miniprogram/storage/local');
-  updateState((draft) => { draft.learningState.completedUnitIds.push(WELCOME_UNIT_ID); });
+  completeWelcomeForTest();
+  assert.equal(getLearningState().completedUnitIds.includes(WELCOME_UNIT_ID), true);
   page.onLoad({});
   assert.equal(page.chapterId, CHAPTER_UNIT1.id, '完成 Welcome 后无参数入口进入 Unit 1');
   page.onLoad({ chapterId: CHAPTER_001.id });
@@ -117,11 +132,17 @@ test('米米入口和空故事页不会绕过 Welcome', () => {
   assert.equal(page.data.welcomeCompleted, false);
   page.openStory();
   assert.equal(navigationRequests.at(-1), `/pages/story/story?chapterId=${CHAPTER_WELCOME.id}`);
+  assert.equal(page.data.welcomeCompleted, false, 'Welcome 未完成前米米入口不能绕过课程门槛');
   const { updateState } = require('../miniprogram/storage/local');
+  // 旧的“完成单元”标记不能代替目标证据；先确认仍锁在 Welcome。
   updateState((draft) => { draft.learningState.completedUnitIds.push(WELCOME_UNIT_ID); });
   page.refresh();
+  assert.equal(page.data.welcomeCompleted, false, '没有 Welcome 目标证据不能绕过课程门槛');
+  completeWelcomeForTest();
+  page.refresh();
   page.openStory();
-  assert.equal(navigationRequests.at(-1), `/pages/story/story?chapterId=${CHAPTER_001.id}`);
+  assert.equal(navigationRequests.at(-1), `/pages/story/story?chapterId=${CHAPTER_001.id}`,
+    'Welcome 完成后米米页恢复既有第一章剧情入口');
 
   const gamePath = path.resolve(__dirname, '../miniprogram/pages/games/games.js');
   const gameDefinition = loadPageDefinition(gamePath);
@@ -289,10 +310,11 @@ test('课程知识页可切换 Welcome 和 Unit 1，且不写每日任务进度'
   page.onLoad({ mode: 'course-library' });
   const before = JSON.stringify(getLearningState());
   page.onShow();
-  assert.equal(page.data.knowledgeVocabulary.length, 27);
-  assert.equal(page.data.knowledgeSentences.length, 21);
+  assert.equal(page.data.knowledgeVocabulary.length, 3, 'Welcome 只展示当前已释放的词汇');
+  assert.equal(page.data.knowledgeSentences.length, 2, 'Welcome 只展示当前已释放的句型');
   page.selectKnowledgeUnit({ currentTarget: { dataset: { unitId: UNIT1_UNIT_ID } } });
-  assert.equal(page.data.knowledgeVocabulary.length, 27, '未完成 Welcome 时不开放 Unit 1 知识页');
+  assert.equal(page.data.knowledgeVocabulary.length, 3, '未完成 Welcome 时仍只展示已释放的 Welcome 内容');
+  assert.equal(page.data.knowledgeUnitId, WELCOME_UNIT_ID, '未完成 Welcome 时不能切换到 Unit 1 知识页');
   assert.equal(JSON.stringify(getLearningState()), before, '查看或切换知识展示不改学习任务状态');
 
   const homePath = path.resolve(__dirname, '../miniprogram/pages/home/home.js');
@@ -307,9 +329,12 @@ test('课程知识页可切换 Welcome 和 Unit 1，且不写每日任务进度'
   assert.equal(navigationRequests[navigationRequests.length - 1], '/pages/learn/learn?mode=course-library');
 
   const { updateState } = require('../miniprogram/storage/local');
-  updateState((draft) => { draft.learningState.completedUnitIds.push(WELCOME_UNIT_ID); });
-  const afterUnlock = JSON.stringify(getLearningState());
+  completeWelcomeForTest();
+  page.onShow();
+  assert.equal(page.data.knowledgeVocabulary.length, 27, 'Welcome 目标完成后开放完整 Welcome 知识库');
+  assert.equal(page.data.knowledgeSentences.length, 19, 'Welcome 全量课程知识包包含19条已发布句型');
   page.selectKnowledgeUnit({ currentTarget: { dataset: { unitId: UNIT1_UNIT_ID } } });
+  const afterUnlock = JSON.stringify(getLearningState());
   assert.equal(page.data.knowledgeVocabulary.length, 40);
   assert.equal(page.data.knowledgeSentences.length, 14);
   assert.equal(JSON.stringify(getLearningState()), afterUnlock);
