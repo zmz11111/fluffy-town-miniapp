@@ -6,8 +6,10 @@
  * @typedef {{itemIds: string[], furnitureIds: string[], clothingIds: string[]}} Inventory
  * @typedef {{claimedRewardIds: string[], achievementIds: string[]}} Rewards
  * @typedef {{gameId: string, roundIndex: number, correctCount: number, wrongAttempts: number}|null} CurrentGame
- * @typedef {{tuantuan: {emotion: string, lastStorySceneId: string|null}, mimi: {unlocked: boolean, friendship: number, storyProgress: string, dailyGreetingDate?: string|null, dailyGreetingCount?: number, lastGreetedAt?: string|null}}} Companions
- * @typedef {{playerLevel: number, stars: number, unlockedMapIds: string[], chapterProgress: Object<string, ChapterProgress>, triggeredTaskIds: string[], completedTaskIds: string[], currentStory: CurrentStory, inventory: Inventory, rewards: Rewards, currentGame: CurrentGame, companions: Companions}} GameState
+ * @typedef {{emotion: string, lastStorySceneId: string|null, lastGreetingAt?: string|null, greetingHistoryByState?: Object<string, string[]>, seenCompletedTaskIds?: string[]}} TuantuanCompanionState
+ * @typedef {{unlocked: boolean, friendship: number, storyProgress: string, dailyGreetingDate?: string|null, dailyGreetingCount?: number, lastGreetedAt?: string|null, lastGreetingAt?: string|null, greetingHistoryByState?: Object<string, string[]>, seenCompletedTaskIds?: string[]}} MimiCompanionState
+ * @typedef {{tuantuan: TuantuanCompanionState, mimi: MimiCompanionState}} Companions
+ * @typedef {{playerLevel: number, stars: number, studyDayKeys?: string[], unlockedMapIds: string[], chapterProgress: Object<string, ChapterProgress>, triggeredTaskIds: string[], completedTaskIds: string[], currentStory: CurrentStory, inventory: Inventory, rewards: Rewards, currentGame: CurrentGame, companions: Companions}} GameState
  */
 
 // 创建独立的初始状态，避免多个档案共享可变数组或对象。
@@ -15,6 +17,7 @@ function createInitialGameState() {
   return {
     playerLevel: 1,
     stars: 0,
+    studyDayKeys: [],
     unlockedMapIds: [],
     chapterProgress: {},
     triggeredTaskIds: [],
@@ -31,14 +34,23 @@ function createInitialGameState() {
     },
     currentGame: null,
     companions: {
-      tuantuan: { emotion: 'curious', lastStorySceneId: null },
+      tuantuan: {
+        emotion: 'curious',
+        lastStorySceneId: null,
+        lastGreetingAt: null,
+        greetingHistoryByState: {},
+        seenCompletedTaskIds: []
+      },
       mimi: {
         unlocked: false,
         friendship: 0,
         storyProgress: 'not_met',
         dailyGreetingDate: null,
         dailyGreetingCount: 0,
-        lastGreetedAt: null
+        lastGreetedAt: null,
+        lastGreetingAt: null,
+        greetingHistoryByState: {},
+        seenCompletedTaskIds: []
       }
     }
   };
@@ -52,6 +64,19 @@ function isValidContentId(id) {
 // 数组必须只包含不重复的内容 ID。
 function isValidIdList(ids) {
   return Array.isArray(ids) && ids.every(isValidContentId) && new Set(ids).size === ids.length;
+}
+
+function isValidDateKeyList(keys) {
+  return Array.isArray(keys) && keys.every((key) => typeof key === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(key)) &&
+    new Set(keys).size === keys.length;
+}
+
+function isValidGreetingHistory(history) {
+  const allowedStates = ['firstMeeting', 'ordinary', 'continuousLearning', 'taskCompleted', 'longAbsence'];
+  return history === undefined || Boolean(
+    history && typeof history === 'object' && !Array.isArray(history) &&
+    Object.keys(history).every((state) => allowedStates.indexOf(state) !== -1 && isValidIdList(history[state]))
+  );
 }
 
 // Sprint 1.5 的五个基础字段用于检查旧版档案并安全迁移。
@@ -104,13 +129,20 @@ function isValidGameState(value) {
   }
   const tuantuan = value.companions.tuantuan;
   const mimi = value.companions.mimi;
-  if (['curious', 'happy', 'worried', 'excited'].indexOf(tuantuan.emotion) === -1 ||
+  if ((value.studyDayKeys !== undefined && !isValidDateKeyList(value.studyDayKeys)) ||
+      ['curious', 'happy', 'worried', 'excited'].indexOf(tuantuan.emotion) === -1 ||
       (tuantuan.lastStorySceneId !== null && !isValidContentId(tuantuan.lastStorySceneId)) ||
+      (tuantuan.lastGreetingAt !== undefined && tuantuan.lastGreetingAt !== null && typeof tuantuan.lastGreetingAt !== 'string') ||
+      !isValidGreetingHistory(tuantuan.greetingHistoryByState) ||
+      (tuantuan.seenCompletedTaskIds !== undefined && !isValidIdList(tuantuan.seenCompletedTaskIds)) ||
       typeof mimi.unlocked !== 'boolean' ||
       !Number.isInteger(mimi.friendship) || mimi.friendship < 0 ||
       (mimi.dailyGreetingDate !== undefined && mimi.dailyGreetingDate !== null && typeof mimi.dailyGreetingDate !== 'string') ||
       (mimi.dailyGreetingCount !== undefined && (!Number.isInteger(mimi.dailyGreetingCount) || mimi.dailyGreetingCount < 0)) ||
       (mimi.lastGreetedAt !== undefined && mimi.lastGreetedAt !== null && typeof mimi.lastGreetedAt !== 'string') ||
+      (mimi.lastGreetingAt !== undefined && mimi.lastGreetingAt !== null && typeof mimi.lastGreetingAt !== 'string') ||
+      !isValidGreetingHistory(mimi.greetingHistoryByState) ||
+      (mimi.seenCompletedTaskIds !== undefined && !isValidIdList(mimi.seenCompletedTaskIds)) ||
       ['not_met', 'met', 'joined'].indexOf(mimi.storyProgress) === -1) {
     return false;
   }

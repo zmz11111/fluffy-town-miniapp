@@ -1,4 +1,5 @@
 const { loadState, updateState } = require('../storage/local');
+const { recordStudyDayInState } = require('../game/state');
 const {
   COURSE_ID,
   WELCOME_UNIT_ID,
@@ -166,6 +167,7 @@ function completeTask(taskId) {
   const now = new Date().toISOString();
   return updateState((draft) => {
     applyTaskCompleted(draft.learningState, taskId, now);
+    recordStudyDayInState(draft.gameState, now);
   }).learningState;
 }
 
@@ -183,6 +185,7 @@ function completeWelcomeSession(taskId, objectiveIds) {
       learning.objectiveProgressById = {};
     }
     applyTaskCompleted(learning, taskId, now);
+    recordStudyDayInState(draft.gameState, now);
     if (draft.gameState.completedTaskIds.indexOf(taskId) === -1) {
       draft.gameState.completedTaskIds.push(taskId);
     }

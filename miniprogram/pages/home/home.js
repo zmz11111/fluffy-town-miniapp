@@ -2,10 +2,10 @@ const { TUANTUAN } = require('../../pets/pet');
 const { interactWithTuantuan, getDailyInteractionStatus } = require('../../pets/interaction');
 const { getTuantuanFeedback } = require('../../pets/companion-feedback');
 const { getTuantuanVisual, TREEHOUSE_BACKGROUND } = require('../../assets/visuals');
+const { getCompanionGreeting, recordCompanionGreeting } = require('../../pets/companion-greetings');
 const { getGameState } = require('../../game/state');
 const { UNIT1_PREVIEW } = require('../../curriculum/unit1/preview-content');
 const { WELCOME_PREVIEW } = require('../../curriculum/welcome/preview-content');
-const { getTuantuanDialogue } = require('../../pets/tuantuan-dialogues');
 const { needsWelcome, markWelcomeSeen } = require('../../guidance/welcome');
 const { getNextCourseEntry, isWelcomeCompleted, getLearningState } = require('../../english/learning-state');
 const { getWelcomeProgress } = require('../../english/welcome-learning');
@@ -47,6 +47,8 @@ Page({
     const welcomeFirstSessionDone = Boolean(welcomeFirstSession && welcomeFirstSession.status === 'completed');
     const interactionStatus = getDailyInteractionStatus();
     const companionStatus = getTuantuanFeedback(Object.assign({ interactionAccepted: false }, interactionStatus));
+    const companionGreeting = getCompanionGreeting('tuantuan');
+    this.pendingTuantuanGreeting = companionGreeting;
     const nextEntry = getNextCourseEntry();
     const currentChapterId = gameState.currentStory
       ? gameState.currentStory.chapterId : nextEntry.chapterId;
@@ -89,14 +91,7 @@ Page({
       progressPercent: Math.round((completed / total) * 100),
       tuantuanVisual: getTuantuanVisual('idle'),
       showWelcome,
-      companionMessage: showWelcome
-        ? '嗨，我是团团！我们先打个招呼，再认识新朋友吧。'
-        : currentIsWelcome
-          ? welcomeCompleted ? 'Welcome 的内容都认识啦！团团陪你去 Unit 1 看看。'
-            : `嗨，我是团团！我们已经一起完成 ${welcomeProgress.completedSessions} 节 Welcome。`
-          : chapterCompleted
-          ? '今天我们一起听懂了问候，也放好了介绍卡。'
-          : '我正准备一张朋友卡，要和我一起看看吗？',
+      companionMessage: companionGreeting.text,
       taskGuide,
       storyStatus,
       nextStep,
@@ -104,9 +99,9 @@ Page({
       taskTitle: currentIsWelcome
         ? welcomeFirstSessionDone ? `和团团继续 Welcome · 第 ${welcomeProgress.currentSessionIndex} 节` : '和团团一起完成 Welcome 初次见面'
         : '和团团一起认识树屋的新朋友',
-      startLabel: gameState.currentStory ? '继续当前冒险'
+      startLabel: companionGreeting.actionLabel || (gameState.currentStory ? '继续当前冒险'
         : welcomeCompleted ? '开始 Unit 1 学习冒险'
-          : welcomeFirstSessionDone ? `继续 Welcome · 第 ${welcomeProgress.currentSessionIndex} 节` : '开始 Welcome 初次见面',
+          : welcomeFirstSessionDone ? `继续 Welcome · 第 ${welcomeProgress.currentSessionIndex} 节` : '开始 Welcome 初次见面'),
       interactionsRemaining: companionStatus.remaining,
       maxDailyInteractions: companionStatus.maximum,
       interactionRecoveryHint: companionStatus.recoveryHint,
@@ -119,10 +114,7 @@ Page({
   // 欢迎卡只出现一次；即使存储暂时不可用，也允许继续体验。
   finishWelcome() {
     markWelcomeSeen();
-    this.setData({
-      showWelcome: false,
-      companionMessage: '很高兴认识你！我们可以一起开始这段小冒险。'
-    });
+    this.setData({ showWelcome: false });
   },
 
   // 页面离开后清除短暂的表情恢复计时，避免改动已退出页面。
@@ -150,9 +142,10 @@ Page({
     this.setData({ characterImageFailed: true });
   },
 
-  // 每日互动上限和轻点冷却由角色模块管理，页面按首次或后续互动展示不同反馈。
+  // 互动次数由角色模块管理；动态对白给出伙伴回应，首次当日互动保留开心表情。
   tapPet() {
     try {
+      const greeting = this.pendingTuantuanGreeting || getCompanionGreeting('tuantuan');
       const interaction = interactWithTuantuan();
       const feedback = getTuantuanFeedback(interaction);
       if (!interaction.interactionAccepted) {
@@ -165,13 +158,13 @@ Page({
         });
         return;
       }
+      recordCompanionGreeting(greeting);
+      this.pendingTuantuanGreeting = null;
       this.clearVisualTimer();
-      const isWelcome = this.data.taskTitle.indexOf('Welcome') !== -1;
       const firstToday = interaction.feedbackLevel === 'high';
       this.setData({
-        companionMessage: firstToday
-          ? isWelcome ? `${feedback.message} ${feedback.courseHint}` : getTuantuanDialogue('unit1Greeting').text
-          : feedback.message,
+        companionMessage: greeting.text,
+        startLabel: greeting.actionLabel,
         tuantuanVisual: firstToday ? getTuantuanVisual('happy') : getTuantuanVisual('idle'),
         characterImageFailed: false,
         interactionsRemaining: feedback.remaining,

@@ -12,12 +12,14 @@
     <view class="name">{{mimi.name}}</view>
     <view class="description">橘色小猫 · 好奇的侦探伙伴</view>
     <view wx:if="{{mimi.unlocked}}">
+      <view class="mimi-greeting">{{mimiGreetingLine}}</view>
       <view class="detail">已加入 · 友谊 {{mimi.friendship}}</view>
       <view class="detail">今天还可以打招呼 {{mimi.greetingRemaining}} / {{mimi.dailyGreetingLimit}} 次</view>
       <view class="greeting-recovery">{{mimi.greetingRecoveryHint}}</view>
       <button class="action" bindtap="greet" disabled="{{mimi.greetingRemaining < 1}}">
         {{mimi.greetingRemaining < 1 ? '明天再来找米米' : '和米米打招呼'}}
       </button>
+      <button class="action companion-action" bindtap="openStory">{{mimiActionLabel || '和米米继续探索'}}</button>
     </view>
     <view wx:else>
       <view class="detail">在第一章故事中相遇</view>

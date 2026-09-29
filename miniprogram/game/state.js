@@ -51,11 +51,35 @@ function unlockMap(mapId) {
 
 function completeTask(taskId) {
   requireId(taskId);
+  const now = new Date().toISOString();
   return updateGameState((draft) => {
     if (draft.completedTaskIds.indexOf(taskId) === -1) {
       draft.completedTaskIds.push(taskId);
     }
+    recordStudyDayInState(draft, now);
   });
+}
+
+// 日期格式兼容较旧的微信小程序运行环境。
+function formatDatePart(value) {
+  return value < 10 ? `0${value}` : String(value);
+}
+
+// 仅在任务实际完成时记录学习日期，供伙伴连续学习问候使用。
+function recordStudyDayInState(gameState, timestamp) {
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error('学习日期无效');
+  }
+  const month = formatDatePart(date.getMonth() + 1);
+  const day = formatDatePart(date.getDate());
+  const dateKey = `${date.getFullYear()}-${month}-${day}`;
+  const studyDayKeys = Array.isArray(gameState.studyDayKeys) ? gameState.studyDayKeys.slice() : [];
+  if (studyDayKeys.indexOf(dateKey) === -1) {
+    studyDayKeys.push(dateKey);
+  }
+  gameState.studyDayKeys = studyDayKeys.sort().slice(-30);
+  return gameState.studyDayKeys;
 }
 
 // 章节只保存进度事实；故事节点内容由独立剧情数据模块提供。
@@ -81,5 +105,6 @@ module.exports = {
   setStars,
   unlockMap,
   setChapterProgress,
-  completeTask
+  completeTask,
+  recordStudyDayInState
 };
