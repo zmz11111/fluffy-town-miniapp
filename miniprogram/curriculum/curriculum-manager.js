@@ -4,14 +4,15 @@ const { DEMO_UNIT_1 } = require('./units/demo-grade3-unit1');
 const { DEMO_VOCABULARY } = require('./vocabulary/demo-grade3-unit1');
 const { DEMO_SENTENCES } = require('./sentences/demo-grade3-unit1');
 const { WELCOME_UNIT_ID, UNIT1_UNIT_ID } = require('../english/learning-state-model');
-const WELCOME_UNIT_INFO = require('./welcome/unit-info.json');
-const WELCOME_VOCABULARY = require('./welcome/vocabulary.json');
-const WELCOME_SENTENCES = require('./welcome/sentences.json');
-const WELCOME_OBJECTIVES = require('./welcome/learning-objectives.json');
-const UNIT1_UNIT_INFO = require('./unit1/unit-info.json');
-const UNIT1_VOCABULARY = require('./unit1/vocabulary.json');
-const UNIT1_SENTENCES = require('./unit1/sentences.json');
-const UNIT1_OBJECTIVES = require('./unit1/learning-objectives.json');
+// 微信小程序模块加载器只加载 JavaScript；课程 JSON 的运行时镜像由脚本同步生成。
+const WELCOME_UNIT_INFO = require('./welcome/unit-info.runtime');
+const WELCOME_VOCABULARY = require('./welcome/vocabulary.runtime');
+const WELCOME_SENTENCES = require('./welcome/sentences.runtime');
+const WELCOME_OBJECTIVES = require('./welcome/learning-objectives.runtime');
+const UNIT1_UNIT_INFO = require('./unit1/unit-info.runtime');
+const UNIT1_VOCABULARY = require('./unit1/vocabulary.runtime');
+const UNIT1_SENTENCES = require('./unit1/sentences.runtime');
+const UNIT1_OBJECTIVES = require('./unit1/learning-objectives.runtime');
 
 // 内容目录只收录本阶段的原创模拟教材；后续教材须先核实授权与审校状态。
 const catalog = {

@@ -1,0 +1,84 @@
+// 由 unit-info.json 同步生成，字段和值保持一致。
+module.exports = {
+  "schemaVersion": "0.1-draft",
+  "id": "wj-g3-v1:welcome",
+  "textbookId": "wj-g3-v1",
+  "grade": 3,
+  "volume": "上册",
+  "number": 0,
+  "title": "Welcome to school",
+  "displayTitle": "Welcome · 初次见面",
+  "topic": "问候、自我介绍与课堂学习指令",
+  "courseOrder": 0,
+  "previousUnitId": null,
+  "nextUnitId": "wj-g3-v1:unit-1",
+  "chapterId": "wj-g3-v1:welcome:chapter",
+  "dailyPlanId": "wj-g3-v1:welcome:daily-lesson-1",
+  "studentBookPdfPages": {
+    "start": 7,
+    "end": 10
+  },
+  "teacherBookPdfPages": {
+    "start": 5,
+    "end": 8
+  },
+  "wordListPdfPage": 1,
+  "reviewStatus": "pending_human_review",
+  "releaseStatus": "development_preview_only",
+  "contentCompleteness": {
+    "vocabulary": "词表 Welcome 页27行已逐行核对，be已补入，a(an)保留为一条；释义与分组待教学审核",
+    "sentences": "学生用书PDF第7至10页（印刷页2至5）的问候、自我介绍、告别、课堂指令及活动标题已逐项登记；教学审核待完成",
+    "objectives": "教师用书PDF第5页（印刷页1）的3项正式目标已录入；自我介绍和道别子目标另作内容映射；教学审核待完成"
+  },
+  "sourceReferences": [
+    {
+      "documentId": "student-book",
+      "sourceFile": "英语 三年级上册 外研 (主编孙有中) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "pdfPage": 7,
+      "printedPage": 2,
+      "locator": "Welcome：问候、姓名问答、自我介绍与告别",
+      "sourcePositionCheck": "verified_by_visual_pdf"
+    },
+    {
+      "documentId": "student-book",
+      "sourceFile": "英语 三年级上册 外研 (主编孙有中) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "pdfPage": 8,
+      "printedPage": 3,
+      "locator": "Welcome：早晨问候与课堂操作指令",
+      "sourcePositionCheck": "verified_by_visual_pdf"
+    },
+    {
+      "documentId": "student-book",
+      "sourceFile": "英语 三年级上册 外研 (主编孙有中) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "pdfPage": 9,
+      "printedPage": 4,
+      "locator": "Welcome 活动4：Meet your new friends.",
+      "sourcePositionCheck": "verified_by_visual_pdf"
+    },
+    {
+      "documentId": "student-book",
+      "sourceFile": "英语 三年级上册 外研 (主编孙有中) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "pdfPage": 10,
+      "printedPage": 5,
+      "locator": "Welcome 活动5：Listen, point and say（字母活动）",
+      "sourcePositionCheck": "verified_by_visual_pdf"
+    },
+    {
+      "documentId": "teacher-book",
+      "sourceFile": "新标准外研版三上教师用书.pdf",
+      "pdfPage": 5,
+      "printedPage": 1,
+      "locator": "Welcome to school：教学目标三项与活动设计",
+      "sourcePositionCheck": "verified_by_visual_pdf"
+    },
+    {
+      "documentId": "word-list",
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "pdfPage": 1,
+      "printedPage": null,
+      "locator": "Welcome 词表第1至14行，左右栏共27条",
+      "sourcePositionCheck": "verified_by_visual_pdf"
+    }
+  ],
+  "editorialNote": "Welcome 已作为正式教材单元接入。词形、原句、教师用书三项目标及对应页码已对照原 PDF 视觉核验；中文释义、目标映射和最终教学适切性仍待人工审核，数据仅作开发预览。"
+};

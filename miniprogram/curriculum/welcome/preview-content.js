@@ -5,8 +5,8 @@ const {
   WELCOME_TASK_ID
 } = require('../../english/learning-state-model');
 const { getUnitKnowledgePackage } = require('../curriculum-manager');
-const WELCOME_UNIT_INFO = require('./unit-info.json');
-const WELCOME_DAILY_PLAN = require('./daily-plan.json');
+const WELCOME_UNIT_INFO = require('./unit-info.runtime');
+const WELCOME_DAILY_PLAN = require('./daily-plan.runtime');
 
 const WELCOME_KNOWLEDGE = getUnitKnowledgePackage(WELCOME_UNIT_ID);
 const VOCABULARY_BY_ID = Object.create(null);
