@@ -2,6 +2,8 @@ const { CHAPTER_001 } = require('../../story/chapters/chapter_001');
 const { startChapter, getCurrentStory, advanceStory } = require('../../story/story-manager');
 const { getGameState } = require('../../game/state');
 const { getStoryAvatar, TREEHOUSE_BACKGROUND } = require('../../assets/visuals');
+const { TASK_ID, REWARD_ID } = require('../../games/find-cookie/data');
+const { getRewardDefinition } = require('../../reward/reward-manager');
 
 Page({
   data: {
@@ -13,6 +15,11 @@ Page({
     dialogue: '',
     completed: false,
     stars: 0,
+    taskStatus: '',
+    nextStep: '',
+    gameRewardStars: 0,
+    chapterRewardStars: 0,
+    mimiUnlocked: false,
     notice: '',
     sceneSrc: TREEHOUSE_BACKGROUND,
     sceneImageFailed: false,
@@ -40,9 +47,22 @@ Page({
     const avatar = current
       ? getStoryAvatar(current.dialogue.speakerId, state.companions.tuantuan.emotion)
       : null;
+    // 任务与奖励只读取既有状态；页面不发放奖励，也不改动剧情游标。
+    const taskCompleted = state.completedTaskIds.indexOf(TASK_ID) !== -1;
+    const gameReward = getRewardDefinition(REWARD_ID);
+    const chapterReward = getRewardDefinition('demo-grade-3:reward-chapter-001-stars');
+    const claimed = state.rewards.claimedRewardIds;
     this.setData({
       completed: Boolean(completed),
       stars: state.stars,
+      taskStatus: taskCompleted ? '线索任务：已完成' : '线索任务：待探索',
+      nextStep: completed ? '下一步：去伙伴页看看米米。'
+        : current && current.scene.requiredTaskId && !taskCompleted
+          ? '下一步：读完对白，一起去听音找图。'
+          : '下一步：点“继续故事”，看看会发现什么。',
+      gameRewardStars: gameReward && claimed.indexOf(REWARD_ID) !== -1 ? gameReward.amount : 0,
+      chapterRewardStars: chapterReward && claimed.indexOf(chapterReward.id) !== -1 ? chapterReward.amount : 0,
+      mimiUnlocked: state.companions.mimi.unlocked,
       sceneTitle: current ? current.scene.title : '',
       sceneNumber: current ? current.sceneIndex : CHAPTER_001.sceneIds.length,
       speaker: current ? ({ tuantuan: '团团', mimi: '米米', narrator: '故事' }[current.dialogue.speakerId] || '伙伴') : '',
@@ -86,4 +106,3 @@ Page({
     wx.reLaunch({ url: '/pages/home/home' });
   }
 });
-

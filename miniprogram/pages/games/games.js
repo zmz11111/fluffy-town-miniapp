@@ -1,4 +1,7 @@
 const { startGame, chooseImage } = require('../../games/find-cookie/game-manager');
+const { getGameState } = require('../../game/state');
+const { REWARD_ID, TASK_ID } = require('../../games/find-cookie/data');
+const { getRewardDefinition } = require('../../reward/reward-manager');
 
 Page({
   data: {
@@ -9,7 +12,11 @@ Page({
     audioSrc: '',
     fallbackWord: '',
     audioFailed: false,
-    message: '听一听，找出对应的图片。'
+    message: '听一听，找出对应的图片。',
+    foundCount: 0,
+    taskStatus: '',
+    nextStep: '',
+    rewardStars: 0
   },
 
   onLoad() {
@@ -35,6 +42,12 @@ Page({
   },
 
   showRound(view) {
+    // 已完成数量与奖励只从管理器状态推导，页面不直接保存游戏数据。
+    const state = getGameState();
+    const completed = state.completedTaskIds.indexOf(TASK_ID) !== -1;
+    const reward = getRewardDefinition(REWARD_ID);
+    const rewardStars = reward && state.rewards.claimedRewardIds.indexOf(REWARD_ID) !== -1
+      ? reward.amount : 0;
     this.setData({
       status: view.status,
       roundNumber: view.roundNumber || 0,
@@ -43,7 +56,11 @@ Page({
       audioSrc: view.audioSrc || '',
       fallbackWord: view.fallbackWord || '',
       audioFailed: false,
-      message: view.status === 'completed' ? '线索都找到了！回去告诉米米吧。' : '听一听，找出对应的图片。'
+      foundCount: completed ? view.total : Math.max(0, (view.roundNumber || 1) - 1),
+      taskStatus: completed ? '线索任务：已完成' : '线索任务：进行中',
+      nextStep: completed ? '下一步：回到故事，告诉米米新发现。' : '下一步：听单词，点对应的图片。',
+      rewardStars,
+      message: completed ? '团团：我们一起找齐线索啦！' : '团团：听一听，我们一起找线索。'
     });
   },
 
@@ -61,7 +78,11 @@ Page({
     try {
       const result = chooseImage(event.currentTarget.dataset.wordId);
       this.showRound(startGame());
-      this.setData({ message: result.message });
+      this.setData({ message: result.completed
+        ? '团团：我们一起找齐线索啦！米米一定很想听。'
+        : result.correct
+          ? '团团：好发现！我们再找下一条线索吧。'
+          : '团团：没关系，再听一遍，我们一起找。' });
       if (result.correct && !result.completed) {
         this.playWord();
       }

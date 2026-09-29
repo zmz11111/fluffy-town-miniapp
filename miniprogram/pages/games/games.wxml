@@ -3,6 +3,7 @@
   <view class="header">寻找星星饼干的线索</view>
   <view wx:if="{{status === 'playing'}}" class="game-card">
     <view class="round">第 {{roundNumber}} / {{total}} 条线索</view>
+    <view class="task-status">{{taskStatus}} · 已找到 {{foundCount}} / {{total}}</view>
     <view class="instruction">听一听，找出对应的图片</view>
     <button class="listen" bindtap="playWord">🔊 播放单词</button>
     <view wx:if="{{audioFailed}}" class="fallback">{{fallbackWord}}</view>
@@ -15,6 +16,7 @@
   <view wx:elif="{{status === 'completed'}}" class="game-card complete">
     <view class="finish-icon">⭐</view>
     <view class="instruction">三条线索都找到了！</view>
+    <view class="reward-detail">获得 {{rewardStars}} 颗星星 ⭐</view>
     <button class="listen" bindtap="backStory">继续故事</button>
   </view>
   <view wx:else class="game-card">
@@ -22,4 +24,5 @@
     <button class="listen" bindtap="openStory">去故事里看看</button>
   </view>
   <view class="message">{{message}}</view>
+  <view wx:if="{{status !== 'locked'}}" class="next-step">{{nextStep}}</view>
 </view>

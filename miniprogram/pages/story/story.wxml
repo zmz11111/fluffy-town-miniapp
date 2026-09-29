@@ -16,15 +16,20 @@
       <view class="speaker">{{speaker}}</view>
     </view>
     <view class="dialogue">{{dialogue}}</view>
+    <view class="task-status">{{taskStatus}}</view>
+    <view class="next-step">{{nextStep}}</view>
     <button class="primary" bindtap="next">继续故事</button>
   </view>
   <view wx:else class="story-card finish">
     <view class="finish-icon">⭐</view>
     <view class="scene-title">星星饼干找到了！</view>
-    <view class="dialogue">米米加入了冒险。现在有 {{stars}} 颗星星啦！</view>
+    <view class="dialogue">团团：我们一起找到了星星饼干！真开心！</view>
+    <view class="reward-detail">本次冒险：线索 +{{gameRewardStars}} ⭐ · 章节 +{{chapterRewardStars}} ⭐</view>
+    <view wx:if="{{mimiUnlocked}}" class="reward-detail">新伙伴：米米加入啦！</view>
+    <view class="reward-total">现在共有 {{stars}} 颗星星</view>
+    <view class="next-step">{{nextStep}}</view>
     <button class="primary" bindtap="openFriends">去看看米米</button>
     <button class="secondary" bindtap="backHome">回树屋</button>
   </view>
   <view wx:if="{{notice}}" class="notice">{{notice}}</view>
 </view>
-

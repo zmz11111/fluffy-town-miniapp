@@ -6,6 +6,12 @@
     <text class="intro">和团团一起，寻找消失的星星饼干。</text>
   </view>
 
+  <view wx:if="{{showWelcome}}" class="welcome-card">
+    <text class="section-label">团团来打招呼</text>
+    <text class="welcome-message">{{companionMessage}}</text>
+    <button class="welcome-action" bindtap="finishWelcome">好呀，一起看看</button>
+  </view>
+
   <view class="scene" aria-label="毛茸茸树屋背景">
     <view class="sun"></view>
     <view class="cloud cloud-left"></view>
@@ -30,6 +36,7 @@
       <text class="section-label">你的伙伴</text>
       <text class="pet-name">{{pet.name}}</text>
       <text class="pet-intro">{{pet.introduction}}</text>
+      <text wx:if="{{!showWelcome}}" class="companion-message">团团：{{companionMessage}}</text>
       <text class="interaction-count">和团团打个招呼 · 累计互动 {{interactionCount}} 次</text>
     </view>
     <button class="pet-button" bindtap="tapPet" aria-label="点击和团团互动">
@@ -51,16 +58,18 @@
       <text class="section-label">今日任务</text>
       <text class="task-count">{{completed}} / {{total}}</text>
     </view>
-    <text class="task-title">认识树屋里的 6 个测试单词</text>
+    <text class="task-title">认识树屋里的 {{total}} 个测试单词</text>
     <view class="progress-track"><view class="progress-fill" style="width: {{progressPercent}}%;"></view></view>
-    <text class="task-hint" wx:if="{{completed < total}}">每学会一个词，就离小小冒险更近一步。</text>
-    <text class="task-hint" wx:else>今天的示例单词都认识啦！</text>
+    <text class="task-hint">{{taskGuide}}</text>
   </view>
 
+  <view class="story-guide">
+    <text class="story-status">{{storyStatus}}</text>
+    <text class="next-step">{{nextStep}}</text>
+  </view>
   <button class="start-button" bindtap="startAdventure">开始冒险</button>
   <view class="quick-links">
     <button bindtap="openFriends">伙伴</button>
     <button bindtap="openWords">单词卡</button>
   </view>
 </view>
-

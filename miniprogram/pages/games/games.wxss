@@ -11,3 +11,7 @@
 .option image { width: 100%; height: 160rpx; }
 .finish-icon { font-size: 100rpx; }
 .message { margin: 30rpx 10rpx; color: #637764; font-size: 27rpx; line-height: 1.5; }
+/* 进度与下一步提示使用简短文字，不遮挡选图按钮。 */
+.task-status { margin-top: 12rpx; color: #6d8669; font-size: 25rpx; }
+.reward-detail { margin-top: 16rpx; color: #8d6245; font-size: 29rpx; }
+.next-step { margin: 0 10rpx 24rpx; color: #53715a; font-size: 26rpx; line-height: 1.5; }

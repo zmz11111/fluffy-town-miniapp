@@ -18,4 +18,8 @@
 .finish { text-align: center; }
 .finish-icon { font-size: 100rpx; }
 .notice { margin: 26rpx; color: #a64f41; font-size: 25rpx; }
-
+/* 引导文字与奖励摘要保持短句，方便低年级孩子独立阅读。 */
+.task-status { margin-top: 16rpx; color: #6d8669; font-size: 25rpx; }
+.next-step { margin-top: 14rpx; color: #53715a; font-size: 26rpx; line-height: 1.5; }
+.reward-detail { margin-top: 12rpx; color: #8d6245; font-size: 28rpx; }
+.reward-total { margin-top: 18rpx; color: #304d3c; font-size: 27rpx; }
