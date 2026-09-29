@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "0.1-draft",
+  "id": "wj-g3-v1:unit-1",
+  "reviewStatus": "pending_human_review",
+  "releaseStatus": "not_for_runtime",
+  "textbook": {
+    "id": "wj-g3-v1",
+    "subject": "英语",
+    "grade": 3,
+    "volume": "上册",
+    "publisherSeries": "外研版新标准（三年级起点）",
+    "editionDetails": "待人工核对封面和版权页",
+    "sources": [
+      {
+        "documentId": "student-book",
+        "pdfPage": 2,
+        "printedPage": null,
+        "locator": "书名页；年级、册别及主编"
+      },
+      {
+        "documentId": "teacher-book",
+        "pdfPage": 9,
+        "printedPage": 5,
+        "locator": "Unit 1 单元整体分析标题"
+      }
+    ]
+  },
+  "position": {
+    "sequence": [
+      "Welcome",
+      "Unit 1",
+      "Unit 2",
+      "Unit 3",
+      "Unit 4",
+      "Unit 5",
+      "Unit 6",
+      "Appendices"
+    ],
+    "wordListCoverage": [
+      "Welcome",
+      "Unit 1",
+      "Unit 2",
+      "Unit 3",
+      "Unit 4",
+      "Unit 5",
+      "Unit 6"
+    ],
+    "wordListHasAppendices": false,
+    "sources": [
+      {
+        "documentId": "student-book",
+        "pdfPage": 6,
+        "printedPage": null,
+        "locator": "Contents：Welcome、Unit 1–6、Appendices"
+      },
+      {
+        "documentId": "word-list",
+        "pdfPage": 1,
+        "printedPage": null,
+        "locator": "Welcome 页标题"
+      },
+      {
+        "documentId": "word-list",
+        "pdfPage": 7,
+        "printedPage": null,
+        "locator": "Unit 6 页标题；文件末页"
+      }
+    ]
+  },
+  "unit": {
+    "number": 1,
+    "title": "Let’s be friends!",
+    "topic": "结识新朋友、介绍自己和朋友、互相帮助",
+    "difficulty": null,
+    "studentBookPrintedPages": {
+      "start": 6,
+      "end": 17
+    },
+    "studentBookPdfPages": {
+      "start": 11,
+      "end": 22
+    },
+    "teacherBookPrintedPages": {
+      "start": 5,
+      "end": 26
+    },
+    "teacherBookPdfPages": {
+      "start": 9,
+      "end": 30
+    },
+    "sections": [
+      "Get ready",
+      "Start up",
+      "In focus",
+      "Speed up",
+      "Fuel up",
+      "Hit it big",
+      "Wrap up",
+      "Let’s explore"
+    ],
+    "sources": [
+      {
+        "documentId": "student-book",
+        "pdfPage": 6,
+        "printedPage": null,
+        "locator": "Contents：Unit 1 Let’s be friends! 6；Unit 2 18"
+      },
+      {
+        "documentId": "student-book",
+        "pdfPage": 11,
+        "printedPage": 6,
+        "locator": "Unit 1 标题"
+      },
+      {
+        "documentId": "teacher-book",
+        "pdfPage": 9,
+        "printedPage": 5,
+        "locator": "单元主题和主题意义"
+      }
+    ]
+  },
+  "importScope": {
+    "included": "仅 Unit 1 的教材结构、单词表词条、句型候选和教学目标；均待人工审校",
+    "excluded": [
+      "Welcome 词条不并入 Unit 1 词汇清单",
+      "Appendices 不作为本次单词来源",
+      "现有模拟教材词条不作为真实教材证据",
+      "不导入 PDF 原件、图片、音频或教材长段课文"
+    ],
+    "prerequisiteWelcomeWords": [
+      "hello",
+      "hi",
+      "name"
+    ],
+    "notes": [
+      "Unit 1 课文仍使用 hello、hi；它们在本单词表归属 Welcome。",
+      "官方材料未给出统一的 1–5 难度级别，因此 difficulty 暂为 null。"
+    ],
+    "sources": [
+      {
+        "documentId": "word-list",
+        "pdfPage": 1,
+        "printedPage": null,
+        "locator": "Welcome 词表：hello、hi、name"
+      },
+      {
+        "documentId": "word-list",
+        "pdfPage": 2,
+        "printedPage": null,
+        "locator": "Unit 1 词表"
+      },
+      {
+        "documentId": "student-book",
+        "pdfPage": 21,
+        "printedPage": 16,
+        "locator": "Wrap up：Hello、Hi"
+      }
+    ]
+  },
+  "sourceDocuments": [
+    {
+      "id": "student-book",
+      "fileName": "英语 三年级上册 外研 (主编孙有中) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "extraction": "text-and-visual"
+    },
+    {
+      "id": "teacher-book",
+      "fileName": "新标准外研版三上教师用书.pdf",
+      "extraction": "visual-review-scanned-pages"
+    },
+    {
+      "id": "word-list",
+      "fileName": "三上外研版三起点英语【单词表】.pdf",
+      "extraction": "text-and-visual"
+    }
+  ]
+}
