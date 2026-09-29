@@ -151,7 +151,9 @@ Page({
       const result = advanceStory();
       if (result.status === 'task_required') {
         if (result.taskId === WELCOME_PREVIEW.taskId) {
-          wx.navigateTo({ url: '/pages/learn/learn?mode=welcome' });
+          wx.navigateTo({
+            url: `/pages/learn/learn?mode=welcome&taskId=${encodeURIComponent(WELCOME_PREVIEW.taskId)}`
+          });
         } else if (result.taskId === UNIT1_PREVIEW.coreTaskId) {
           wx.navigateTo({ url: '/pages/learn/learn?mode=unit1-core' });
         } else if (result.taskId === UNIT1_PREVIEW.gameTaskId) {

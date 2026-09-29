@@ -60,6 +60,8 @@ Page({
   onLoad(options) {
     this.courseLibraryMode = Boolean(options && options.mode === 'course-library');
     this.welcomeMode = Boolean(options && options.mode === 'welcome');
+    // 课程入口携带当前课次；若入口过期，学习模块仍以存档中的下一节为准。
+    this.requestedWelcomeTaskId = options && options.taskId ? options.taskId : null;
     this.unit1Mode = Boolean(options && options.mode === 'unit1-core');
     if (this.courseLibraryMode) {
       wx.setNavigationBarTitle({ title: '课程知识' });
@@ -150,7 +152,7 @@ Page({
   // Welcome 使用与现有故事任务相同的学习状态入口，离开后恢复到已保存步骤。
   refreshWelcomeTask(message) {
     try {
-      const view = startWelcomeTask();
+      const view = startWelcomeTask(this.requestedWelcomeTaskId);
       const interactionStatus = getDailyInteractionStatus();
       this.setData({
         welcomeMode: true,

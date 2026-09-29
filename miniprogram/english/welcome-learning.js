@@ -2,10 +2,19 @@ const { loadState, updateState } = require('../storage/local');
 const { getGameState } = require('../game/state');
 const { WELCOME_PREVIEW, WELCOME_SESSIONS, WELCOME_KNOWLEDGE } = require('../curriculum/welcome/preview-content');
 const {
+  COURSE_ID,
+  WELCOME_UNIT_ID,
+  WELCOME_CHAPTER_ID,
   WELCOME_TASK_ID,
   WELCOME_OBJECTIVE_IDS
 } = require('./learning-state-model');
-const { applyTaskStarted, applyTaskStep, completeWelcomeSession, getLearningState } = require('./learning-state');
+const {
+  applyTaskStarted,
+  applyTaskStep,
+  beginLearningChapter,
+  completeWelcomeSession,
+  getLearningState
+} = require('./learning-state');
 const { adjustTuantuanAffinity } = require('../pets/affinity');
 
 function copy(value) {
@@ -109,15 +118,25 @@ function getTaskView(message) {
 }
 
 // 第一天必须从故事邀请进入；后续分课由课程入口接续，可随时恢复进度。
-function startTask() {
+function startTask(requestedTaskId) {
   const state = getGameState();
-  const learning = getLearningState();
-  const session = findCurrentSession(learning);
+  let learning = getLearningState();
+  const progressSession = findCurrentSession(learning);
+  const requestedSession = WELCOME_SESSIONS.find((item) => item.taskId === requestedTaskId);
+  // 页面参数只用于校验入口课次，真实进度始终决定当前应学内容。
+  const session = requestedSession && progressSession && requestedSession.taskId === progressSession.taskId
+    ? requestedSession : progressSession;
   if (!session) {
     return getTaskView();
   }
   if (session.taskId === WELCOME_TASK_ID && state.triggeredTaskIds.indexOf(WELCOME_TASK_ID) === -1) {
     throw new Error('请先和团团开始 Welcome');
+  }
+  // 修复旧存档的课程游标漂移；只有已进入后续分课时才校准到 Welcome。
+  if (session.taskId !== WELCOME_TASK_ID &&
+      (learning.currentUnitId !== WELCOME_UNIT_ID || learning.currentChapterId !== WELCOME_CHAPTER_ID)) {
+    beginLearningChapter(COURSE_ID, WELCOME_UNIT_ID, WELCOME_CHAPTER_ID);
+    learning = getLearningState();
   }
   const progress = learning.taskProgressById[session.taskId];
   if (!progress || progress.status !== 'in_progress') {

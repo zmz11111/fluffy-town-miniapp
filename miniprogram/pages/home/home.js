@@ -206,7 +206,10 @@ Page({
     const learning = getLearningState();
     const welcomeFirstSession = learning.taskProgressById[WELCOME_PREVIEW.taskId];
     if (!isWelcomeCompleted() && welcomeFirstSession && welcomeFirstSession.status === 'completed') {
-      wx.navigateTo({ url: '/pages/learn/learn?mode=welcome' });
+      const welcomeProgress = getWelcomeProgress();
+      const taskQuery = welcomeProgress.currentTaskId
+        ? `&taskId=${encodeURIComponent(welcomeProgress.currentTaskId)}` : '';
+      wx.navigateTo({ url: `/pages/learn/learn?mode=welcome${taskQuery}` });
       return;
     }
     wx.navigateTo({ url: `/pages/story/story?chapterId=${getNextCourseEntry().chapterId}` });
