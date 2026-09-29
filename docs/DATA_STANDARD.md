@@ -25,13 +25,17 @@
 
 ## 3. 宠物与陪伴伙伴数据
 
-当前 `pets/pet.js` 中的团团资料字段为 `id`、`name`、`role`、`kind`、`introduction`，其中 `role: 'companion'` 明确团团是陪伴伙伴，不参与宠物喂养或好感度规则。现有 `petState` 仅是 Sprint 1 遗留的本地互动状态：`petId`、`interactionCount`、`mood`、`lastInteractedAt`。未来迁移到 `companionState` 时必须保留互动记录并兼容旧档案。
+当前 `pets/pet.js` 中的团团资料字段为 `id`、`name`、`role`、`kind`、`introduction`，其中 `role: 'companion'` 明确团团是陪伴伙伴，不参与宠物喂养。互动上限与学习里程碑通过 `pets/affinity.js` 的好感变化接口记录；数值只留在程序状态中，儿童界面显示关系阶段与陪伴反馈，不展示分数。
 
 米米静态资料在 `pets/mimi.js`，包含 `id`、`name`、`type`、`personality`、`role` 和初始 `friendship`、`storyProgress`；真实友谊和加入进度在 `gameState.companions.mimi`。团团的情绪与最近剧情场景也在 `companions`，对白池在 `pets/tuantuan-dialogues.js`。未来真正的可养成宠物应另建 `Pet` 与 `PetState`，避免把团团或米米误作宠物。图片和音频只能引用已授权资源。
 
 ## 4. 英语数据
 
-当前 `EnglishWord` 字段：`id`、`grade`、`courseId`、`unitId`、`english`、`chinese`、`audioSrc`、`imageSrc`、`source`。六个示例词 `hello`、`hi`、`cat`、`dog`、`cookie`、`star` 独立存于 `english/words.js`，不绑定教材。正式教材词条还需内容版本、难度、审校状态和版权来源。
+当前 `EnglishWord` 字段：`id`、`grade`、`courseId`、`unitId`、`english`、`chinese`、`phonetic`、`phoneticAccent`、`pronunciationReviewStatus`、`audioSrc`、`imageSrc`、`source`。所有课程词卡统一展示音标，并通过 `english/pronunciation.js` 点按播放本地音频；缺少已授权录音时显示温和提示，不调用未经授权的第三方朗读服务。音标候选须标记人工审校状态，发布前核对教材规定的口音与标注。
+
+六个示例词 `hello`、`hi`、`cat`、`dog`、`cookie`、`star` 独立存于 `english/words.js`，不绑定教材。正式教材词条还需内容版本、难度、审校状态和版权来源。未来 Unit 复用同一 `CurriculumWord` 字段与播放器，无需增加页面专用音频分支。
+
+教学目标定义保存在课程内容和学习状态中，`objectiveProgressById` 仅供解锁与进度判断。不得将目标名称、目标描述或目标数量放进儿童单词卡、任务选项和鼓励对白；儿童端只显示正在进行的课程、分课进度和下一步提示。家长端可另行展示经设计的学习摘要。
 
 当前 `LearningRecord` 字段：`id`、`wordId`、`courseId`、`grade`、`status`、`learnedAt`。记录通过稳定单词 ID 去重；课程进度保留在 `progress` 中。未来题目作答、复习次数或正确率须使用独立记录或明确的版本化扩展，不能把“我认识了”当作已经掌握的测验结论。默认不存储儿童原始语音。
 
@@ -66,6 +70,6 @@ PDF 导入流程只产生候选词条：抽取 → 标记来源页码 → 人工
 
 ## 7. 本地档案与迁移
 
-当前本地键为 `fluffy-town:local:v4`，根结构为 `schemaVersion: 4`、`progress`、`petState`、`learningRecords`、`gameState`。首次读取 v1/v2/v3 时迁移，保留既有学习、互动、星星等记录；旧版单幕测试章节不视为新版五幕章节完成。旧键暂不删除。若写入失败，仍展示可读取的旧进度，并在后续写入时重试。迁移前后的学习记录数量与 ID 应保持一致。
+当前本地键为 `fluffy-town:local:v5`，根结构为 `schemaVersion: 5`、`progress`、`petState`、`learningRecords`、`gameState`、`learningState`。宠物状态可选保存每日互动日期与次数、好感变化值和最近变化原因；新增字段采用默认值补齐，不清除旧档案。首次读取 v1 至 v4 时迁移，保留既有学习、互动、星星等记录；旧键暂不删除。若写入失败，仍展示可读取的旧进度，并在后续写入时重试。迁移前后的学习记录数量与 ID 应保持一致。
 
 未来家长端与云开发应通过业务接口获得经过授权的摘要，不能让页面或云函数直接假设本地键名、内部字段或未发布的剧情结构长期不变。

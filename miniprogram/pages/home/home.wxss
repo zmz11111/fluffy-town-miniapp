@@ -36,6 +36,7 @@
 .pet-intro { margin-top: 7rpx; color: #6e796f; font-size: 23rpx; line-height: 1.45; }
 .companion-message { margin-top: 12rpx; color: #3d6b4c; font-size: 24rpx; line-height: 1.45; }
 .interaction-count { margin-top: 12rpx; color: #9a8065; font-size: 21rpx; }
+.interaction-recovery { margin-top: 6rpx; color: #879087; font-size: 20rpx; line-height: 1.4; }
 .pet-button { position: relative; flex: none; width: 160rpx; height: 160rpx; margin: 0; padding: 0; border-radius: 50%; background: #f3e0ba; }
 /* 角色图保持独立路径，后续替换正式 PNG 不需重做点击区。 */
 .character-image { display: block; width: 100%; height: 100%; }
@@ -50,6 +51,7 @@
 .task-heading { display: flex; align-items: center; justify-content: space-between; }
 .task-count { color: #567d5b; font-size: 27rpx; font-weight: 700; }
 .task-title { display: block; margin-top: 15rpx; font-size: 30rpx; font-weight: 650; }
+.welcome-progress-label { display: block; margin-top: 12rpx; color: #67816a; font-size: 23rpx; }
 .progress-track { height: 19rpx; margin-top: 26rpx; overflow: hidden; border-radius: 15rpx; background: #e3e9d9; }
 .progress-fill { height: 100%; border-radius: 15rpx; background: #7dab79; }
 .task-hint { display: block; margin-top: 17rpx; color: #7a887a; font-size: 22rpx; }

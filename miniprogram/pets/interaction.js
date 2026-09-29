@@ -1,5 +1,6 @@
 const { TUANTUAN } = require('./pet');
 const { loadState, updateState } = require('../storage/local');
+const { applyTuantuanAffinityChange } = require('./affinity');
 
 const INTERACTION_COOLDOWN_MS = 2000;
 const MAX_DAILY_INTERACTIONS = 5;
@@ -13,54 +14,85 @@ function getLocalDateKey(timestamp) {
   return `${date.getFullYear()}-${month}-${day}`;
 }
 
-// 页面通过角色模块读取状态，不依赖本地存储字段的位置。
-function getTuantuanState() {
-  return loadState().petState;
+function getResetDate(timestamp) {
+  const date = new Date(timestamp);
+  date.setDate(date.getDate() + 1);
+  date.setHours(0, 0, 0, 0);
+  return date;
 }
 
-// 每日互动有上限；当天第一次互动给完整反馈，后续互动使用轻反馈。
+function getUsage(petState, timestamp) {
+  const today = getLocalDateKey(timestamp);
+  const usedToday = petState.dailyInteractionDate === today && Number.isInteger(petState.dailyInteractionCount)
+    ? Math.max(0, petState.dailyInteractionCount) : 0;
+  const resetAt = getResetDate(timestamp);
+  return {
+    today,
+    usedToday,
+    remainingDailyInteractions: Math.max(0, MAX_DAILY_INTERACTIONS - usedToday),
+    maxDailyInteractions: MAX_DAILY_INTERACTIONS,
+    dailyLimitReached: usedToday >= MAX_DAILY_INTERACTIONS,
+    nextResetAt: resetAt.toISOString(),
+    recoveryHint: usedToday >= MAX_DAILY_INTERACTIONS
+      ? '明天零点，团团的互动次数会恢复。'
+      : '互动次数每天零点恢复。'
+  };
+}
+
+// 首页与学习页共用剩余次数及本地零点恢复信息。
+function getDailyInteractionStatus(timestamp) {
+  const nowTime = Number.isFinite(timestamp) ? timestamp : Date.now();
+  const petState = loadState().petState;
+  return Object.assign({}, petState, getUsage(petState, nowTime));
+}
+
+// 每日互动有上限；首次反馈更丰富，后续反馈轻柔，并更新关系值。
 function interactWithTuantuan() {
   const previous = loadState().petState;
   const nowTime = Date.now();
-  const today = getLocalDateKey(nowTime);
-  const usedToday = previous.dailyInteractionDate === today && Number.isInteger(previous.dailyInteractionCount)
-    ? Math.max(0, previous.dailyInteractionCount) : 0;
+  const usage = getUsage(previous, nowTime);
   const lastTime = previous.lastInteractedAt ? Date.parse(previous.lastInteractedAt) : NaN;
-  if (usedToday >= MAX_DAILY_INTERACTIONS) {
-    return Object.assign({}, previous, {
+  if (usage.dailyLimitReached) {
+    return Object.assign({}, previous, usage, {
       interactionAccepted: false,
-      dailyLimitReached: true,
-      dailyInteractionCount: usedToday,
-      remainingDailyInteractions: 0,
-      feedbackLevel: 'none'
+      feedbackLevel: 'none',
+      affinityChange: 0
     });
   }
   const elapsedSinceLast = nowTime - lastTime;
   if (!Number.isNaN(lastTime) && elapsedSinceLast >= 0 && elapsedSinceLast < INTERACTION_COOLDOWN_MS) {
-    return Object.assign({}, previous, {
+    return Object.assign({}, previous, usage, {
       interactionAccepted: false,
-      dailyLimitReached: false,
-      dailyInteractionCount: usedToday,
-      remainingDailyInteractions: MAX_DAILY_INTERACTIONS - usedToday,
-      feedbackLevel: 'none'
+      feedbackLevel: 'none',
+      cooldownRemainingMs: INTERACTION_COOLDOWN_MS - elapsedSinceLast,
+      affinityChange: 0
     });
   }
 
   const now = new Date(nowTime).toISOString();
-  const nextCount = usedToday + 1;
-  const state = updateState((draft) => {
+  const nextCount = usage.usedToday + 1;
+  const feedbackLevel = usage.usedToday === 0 ? 'high' : 'low';
+  const affinityDelta = feedbackLevel === 'high' ? 2 : 1;
+  const updated = updateState((draft) => {
     draft.petState.petId = TUANTUAN.id;
-    draft.petState.mood = nextCount === 1 ? 'happy' : 'content';
+    draft.petState.mood = feedbackLevel === 'high' ? 'happy' : 'content';
     draft.petState.lastInteractedAt = now;
-    draft.petState.dailyInteractionDate = today;
+    draft.petState.dailyInteractionDate = usage.today;
     draft.petState.dailyInteractionCount = nextCount;
+    applyTuantuanAffinityChange(draft.petState, affinityDelta, 'daily-interaction', now);
   });
-  return Object.assign({}, state.petState, {
+  return Object.assign({}, updated.petState, getUsage(updated.petState, nowTime), {
     interactionAccepted: true,
-    dailyLimitReached: false,
-    remainingDailyInteractions: MAX_DAILY_INTERACTIONS - nextCount,
-    feedbackLevel: nextCount === 1 ? 'high' : 'low'
+    feedbackLevel,
+    affinityChange: affinityDelta,
+    cooldownRemainingMs: 0
   });
 }
 
-module.exports = { INTERACTION_COOLDOWN_MS, MAX_DAILY_INTERACTIONS, getTuantuanState, interactWithTuantuan };
+module.exports = {
+  INTERACTION_COOLDOWN_MS,
+  MAX_DAILY_INTERACTIONS,
+  getTuantuanState: () => loadState().petState,
+  getDailyInteractionStatus,
+  interactWithTuantuan
+};

@@ -5,10 +5,12 @@
 .hero-title { margin-top: 13rpx; color: #36553f; font-size: 42rpx; font-weight: 700; }
 .hero-subtitle { margin-top: 13rpx; color: #647969; font-size: 25rpx; line-height: 1.5; }
 .hero-count { margin-top: 21rpx; color: #4c7855; font-size: 28rpx; font-weight: 700; }
+.hero-footnote { margin-top: 8rpx; color: #778677; font-size: 23rpx; }
 .word-list { margin-top: 28rpx; }
 .word-card { display: flex; align-items: center; justify-content: space-between; min-height: 118rpx; margin-bottom: 18rpx; padding: 18rpx 24rpx 18rpx 30rpx; border-radius: 25rpx; background: #fffdf7; }
 .word-copy { display: flex; flex-direction: column; }
 .word-english { color: #344f3c; font-size: 36rpx; font-weight: 700; }
+.word-phonetic { margin-top: 4rpx; color: #728075; font-size: 23rpx; letter-spacing: 1rpx; }
 .word-chinese { margin-top: 4rpx; color: #7a887c; font-size: 24rpx; }
 .mark-button { width: 170rpx; height: 70rpx; margin: 0; border-radius: 22rpx; background: #e5efdf; color: #4c7a55; font-size: 24rpx; line-height: 70rpx; }
 .mark-button.is-learned { background: #eef0eb; color: #87948a; }
@@ -32,11 +34,17 @@
 .knowledge-heading { display: block; margin: 0 0 12rpx 6rpx; color: #48664d; font-size: 29rpx; font-weight: 700; }
 .knowledge-row { display: flex; align-items: center; justify-content: space-between; min-height: 92rpx; margin-bottom: 12rpx; padding: 16rpx 24rpx; border-radius: 22rpx; background: #fffdf7; }
 .knowledge-copy { display: flex; flex: 1; flex-direction: column; }
+.pronunciation-button { flex: none; min-width: 72rpx; height: 64rpx; margin: 0 12rpx; padding: 0 12rpx; border-radius: 22rpx; background: #e8f0e3; color: #4e7457; font-size: 23rpx; line-height: 64rpx; }
+.pronunciation-message { display: block; margin: 14rpx 8rpx; color: #8a7357; font-size: 22rpx; line-height: 1.4; }
 .knowledge-tag { margin-left: 12rpx; color: #809181; font-size: 21rpx; }
 .sentence-row,.objective-row { display: flex; align-items: flex-start; flex-direction: column; }
 .sentence-text { color: #344f3c; font-size: 28rpx; font-weight: 600; line-height: 1.45; }
 .welcome-word-list,.welcome-sentence-list { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 18rpx; }
 .welcome-word { display: flex; flex: 1; min-width: 145rpx; flex-direction: column; padding: 18rpx; border-radius: 20rpx; background: #f2f7ee; }
+.welcome-word .pronunciation-button { align-self: flex-start; margin: 12rpx 0 0; }
 .welcome-word-english { color: #36553f; font-size: 29rpx; font-weight: 700; }
 .welcome-word-chinese { margin-top: 4rpx; color: #718273; font-size: 23rpx; }
 .welcome-sentence { padding: 12rpx 17rpx; border-radius: 18rpx; background: #f2f7ee; color: #36553f; font-size: 25rpx; }
+.welcome-letter-grid { display: flex; flex-wrap: wrap; justify-content: space-between; margin-top: 20rpx; }
+.welcome-letter { box-sizing: border-box; width: 22%; height: 82rpx; margin: 0 0 12rpx; border: 2rpx solid #dce8d9; border-radius: 18rpx; background: #f4f9ef; color: #36553f; font-size: 25rpx; font-weight: 700; }
+.welcome-letter.selected { background: #5a8f69; color: #fff; }

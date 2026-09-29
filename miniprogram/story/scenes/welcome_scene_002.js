@@ -7,7 +7,7 @@ const WELCOME_SCENE_002 = {
   title: '一起慢慢来',
   dialogues: [
     { speakerId: 'tuantuan', text: '认识你真开心！听一听、看一看、试着说一说，都可以按自己的节奏来。' },
-    { speakerId: 'narrator', text: '团团挥挥手，树屋的新朋友正在等你们去看看。' }
+    { speakerId: 'narrator', text: '团团挥挥手，还有几节 Welcome 小课等着你们一起探索。' }
   ],
   nextSceneId: null,
   requiredTaskId: null,

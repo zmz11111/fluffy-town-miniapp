@@ -1,12 +1,14 @@
 const { TUANTUAN } = require('../../pets/pet');
-const { interactWithTuantuan } = require('../../pets/interaction');
+const { interactWithTuantuan, getDailyInteractionStatus } = require('../../pets/interaction');
+const { getTuantuanFeedback } = require('../../pets/companion-feedback');
 const { getTuantuanVisual, TREEHOUSE_BACKGROUND } = require('../../assets/visuals');
 const { getGameState } = require('../../game/state');
 const { UNIT1_PREVIEW } = require('../../curriculum/unit1/preview-content');
 const { WELCOME_PREVIEW } = require('../../curriculum/welcome/preview-content');
 const { getTuantuanDialogue } = require('../../pets/tuantuan-dialogues');
 const { needsWelcome, markWelcomeSeen } = require('../../guidance/welcome');
-const { getNextCourseEntry, isWelcomeCompleted } = require('../../english/learning-state');
+const { getNextCourseEntry, isWelcomeCompleted, getLearningState } = require('../../english/learning-state');
+const { getWelcomeProgress } = require('../../english/welcome-learning');
 
 Page({
   data: {
@@ -25,7 +27,13 @@ Page({
     taskGuide: '',
     storyStatus: '',
     nextStep: '',
-    actionBusy: false
+    actionBusy: false,
+    interactionsRemaining: 5,
+    maxDailyInteractions: 5,
+    interactionRecoveryHint: '互动次数每天零点恢复。',
+    tuantuanBondLabel: '刚认识',
+    welcomeSessionProgress: '',
+    welcomeSessionPercent: 0
   },
 
   // 页面每次显示时读取本地状态，返回树屋后立即更新今日任务。
@@ -33,6 +41,12 @@ Page({
     this.actionBusy = false;
     const gameState = getGameState();
     const welcomeCompleted = isWelcomeCompleted();
+    const welcomeProgress = getWelcomeProgress();
+    const welcomeLearning = getLearningState();
+    const welcomeFirstSession = welcomeLearning.taskProgressById[WELCOME_PREVIEW.taskId];
+    const welcomeFirstSessionDone = Boolean(welcomeFirstSession && welcomeFirstSession.status === 'completed');
+    const interactionStatus = getDailyInteractionStatus();
+    const companionStatus = getTuantuanFeedback(Object.assign({ interactionAccepted: false }, interactionStatus));
     const nextEntry = getNextCourseEntry();
     const currentChapterId = gameState.currentStory
       ? gameState.currentStory.chapterId : nextEntry.chapterId;
@@ -43,19 +57,20 @@ Page({
     const chapterCompleted = Boolean(chapter && chapter.status === 'completed');
     const coreTaskCompleted = gameState.completedTaskIds.indexOf(UNIT1_PREVIEW.coreTaskId) !== -1;
     const greetingTaskCompleted = gameState.completedTaskIds.indexOf(UNIT1_PREVIEW.gameTaskId) !== -1;
-    const welcomeTaskCompleted = gameState.completedTaskIds.indexOf(WELCOME_PREVIEW.taskId) !== -1;
     const completed = currentIsWelcome
-      ? [welcomeTaskCompleted, chapterCompleted].filter(Boolean).length
+      ? welcomeProgress.completedSessions
       : [coreTaskCompleted, greetingTaskCompleted, chapterCompleted].filter(Boolean).length;
-    const total = currentIsWelcome ? 2 : 3;
+    const total = currentIsWelcome ? welcomeProgress.totalSessions : 3;
     const storyStatus = anotherStoryActive ? '还有一段冒险正在进行'
-      : chapterCompleted ? currentIsWelcome ? 'Welcome 初次见面已完成，Unit 1 已开放' : 'Unit 1 学习冒险已完成'
+      : currentIsWelcome && welcomeCompleted ? 'Welcome 学完啦，Unit 1 已开放'
+      : chapterCompleted ? currentIsWelcome ? '初次见面完成啦，Welcome 还有新内容' : 'Unit 1 学习冒险已完成'
       : greetingTaskCompleted ? '问候卡已放好，等你回故事收尾'
         : coreTaskCompleted ? '团团介绍卡已完成，下一步是听问候'
           : chapter ? currentIsWelcome ? 'Welcome · 一起认识新朋友' : '树屋的新朋友 · 探索中'
             : currentIsWelcome ? 'Welcome · 还没开始' : '树屋的新朋友 · 还没开始';
     const nextStep = anotherStoryActive ? '下一步：先回到正在进行的故事，完成或暂停后再开始 Unit 1。'
-      : chapterCompleted ? currentIsWelcome ? '下一步：开始 Unit 1，去树屋认识新朋友。' : '下一步：可以结束今天的冒险，下次再继续学习。'
+      : currentIsWelcome && welcomeCompleted ? '下一步：开始 Unit 1，去树屋认识新朋友。'
+      : chapterCompleted ? currentIsWelcome ? `下一步：继续 Welcome 第 ${welcomeProgress.currentSessionIndex} 节。` : '下一步：可以结束今天的冒险，下次再继续学习。'
       : greetingTaskCompleted ? '下一步：回到故事，看看朋友墙。'
         : coreTaskCompleted ? '下一步：听一听，把问候卡放好。'
           : currentIsWelcome ? '下一步：和团团打招呼，再认识米米。'
@@ -64,7 +79,7 @@ Page({
     const taskGuide = anotherStoryActive
       ? '当前故事的进度会保留；先继续它，再回到课程。'
       : chapterCompleted
-      ? currentIsWelcome ? 'Welcome 完成啦，准备好后就可以去 Unit 1。' : '今天的核心学习任务和问候卡都完成啦。'
+      ? currentIsWelcome ? '初次见面已经完成；团团会陪你一节一节继续 Welcome。' : '今天的核心学习任务和问候卡都完成啦。'
       : currentIsWelcome ? '先听团团问候，再认识名字和学习界面；可以随时暂停。'
         : '先帮团团选介绍卡，再听两张问候卡；可以随时暂停。';
     const showWelcome = needsWelcome();
@@ -77,7 +92,8 @@ Page({
       companionMessage: showWelcome
         ? '嗨，我是团团！我们先打个招呼，再认识新朋友吧。'
         : currentIsWelcome
-          ? '嗨，我是团团！我们先打个招呼，再认识新朋友吧。'
+          ? welcomeCompleted ? 'Welcome 的内容都认识啦！团团陪你去 Unit 1 看看。'
+            : `嗨，我是团团！我们已经一起完成 ${welcomeProgress.completedSessions} 节 Welcome。`
           : chapterCompleted
           ? '今天我们一起听懂了问候，也放好了介绍卡。'
           : '我正准备一张朋友卡，要和我一起看看吗？',
@@ -85,9 +101,18 @@ Page({
       storyStatus,
       nextStep,
       actionBusy: false,
-      taskTitle: currentIsWelcome ? '和团团一起完成 Welcome 初次见面' : '和团团一起认识树屋的新朋友',
+      taskTitle: currentIsWelcome
+        ? welcomeFirstSessionDone ? `和团团继续 Welcome · 第 ${welcomeProgress.currentSessionIndex} 节` : '和团团一起完成 Welcome 初次见面'
+        : '和团团一起认识树屋的新朋友',
       startLabel: gameState.currentStory ? '继续当前冒险'
-        : welcomeCompleted ? '开始 Unit 1 学习冒险' : '开始 Welcome 初次见面'
+        : welcomeCompleted ? '开始 Unit 1 学习冒险'
+          : welcomeFirstSessionDone ? `继续 Welcome · 第 ${welcomeProgress.currentSessionIndex} 节` : '开始 Welcome 初次见面',
+      interactionsRemaining: companionStatus.remaining,
+      maxDailyInteractions: companionStatus.maximum,
+      interactionRecoveryHint: companionStatus.recoveryHint,
+      tuantuanBondLabel: companionStatus.bondLabel,
+      welcomeSessionProgress: welcomeCompleted ? '' : `Welcome · 已完成 ${welcomeProgress.completedSessions} / ${welcomeProgress.totalSessions} 节`,
+      welcomeSessionPercent: welcomeCompleted ? 100 : Math.round((welcomeProgress.completedSessions / welcomeProgress.totalSessions) * 100)
     });
   },
 
@@ -129,10 +154,15 @@ Page({
   tapPet() {
     try {
       const interaction = interactWithTuantuan();
+      const feedback = getTuantuanFeedback(interaction);
       if (!interaction.interactionAccepted) {
-        if (interaction.dailyLimitReached) {
-          this.setData({ companionMessage: '今天已经和团团打过招呼啦！我们一起看看学习任务吧。' });
-        }
+        this.setData({
+          companionMessage: feedback.message,
+          interactionsRemaining: feedback.remaining,
+          maxDailyInteractions: feedback.maximum,
+          interactionRecoveryHint: feedback.recoveryHint,
+          tuantuanBondLabel: feedback.bondLabel
+        });
         return;
       }
       this.clearVisualTimer();
@@ -140,10 +170,14 @@ Page({
       const firstToday = interaction.feedbackLevel === 'high';
       this.setData({
         companionMessage: firstToday
-          ? isWelcome ? '团团眼睛一亮，开心地回应了你的问候！' : getTuantuanDialogue('unit1Greeting').text
-          : '团团朝你笑了笑，继续陪你一起探索。',
+          ? isWelcome ? `${feedback.message} ${feedback.courseHint}` : getTuantuanDialogue('unit1Greeting').text
+          : feedback.message,
         tuantuanVisual: firstToday ? getTuantuanVisual('happy') : getTuantuanVisual('idle'),
-        characterImageFailed: false
+        characterImageFailed: false,
+        interactionsRemaining: feedback.remaining,
+        maxDailyInteractions: feedback.maximum,
+        interactionRecoveryHint: feedback.recoveryHint,
+        tuantuanBondLabel: feedback.bondLabel
       });
       if (firstToday) {
         this.visualTimer = setTimeout(() => {
@@ -167,6 +201,12 @@ Page({
     if (state.currentStory) {
       const chapterId = state.currentStory.chapterId;
       wx.navigateTo({ url: `/pages/story/story?chapterId=${chapterId}` });
+      return;
+    }
+    const learning = getLearningState();
+    const welcomeFirstSession = learning.taskProgressById[WELCOME_PREVIEW.taskId];
+    if (!isWelcomeCompleted() && welcomeFirstSession && welcomeFirstSession.status === 'completed') {
+      wx.navigateTo({ url: '/pages/learn/learn?mode=welcome' });
       return;
     }
     wx.navigateTo({ url: `/pages/story/story?chapterId=${getNextCourseEntry().chapterId}` });

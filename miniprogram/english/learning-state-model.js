@@ -3,6 +3,22 @@ const COURSE_ID = 'wj-g3-v1';
 const WELCOME_UNIT_ID = 'wj-g3-v1:welcome';
 const WELCOME_CHAPTER_ID = 'wj-g3-v1:welcome:chapter';
 const WELCOME_TASK_ID = 'wj-g3-v1:welcome:task-greeting-and-introduction';
+const WELCOME_SESSION_TASK_IDS = Object.freeze([
+  WELCOME_TASK_ID,
+  'wj-g3-v1:welcome:task-self-introduction',
+  'wj-g3-v1:welcome:task-morning-greetings',
+  'wj-g3-v1:welcome:task-farewell',
+  'wj-g3-v1:welcome:task-classroom-actions-one',
+  'wj-g3-v1:welcome:task-classroom-actions-two',
+  'wj-g3-v1:welcome:task-letter-recognition'
+]);
+const WELCOME_OBJECTIVE_IDS = Object.freeze([
+  'greet-in-context',
+  'introduce-self',
+  'understand-learning-actions',
+  'farewell',
+  'recognize-letters'
+]);
 const UNIT1_UNIT_ID = 'wj-g3-v1:unit-1';
 const UNIT1_CHAPTER_ID = 'wj-g3-v1:unit-1:chapter-first-adventure';
 const UNIT1_CORE_TASK_ID = 'wj-g3-v1:unit-1:task-self-introduction';
@@ -23,6 +39,7 @@ function createInitialLearningState() {
     completedChapterIds: [],
     completedUnitIds: [],
     prerequisiteBypassUnitIds: [],
+    objectiveProgressById: {},
     unitProgressById: {
       [WELCOME_UNIT_ID]: createUnitProgress(WELCOME_CHAPTER_ID),
       [UNIT1_UNIT_ID]: createUnitProgress(UNIT1_CHAPTER_ID)
@@ -64,6 +81,8 @@ function isValidLearningState(value) {
     (value.currentTaskId === null || isContentId(value.currentTaskId)) &&
     isUniqueIdList(value.completedChapterIds) && isUniqueIdList(value.completedUnitIds) &&
     isUniqueIdList(value.prerequisiteBypassUnitIds) &&
+    (value.objectiveProgressById === undefined ||
+      isProgressMap(value.objectiveProgressById, ['in_progress', 'completed'], false)) &&
     isProgressMap(value.unitProgressById, allowedProgress, true) &&
     isProgressMap(value.chapterProgressById, allowedProgress, false) &&
     isProgressMap(value.taskProgressById, ['in_progress', 'paused', 'completed', 'skipped'], false) &&
@@ -119,6 +138,8 @@ module.exports = {
   WELCOME_UNIT_ID,
   WELCOME_CHAPTER_ID,
   WELCOME_TASK_ID,
+  WELCOME_SESSION_TASK_IDS,
+  WELCOME_OBJECTIVE_IDS,
   UNIT1_UNIT_ID,
   UNIT1_CHAPTER_ID,
   UNIT1_CORE_TASK_ID,

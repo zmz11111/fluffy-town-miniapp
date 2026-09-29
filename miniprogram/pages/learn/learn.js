@@ -2,8 +2,11 @@ const { WORDS } = require('../../english/words');
 const { getLearnedWordIds, markWordLearned } = require('../../english/learning');
 const { getUnitKnowledgePackage } = require('../../curriculum/curriculum-manager');
 const { WELCOME_UNIT_ID, UNIT1_UNIT_ID } = require('../../english/learning-state-model');
-const { getLearningState } = require('../../english/learning-state');
-const { interactWithTuantuan } = require('../../pets/interaction');
+const { getLearningState, isWelcomeCompleted } = require('../../english/learning-state');
+const { getWelcomeProgress, selectWelcomeLetter } = require('../../english/welcome-learning');
+const { playVocabularyAudio } = require('../../english/pronunciation');
+const { interactWithTuantuan, getDailyInteractionStatus } = require('../../pets/interaction');
+const { getTuantuanFeedback } = require('../../pets/companion-feedback');
 const {
   startLearningTask,
   chooseIntroduction
@@ -23,13 +26,22 @@ Page({
     knowledgeReviewStatus: '',
     knowledgeVocabulary: [],
     knowledgeSentences: [],
-    knowledgeObjectives: [],
+    knowledgeReleaseHint: '',
+    knowledgeVocabularyCount: 0,
+    knowledgeSentenceCount: 0,
+    pronunciationMessage: '',
     welcomeMode: false,
     welcomeStatus: 'ready',
     welcomeTitle: '',
     welcomeStep: null,
     welcomeStepNumber: 0,
     welcomeTotalSteps: 0,
+    welcomeSessionNumber: 0,
+    welcomeTotalSessions: 0,
+    welcomeCompletedSessions: 0,
+    interactionsRemaining: 5,
+    maxDailyInteractions: 5,
+    interactionRecoveryHint: '互动次数每天零点恢复。',
     welcomeMessage: '',
     choiceBusy: false,
     unit1Mode: false,
@@ -52,11 +64,12 @@ Page({
     if (this.courseLibraryMode) {
       wx.setNavigationBarTitle({ title: '课程知识' });
     }
-    if (this.welcomeMode) {
-      wx.setNavigationBarTitle({ title: 'Welcome · 初次见面' });
-      this.audio = wx.createInnerAudioContext();
-      this.audio.onError(() => this.setData({ welcomeMessage: '声音暂时不能播放，可以看着问候卡继续。' }));
-    }
+    if (this.welcomeMode) wx.setNavigationBarTitle({ title: 'Welcome · 初次见面' });
+    this.audio = wx.createInnerAudioContext();
+    this.audio.onError(() => {
+      const message = '声音暂时不能播放，可以看着词卡继续。';
+      this.setData(this.courseLibraryMode ? { pronunciationMessage: message } : { welcomeMessage: message });
+    });
     if (this.unit1Mode) {
       wx.setNavigationBarTitle({ title: '团团的介绍卡' });
     }
@@ -84,7 +97,7 @@ Page({
   // 课程知识展示只读 Welcome 或 Unit 1 知识包，不生成或完成每日任务。
   refreshCourseLibrary(unitId) {
     const currentLearning = getLearningState();
-    const welcomeCompleted = currentLearning.completedUnitIds.indexOf(WELCOME_UNIT_ID) !== -1;
+    const welcomeCompleted = isWelcomeCompleted();
     const requestedUnitId = unitId || this.selectedKnowledgeUnitId || currentLearning.currentUnitId || WELCOME_UNIT_ID;
     const selectedUnitId = requestedUnitId === UNIT1_UNIT_ID && !welcomeCompleted ? WELCOME_UNIT_ID : requestedUnitId;
     const content = getUnitKnowledgePackage(selectedUnitId);
@@ -95,10 +108,17 @@ Page({
         knowledgeReviewStatus: 'unavailable',
         knowledgeVocabulary: [],
         knowledgeSentences: [],
-        knowledgeObjectives: []
       });
       return;
     }
+    const welcomeProgress = getWelcomeProgress();
+    const isWelcomeKnowledge = selectedUnitId === WELCOME_UNIT_ID;
+    const vocabulary = isWelcomeKnowledge
+      ? content.vocabulary.filter((entry) => welcomeProgress.releasedVocabularyIds.indexOf(entry.id) !== -1)
+      : content.vocabulary;
+    const sentences = isWelcomeKnowledge
+      ? content.sentences.filter((entry) => welcomeProgress.releasedSentenceIds.indexOf(entry.id) !== -1)
+      : content.sentences;
     this.selectedKnowledgeUnitId = selectedUnitId;
     this.setData({
       courseLibraryMode: true,
@@ -107,11 +127,16 @@ Page({
       knowledgeTopic: content.topic,
       knowledgeReviewStatus: content.reviewStatus,
       unit1KnowledgeUnlocked: welcomeCompleted,
-      knowledgeVocabulary: content.vocabulary,
-      knowledgeSentences: content.sentences,
-      knowledgeObjectives: content.objectives,
-      isWelcomeKnowledge: selectedUnitId === WELCOME_UNIT_ID,
-      isUnit1Knowledge: selectedUnitId === UNIT1_UNIT_ID
+      knowledgeVocabulary: vocabulary,
+      knowledgeSentences: sentences,
+      knowledgeVocabularyCount: vocabulary.length,
+      knowledgeSentenceCount: sentences.length,
+      knowledgeReleaseHint: isWelcomeKnowledge
+        ? `Welcome 全部课程内容会随学习逐步开放；当前可查看第 ${welcomeProgress.currentSessionIndex} / ${welcomeProgress.totalSessions} 节。`
+        : '本单元内容已开放，今天的学习任务会单独安排。',
+      isWelcomeKnowledge,
+      isUnit1Knowledge: selectedUnitId === UNIT1_UNIT_ID,
+      pronunciationMessage: ''
     });
   },
 
@@ -126,14 +151,21 @@ Page({
   refreshWelcomeTask(message) {
     try {
       const view = startWelcomeTask();
+      const interactionStatus = getDailyInteractionStatus();
       this.setData({
         welcomeMode: true,
         welcomeStatus: view.status,
         welcomeTitle: view.title || '',
         welcomeStep: view.step || null,
         welcomeStepNumber: view.status === 'completed' ? view.totalSteps : view.stepIndex + 1,
-        welcomeTotalSteps: view.totalSteps || 4,
+        welcomeTotalSteps: view.totalSteps || 0,
+        welcomeSessionNumber: view.sessionIndex || view.welcomeProgress && view.welcomeProgress.currentSessionIndex || 0,
+        welcomeTotalSessions: view.totalSessions || 7,
+        welcomeCompletedSessions: view.completedSessions || 0,
         welcomeMessage: message || (view.status === 'completed' ? 'Welcome 已完成，我们回故事告诉团团吧。' : '每一步都可以慢慢来。'),
+        interactionsRemaining: interactionStatus.remainingDailyInteractions,
+        maxDailyInteractions: interactionStatus.maxDailyInteractions,
+        interactionRecoveryHint: interactionStatus.recoveryHint,
         choiceBusy: this.choiceBusy
       });
     } catch (error) {
@@ -233,12 +265,23 @@ Page({
     this.setData({ choiceBusy: true });
     try {
       const interaction = interactWithTuantuan();
+      const feedback = getTuantuanFeedback(interaction);
       if (!interaction.interactionAccepted && !interaction.dailyLimitReached) {
-        this.setData({ welcomeMessage: '团团还在休息一小会儿，等一下再轻轻点它吧。' });
+        this.setData({
+          welcomeMessage: feedback.message,
+          interactionsRemaining: feedback.remaining,
+          maxDailyInteractions: feedback.maximum,
+          interactionRecoveryHint: feedback.recoveryHint
+        });
         this.releaseChoiceAfterDelay();
         return;
       }
       const result = completeWelcomeInteractionStep(interaction);
+      this.setData({
+        interactionsRemaining: feedback.remaining,
+        maxDailyInteractions: feedback.maximum,
+        interactionRecoveryHint: feedback.recoveryHint
+      });
       if (result.completed) {
         this.setData({ welcomeStatus: 'completed', welcomeStep: null, welcomeMessage: result.message });
         this.returnTimer = setTimeout(() => this.backToStory(), 700);
@@ -260,10 +303,43 @@ Page({
         id: word.id,
         english: word.english,
         chinese: word.chinese,
+        phonetic: word.phonetic,
+        phoneticAccent: word.phoneticAccent,
+        audioSrc: word.audioSrc,
         learned: learnedIds.indexOf(word.id) !== -1
       })),
       completed: WORDS.filter((word) => learnedIds.indexOf(word.id) !== -1).length
     });
+  },
+
+  // 单词卡共用本地音频接口；所有课程只需提供同一词条字段即可播放。
+  playVocabularyAudio(event) {
+    const wordId = event.currentTarget.dataset.wordId;
+    const vocabulary = (this.data.knowledgeVocabulary || []).concat(this.data.words || [],
+      this.data.welcomeStep && this.data.welcomeStep.vocabulary || []
+    );
+    const word = vocabulary.find((entry) => entry.id === wordId);
+    const result = playVocabularyAudio(this.audio, word);
+    const update = { pronunciationMessage: result.message };
+    if (!this.courseLibraryMode) {
+      update.welcomeMessage = result.message || '团团陪你一起听一听。';
+    }
+    this.setData(update);
+  },
+
+  // 字母识别由 Welcome 进度模块持久化，离开页面后仍保留已找到的字母。
+  tapWelcomeLetter(event) {
+    try {
+      const result = selectWelcomeLetter(event.currentTarget.dataset.letter);
+      if (result.sessionCompleted) {
+        this.setData({ welcomeStatus: 'completed', welcomeStep: null, welcomeMessage: result.message });
+        this.returnTimer = setTimeout(() => this.backToStory(), 700);
+        return;
+      }
+      this.refreshWelcomeTask(result.message);
+    } catch (error) {
+      this.setData({ welcomeMessage: '这张字母卡暂时没有记下，再点一次试试。' });
+    }
   },
 
   // 点击“我认识了”写入一条去重的学习记录。

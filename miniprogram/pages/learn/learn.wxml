@@ -4,7 +4,7 @@
     <text class="hero-kicker">教材知识预览</text>
     <text class="hero-title">{{knowledgeTitle}}</text>
     <text class="hero-subtitle">{{knowledgeTopic}}</text>
-    <text class="hero-count">{{knowledgeVocabulary.length}} 个词条 · {{knowledgeSentences.length}} 条句型 · {{knowledgeObjectives.length}} 项目标</text>
+    <text class="hero-count">{{knowledgeVocabularyCount}} 个词条 · {{knowledgeSentenceCount}} 条表达</text>
   </view>
 
   <view class="knowledge-unit-switch">
@@ -14,7 +14,8 @@
 
   <view class="knowledge-note">
     <text>这里可以随时查看课程知识；每日任务由课程冒险单独安排。</text>
-    <text>教材内容仍是校对预览，不代表已经掌握。</text>
+    <text>{{knowledgeReleaseHint}}</text>
+    <text>课程进度由团团悄悄记下；这里显示当前开放的知识卡。</text>
   </view>
 
   <view class="knowledge-section">
@@ -22,9 +23,11 @@
     <view class="knowledge-row" wx:for="{{knowledgeVocabulary}}" wx:key="id">
       <view class="knowledge-copy">
         <text class="word-english">{{item.english}}</text>
+        <text wx:if="{{item.phonetic}}" class="word-phonetic">{{item.phonetic}}</text>
         <text wx:if="{{item.printedEnglish && item.printedEnglish !== item.english}}" class="word-chinese">{{item.printedEnglish}}</text>
         <text class="word-chinese">{{item.chinese}}</text>
       </view>
+      <button class="pronunciation-button" data-word-id="{{item.id}}" bindtap="playVocabularyAudio" aria-label="播放{{item.english}}发音">🔊</button>
       <text wx:if="{{item.learningGroup}}" class="knowledge-tag">{{item.learningGroup}}</text>
     </view>
   </view>
@@ -37,20 +40,19 @@
     </view>
   </view>
 
-  <view class="knowledge-section">
-    <text class="knowledge-heading">学习目标</text>
-    <view class="knowledge-row objective-row" wx:for="{{knowledgeObjectives}}" wx:key="id">
-      <text class="sentence-text">{{item.description}}</text>
-    </view>
-  </view>
+  <text wx:if="{{pronunciationMessage}}" class="pronunciation-message">{{pronunciationMessage}}</text>
   <button class="back-button" bindtap="backHome">回到树屋</button>
 </view>
 
 <view wx:elif="{{welcomeMode}}" class="learn-page">
   <view class="learn-hero">
-    <text class="hero-kicker">Welcome · 第 {{welcomeStepNumber}} / {{welcomeTotalSteps}} 步</text>
+    <text class="hero-kicker">Welcome · 第 {{welcomeSessionNumber}} / {{welcomeTotalSessions}} 节</text>
+    <text wx:if="{{welcomeTotalSteps}}" class="hero-footnote">本节第 {{welcomeStepNumber}} / {{welcomeTotalSteps}} 步</text>
     <text class="hero-title">{{welcomeTitle}}</text>
     <text class="hero-subtitle">第一次见面，我们慢慢认识彼此。</text>
+    <text class="hero-count">今天还可以和团团互动 {{interactionsRemaining}} / {{maxDailyInteractions}} 次</text>
+    <text class="hero-footnote">{{interactionRecoveryHint}}</text>
+    <text class="hero-footnote">Welcome · 已完成 {{welcomeCompletedSessions}} / {{welcomeTotalSessions}} 节</text>
   </view>
 
   <view wx:if="{{welcomeStatus === 'playing' && welcomeStep}}" class="welcome-task-card">
@@ -58,11 +60,18 @@
     <view wx:if="{{welcomeStep.kind === 'learn-vocabulary'}}" class="welcome-word-list">
       <view class="welcome-word" wx:for="{{welcomeStep.vocabulary}}" wx:key="id">
         <text class="welcome-word-english">{{item.english}}</text>
+        <text wx:if="{{item.phonetic}}" class="word-phonetic">{{item.phonetic}}</text>
         <text class="welcome-word-chinese">{{item.chinese}}</text>
+        <button class="pronunciation-button" data-word-id="{{item.id}}" bindtap="playVocabularyAudio" aria-label="播放{{item.english}}发音">🔊 点按朗读</button>
       </view>
     </view>
     <view wx:if="{{welcomeStep.kind === 'practice-sentence'}}" class="welcome-sentence-list">
       <text class="welcome-sentence" wx:for="{{welcomeStep.sentences}}" wx:key="id">{{item.text}}</text>
+    </view>
+    <view wx:if="{{welcomeStep.kind === 'recognize-letters'}}" class="welcome-letter-grid">
+      <button wx:for="{{welcomeStep.letters}}" wx:key="value" class="welcome-letter {{item.selected ? 'selected' : ''}}" data-letter="{{item.value}}" bindtap="tapWelcomeLetter" disabled="{{item.selected}}">
+        <text>{{item.value}} {{item.lowercase}}</text>
+      </button>
     </view>
     <button wx:if="{{welcomeStep.kind === 'listen-and-identify'}}" class="welcome-option" bindtap="playWelcomeAudio" disabled="{{choiceBusy}}">🔊 听一听</button>
     <button wx:if="{{welcomeStep.kind === 'companion-interaction'}}" class="welcome-option" bindtap="interactForWelcome" disabled="{{choiceBusy}}">和团团打个招呼</button>
@@ -71,6 +80,7 @@
       <text wx:if="{{item.chinese}}" class="welcome-option-translation">{{item.chinese}}</text>
     </button>
     <text class="welcome-message">{{welcomeMessage}}</text>
+    <text wx:if="{{pronunciationMessage}}" class="pronunciation-message">{{pronunciationMessage}}</text>
   </view>
   <view wx:elif="{{welcomeStatus === 'completed'}}" class="welcome-task-card">
     <text class="welcome-step-title">{{welcomeMessage}}</text>
@@ -120,13 +130,16 @@
     <view class="word-card" wx:for="{{words}}" wx:key="id">
       <view class="word-copy">
         <text class="word-english">{{item.english}}</text>
+        <text wx:if="{{item.phonetic}}" class="word-phonetic">{{item.phonetic}}</text>
         <text class="word-chinese">{{item.chinese}}</text>
       </view>
+      <button class="pronunciation-button" data-word-id="{{item.id}}" bindtap="playVocabularyAudio" aria-label="播放{{item.english}}发音">🔊</button>
       <button class="mark-button {{item.learned ? 'is-learned' : ''}}" data-word-id="{{item.id}}" bindtap="markLearned" disabled="{{item.learned}}">
         {{item.learned ? '已认识' : '我认识了'}}
       </button>
     </view>
   </view>
+  <text wx:if="{{pronunciationMessage}}" class="pronunciation-message">{{pronunciationMessage}}</text>
 
   <button class="back-button" bindtap="backHome">返回树屋</button>
 </view>

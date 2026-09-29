@@ -30,7 +30,9 @@ function createInitialState() {
       mood: 'happy',
       lastInteractedAt: null,
       dailyInteractionDate: null,
-      dailyInteractionCount: 0
+      dailyInteractionCount: 0,
+      affinity: 0,
+      lastAffinityChange: null
     },
     learningRecords: [],
     gameState: createInitialGameState(),

@@ -2,7 +2,8 @@ const { startGame, chooseImage } = require('../../games/find-cookie/game-manager
 const { getGameState } = require('../../game/state');
 const { REWARD_ID, TASK_ID } = require('../../games/find-cookie/data');
 const { getRewardDefinition } = require('../../reward/reward-manager');
-const { getNextCourseEntry } = require('../../english/learning-state');
+const { getNextCourseEntry, getLearningState, isWelcomeCompleted } = require('../../english/learning-state');
+const { WELCOME_PREVIEW } = require('../../curriculum/welcome/preview-content');
 const {
   startGame: startGreetingGame,
   getGameView: getGreetingGameView,
@@ -170,6 +171,11 @@ Page({
   openStory() {
     if (getGameState().currentStory) {
       wx.navigateBack({ delta: 1 });
+      return;
+    }
+    const welcomeTask = getLearningState().taskProgressById[WELCOME_PREVIEW.taskId];
+    if (!isWelcomeCompleted() && welcomeTask && welcomeTask.status === 'completed') {
+      wx.navigateTo({ url: '/pages/learn/learn?mode=welcome' });
       return;
     }
     const chapterId = getNextCourseEntry().chapterId;

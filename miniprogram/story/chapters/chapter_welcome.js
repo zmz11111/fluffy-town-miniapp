@@ -20,7 +20,7 @@ const CHAPTER_WELCOME = {
     title: '欢迎来到毛茸茸小镇！',
     message: '我们一起打过招呼、认识了新朋友，也知道可以慢慢来。',
     actionLabel: '回到树屋',
-    nextStep: '下一步：回到树屋后，Unit 1 就可以开始啦。'
+    nextStep: '下一步：回到树屋，继续和团团认识更多新词和表达。'
   },
   source: { kind: 'welcome-learning-preview', reference: WELCOME_PREVIEW.unitId }
 };

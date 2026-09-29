@@ -4,17 +4,23 @@ const {
   WELCOME_UNIT_ID,
   WELCOME_CHAPTER_ID,
   WELCOME_TASK_ID,
+  WELCOME_SESSION_TASK_IDS,
+  WELCOME_OBJECTIVE_IDS,
   UNIT1_UNIT_ID,
   UNIT1_CHAPTER_ID,
   UNIT1_CORE_TASK_ID,
   UNIT1_GREETING_TASK_ID
 } = require('./learning-state-model');
 
-const TASK_UNITS = Object.freeze({
-  [WELCOME_TASK_ID]: WELCOME_UNIT_ID,
+const TASK_UNITS = Object.freeze(Object.assign(
+  WELCOME_SESSION_TASK_IDS.reduce((units, taskId) => {
+    units[taskId] = WELCOME_UNIT_ID;
+    return units;
+  }, {}), {
   [UNIT1_CORE_TASK_ID]: UNIT1_UNIT_ID,
   [UNIT1_GREETING_TASK_ID]: UNIT1_UNIT_ID
-});
+  }
+));
 
 function copy(value) {
   return JSON.parse(JSON.stringify(value));
@@ -27,12 +33,23 @@ function addUnique(ids, id) {
 }
 
 function getLearningState() {
-  return copy(loadState().learningState);
+  const learning = copy(loadState().learningState);
+  if (!learning.objectiveProgressById) {
+    learning.objectiveProgressById = {};
+  }
+  return learning;
+}
+
+function areWelcomeObjectivesComplete(learning) {
+  const progress = learning && learning.objectiveProgressById || {};
+  return WELCOME_OBJECTIVE_IDS.every((objectiveId) => {
+    return progress[objectiveId] && progress[objectiveId].status === 'completed';
+  });
 }
 
 function isWelcomeCompleted(state) {
   const learning = state ? state.learningState || state : getLearningState();
-  return learning.completedUnitIds.indexOf(WELCOME_UNIT_ID) !== -1;
+  return areWelcomeObjectivesComplete(learning);
 }
 
 function hasWelcomePrerequisite(state) {
@@ -152,12 +169,66 @@ function completeTask(taskId) {
   }).learningState;
 }
 
+// Welcome 分课完成后只登记本课掌握目标；所有目标达成前课程仍保持进行中。
+function completeWelcomeSession(taskId, objectiveIds) {
+  if (WELCOME_SESSION_TASK_IDS.indexOf(taskId) === -1 || !Array.isArray(objectiveIds) ||
+      !objectiveIds.every((objectiveId) => WELCOME_OBJECTIVE_IDS.indexOf(objectiveId) !== -1)) {
+    throw new Error('Welcome 学习任务或目标无效');
+  }
+  const now = new Date().toISOString();
+  const newlyCompletedObjectiveIds = [];
+  const updated = updateState((draft) => {
+    const learning = draft.learningState;
+    if (!learning.objectiveProgressById) {
+      learning.objectiveProgressById = {};
+    }
+    applyTaskCompleted(learning, taskId, now);
+    if (draft.gameState.completedTaskIds.indexOf(taskId) === -1) {
+      draft.gameState.completedTaskIds.push(taskId);
+    }
+    objectiveIds.forEach((objectiveId) => {
+      const previous = learning.objectiveProgressById[objectiveId];
+      if (previous && previous.status === 'completed') {
+        return;
+      }
+      newlyCompletedObjectiveIds.push(objectiveId);
+      learning.objectiveProgressById[objectiveId] = {
+        status: 'completed',
+        evidenceTaskIds: [taskId],
+        updatedAt: now
+      };
+    });
+
+    const allObjectivesComplete = areWelcomeObjectivesComplete(learning);
+    const unit = learning.unitProgressById[WELCOME_UNIT_ID];
+    unit.status = allObjectivesComplete ? 'completed' : 'in_progress';
+    unit.updatedAt = now;
+    const chapter = learning.chapterProgressById[WELCOME_CHAPTER_ID] || { status: 'not_started', updatedAt: null };
+    chapter.status = allObjectivesComplete ? 'completed' : 'in_progress';
+    chapter.updatedAt = now;
+    learning.chapterProgressById[WELCOME_CHAPTER_ID] = chapter;
+    if (allObjectivesComplete) {
+      addUnique(learning.completedUnitIds, WELCOME_UNIT_ID);
+      addUnique(learning.completedChapterIds, WELCOME_CHAPTER_ID);
+      learning.currentUnitId = UNIT1_UNIT_ID;
+      learning.currentChapterId = UNIT1_CHAPTER_ID;
+    } else {
+      learning.currentUnitId = WELCOME_UNIT_ID;
+      learning.currentChapterId = WELCOME_CHAPTER_ID;
+    }
+    learning.currentCourseId = COURSE_ID;
+    learning.currentTaskId = null;
+    learning.updatedAt = now;
+  });
+  return { learningState: updated.learningState, newlyCompletedObjectiveIds };
+}
+
 function completeLearningChapter(unitId, chapterId) {
   if ([WELCOME_UNIT_ID, UNIT1_UNIT_ID].indexOf(unitId) === -1 ||
       [WELCOME_CHAPTER_ID, UNIT1_CHAPTER_ID].indexOf(chapterId) === -1) {
     throw new Error('课程章节不存在');
   }
-  if (unitId === WELCOME_UNIT_ID && !isWelcomeCompleted()) {
+  if (unitId === WELCOME_UNIT_ID) {
     const taskProgress = getLearningState().taskProgressById[WELCOME_TASK_ID];
     if (!taskProgress || taskProgress.status !== 'completed') {
       throw new Error('Welcome 学习任务尚未完成');
@@ -167,18 +238,26 @@ function completeLearningChapter(unitId, chapterId) {
   const now = new Date().toISOString();
   return updateState((draft) => {
     const learning = draft.learningState;
-    learning.chapterProgressById[chapterId] = { status: 'completed', updatedAt: now };
-    addUnique(learning.completedChapterIds, chapterId);
     const unit = learning.unitProgressById[unitId];
     unit.updatedAt = now;
     if (unitId === WELCOME_UNIT_ID) {
-      unit.status = 'completed';
-      addUnique(learning.completedUnitIds, unitId);
-      learning.currentUnitId = UNIT1_UNIT_ID;
-      learning.currentChapterId = UNIT1_CHAPTER_ID;
+      const complete = areWelcomeObjectivesComplete(learning);
+      unit.status = complete ? 'completed' : 'in_progress';
+      learning.chapterProgressById[chapterId] = { status: complete ? 'completed' : 'in_progress', updatedAt: now };
+      if (complete) {
+        addUnique(learning.completedChapterIds, chapterId);
+        addUnique(learning.completedUnitIds, unitId);
+        learning.currentUnitId = UNIT1_UNIT_ID;
+        learning.currentChapterId = UNIT1_CHAPTER_ID;
+      } else {
+        learning.currentUnitId = WELCOME_UNIT_ID;
+        learning.currentChapterId = WELCOME_CHAPTER_ID;
+      }
     } else {
       // 当前 Unit 1 内容只是首个学习冒险，不能据此声称整册 Unit 1 已学完。
       unit.status = 'in_progress';
+      learning.chapterProgressById[chapterId] = { status: 'completed', updatedAt: now };
+      addUnique(learning.completedChapterIds, chapterId);
     }
     learning.currentCourseId = COURSE_ID;
     learning.currentTaskId = null;
@@ -199,5 +278,6 @@ module.exports = {
   applyTaskStep,
   applyTaskCompleted,
   completeTask,
+  completeWelcomeSession,
   completeLearningChapter
 };

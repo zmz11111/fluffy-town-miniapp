@@ -20,7 +20,11 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第1行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/haɪ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review",
+      "audioSrc": "/assets/audio/hi.wav"
     },
     {
       "id": "wj-g3-v1:welcome:be",
@@ -41,7 +45,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第1行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/biː/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:what",
@@ -57,7 +64,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第2行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/wɒt/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:your",
@@ -73,7 +83,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第2行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/jɔː/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:name",
@@ -89,7 +102,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第3行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/neɪm/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:hello",
@@ -105,7 +121,11 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第3行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/həˈləʊ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review",
+      "audioSrc": "/assets/audio/hello.wav"
     },
     {
       "id": "wj-g3-v1:welcome:my",
@@ -121,7 +141,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第4行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/maɪ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:goodbye",
@@ -137,7 +160,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第4行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/ˌɡʊdˈbaɪ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:have",
@@ -153,7 +179,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第5行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/hæv/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:a-an",
@@ -173,7 +202,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第5行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/ə/, /ən/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:nice",
@@ -189,7 +221,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第6行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/naɪs/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:day",
@@ -205,7 +240,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第6行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/deɪ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:good",
@@ -221,7 +259,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第7行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/ɡʊd/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:morning",
@@ -237,7 +278,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第7行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/ˈmɔːnɪŋ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:ms",
@@ -253,7 +297,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第8行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/mɪz/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:stand",
@@ -269,7 +316,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第8行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/stænd/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:stand-up",
@@ -285,7 +335,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第9行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/stænd ʌp/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:sit",
@@ -301,7 +354,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第9行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/sɪt/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:sit-down",
@@ -317,7 +373,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第10行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/sɪt daʊn/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:open",
@@ -333,7 +392,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第10行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/ˈəʊpən/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:book",
@@ -349,7 +411,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第11行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/bʊk/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:close",
@@ -365,7 +430,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第11行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/kləʊz/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:point",
@@ -381,7 +449,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第12行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/pɔɪnt/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:say",
@@ -397,7 +468,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第12行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/seɪ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:read",
@@ -413,7 +487,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第13行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/riːd/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:listen",
@@ -429,7 +506,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第13行右栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/ˈlɪsən/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:welcome:write",
@@ -445,7 +525,10 @@ module.exports = {
         "printedPage": null,
         "locator": "Welcome 词表第14行左栏",
         "sourcePositionCheck": "verified_by_visual_pdf"
-      }
+      },
+      "phonetic": "/raɪt/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     }
   ],
   "editorialNote": "与原单词表 Welcome 页视觉逐行核对，共27个表格条目；a(an) 保持为一条并用 forms 记录两个形式，be (am, is, are) 已纳入。释义和课程分组仍待教学人员审核。"

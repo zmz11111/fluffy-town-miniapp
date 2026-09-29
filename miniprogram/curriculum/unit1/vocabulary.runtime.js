@@ -22,7 +22,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/lets/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:friend",
@@ -41,7 +44,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/frend/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:to",
@@ -60,7 +66,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/tə/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:meet",
@@ -79,7 +88,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/miːt/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:you",
@@ -98,7 +110,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/juː/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:play",
@@ -117,7 +132,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/pleɪ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:happy",
@@ -136,7 +154,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/ˈhæpi/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:new",
@@ -155,7 +176,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/njuː/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:do",
@@ -174,7 +198,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/duː/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:they",
@@ -193,7 +220,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/ðeɪ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:welcome",
@@ -212,7 +242,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/ˈwelkəm/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:everyone",
@@ -231,7 +264,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/ˈevriwʌn/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:nine",
@@ -250,7 +286,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/naɪn/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:she",
@@ -269,7 +308,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/ʃiː/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:too",
@@ -288,7 +330,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/tuː/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:we",
@@ -307,7 +352,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/wiː/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:from",
@@ -326,7 +374,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/frəm/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:the",
@@ -345,7 +396,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/ðə/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:twin",
@@ -364,7 +418,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/twɪn/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:he",
@@ -383,7 +440,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/hiː/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:come",
@@ -402,7 +462,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/kʌm/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:and",
@@ -421,7 +484,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/ænd/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:oh",
@@ -440,7 +506,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/əʊ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:no",
@@ -459,7 +528,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/nəʊ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:help",
@@ -478,7 +550,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/help/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:here-location",
@@ -497,7 +572,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/hɪə(r)/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:here-giving",
@@ -516,7 +594,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/hɪə(r)/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:thank",
@@ -535,7 +616,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/θæŋk/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:together",
@@ -554,7 +638,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/təˈɡeðə(r)/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:ok",
@@ -573,7 +660,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/ˌəʊˈkeɪ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:great",
@@ -592,7 +682,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/ɡreɪt/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:song",
@@ -611,7 +704,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/sɒŋ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:dear",
@@ -630,7 +726,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/dɪə(r)/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:sing",
@@ -649,7 +748,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/sɪŋ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:now",
@@ -668,7 +770,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/naʊ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:know",
@@ -687,7 +792,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/nəʊ/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:our",
@@ -706,7 +814,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/aʊə(r)/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:everybody",
@@ -725,7 +836,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/ˈevribɒdi/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:with",
@@ -744,7 +858,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/wɪð/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     },
     {
       "id": "wj-g3-v1:unit-1:me",
@@ -763,7 +880,10 @@ module.exports = {
       "extractionType": "transcribed",
       "reviewStatus": "pending_human_review",
       "sourcePositionCheck": "visually_cross_checked",
-      "sourceFile": "三上外研版三起点英语【单词表】.pdf"
+      "sourceFile": "三上外研版三起点英语【单词表】.pdf",
+      "phonetic": "/miː/",
+      "phoneticAccent": "en-GB",
+      "pronunciationReviewStatus": "pending_human_review"
     }
   ],
   "editorialNote": "按单词表 Unit 1 单独收录，here 的两种释义保留为两个带来源定位的条目；不包含 Welcome 或 Appendices 词条。",

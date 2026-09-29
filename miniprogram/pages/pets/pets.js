@@ -1,6 +1,7 @@
 const { getCharacterOverview, greetMimi } = require('../../pets/character-manager');
 const { CHAPTER_001 } = require('../../story/chapters/chapter_001');
-const { getNextCourseEntry, isWelcomeCompleted } = require('../../english/learning-state');
+const { getNextCourseEntry, isWelcomeCompleted, getLearningState } = require('../../english/learning-state');
+const { WELCOME_PREVIEW } = require('../../curriculum/welcome/preview-content');
 
 Page({
   data: {
@@ -39,6 +40,11 @@ Page({
   },
 
   openStory() {
+    const welcomeTask = getLearningState().taskProgressById[WELCOME_PREVIEW.taskId];
+    if (!isWelcomeCompleted() && welcomeTask && welcomeTask.status === 'completed') {
+      wx.navigateTo({ url: '/pages/learn/learn?mode=welcome' });
+      return;
+    }
     const chapterId = isWelcomeCompleted() ? CHAPTER_001.id : getNextCourseEntry().chapterId;
     wx.navigateTo({ url: `/pages/story/story?chapterId=${chapterId}` });
   }

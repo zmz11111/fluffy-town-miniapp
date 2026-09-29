@@ -4,7 +4,7 @@
  * @typedef {{kind: string, reference: string|null, rightsStatus: string, reviewStatus: string}} ContentSource
  * @typedef {{id: string, title: string, edition: string, grade: number, volume: string, contentVersion: string, source: ContentSource, unitIds: string[]}} Textbook
  * @typedef {{id: string, textbookId: string, number: number, title: string, topic: string, difficulty: number, vocabularyIds: string[], sentenceIds: string[]}} CurriculumUnit
- * @typedef {{id: string, textbookId: string, unitId: string, english: string, chinese: string, difficulty: number, audioSrc: string|null, imageSrc: string|null}} CurriculumWord
+ * @typedef {{id: string, textbookId: string, unitId: string, english: string, chinese: string, phonetic: string, phoneticAccent: string, pronunciationReviewStatus: string, difficulty: number, audioSrc: string|null, imageSrc: string|null}} CurriculumWord
  * @typedef {{id: string, textbookId: string, unitId: string, text: string, meaning: string, pattern: string, difficulty: number, vocabularyIds: string[]}} CurriculumSentence
  */
 

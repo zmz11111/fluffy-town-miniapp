@@ -37,7 +37,8 @@
       <text class="pet-name">{{pet.name}}</text>
       <text class="pet-intro">{{pet.introduction}}</text>
       <text wx:if="{{!showWelcome}}" class="companion-message">团团：{{companionMessage}}</text>
-      <text class="interaction-count">和团团打个招呼 · 累计互动 {{interactionCount}} 次</text>
+      <text class="interaction-count">今天还可以打 {{interactionsRemaining}} / {{maxDailyInteractions}} 次招呼 · {{tuantuanBondLabel}}</text>
+      <text class="interaction-recovery">{{interactionRecoveryHint}}</text>
     </view>
     <button class="pet-button" bindtap="tapPet" aria-label="点击和团团互动">
       <image wx:if="{{!characterImageFailed}}" class="character-image" src="{{tuantuanVisual.src}}" mode="aspectFit" binderror="onCharacterImageError" aria-label="{{tuantuanVisual.alt}}" />
@@ -59,6 +60,7 @@
       <text class="task-count">{{completed}} / {{total}}</text>
     </view>
       <text class="task-title">{{taskTitle}}</text>
+    <text wx:if="{{welcomeSessionProgress}}" class="welcome-progress-label">{{welcomeSessionProgress}}</text>
     <view class="progress-track"><view class="progress-fill" style="width: {{progressPercent}}%;"></view></view>
     <text class="task-hint">{{taskGuide}}</text>
   </view>
