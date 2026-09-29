@@ -1,11 +1,20 @@
-<!-- 故事页只展示管理器给出的当前对白，页面不写进度。 -->
+<!-- 故事页展示管理器对白和独立角色头像，页面不写游戏进度。 -->
 <view class="story-page">
   <view class="chapter-tag">第一章 · {{title}}</view>
   <view wx:if="{{!completed}}" class="story-card">
     <view class="scene-count">场景 {{sceneNumber}} / {{sceneTotal}}</view>
     <view class="scene-title">{{sceneTitle}}</view>
-    <view class="scene-art">🌳 <text>毛茸茸树屋</text> ⭐</view>
-    <view class="speaker">{{speaker}}</view>
+    <view class="scene-art">
+      <image wx:if="{{!sceneImageFailed}}" class="scene-background" src="{{sceneSrc}}" mode="aspectFill" binderror="onSceneImageError" aria-label="毛茸茸树屋" />
+      <text wx:if="{{sceneImageFailed}}">🌳 毛茸茸树屋 ⭐</text>
+    </view>
+    <view class="speaker-row">
+      <view wx:if="{{avatarSrc}}" class="speaker-avatar">
+        <image wx:if="{{!avatarImageFailed}}" src="{{avatarSrc}}" mode="aspectFit" binderror="onAvatarImageError" aria-label="{{avatarAlt}}" />
+        <text wx:else>{{avatarFallbackText}}</text>
+      </view>
+      <view class="speaker">{{speaker}}</view>
+    </view>
     <view class="dialogue">{{dialogue}}</view>
     <button class="primary" bindtap="next">继续故事</button>
   </view>
@@ -18,3 +27,4 @@
   </view>
   <view wx:if="{{notice}}" class="notice">{{notice}}</view>
 </view>
+

@@ -1,4 +1,4 @@
-<!-- 首页以原生样式绘制占位场景，不使用外部美术素材。 -->
+<!-- 首页先显示原创资源占位图；图片失败时仍保留原有图形场景。 -->
 <view class="home">
   <view class="welcome">
     <text class="eyebrow">欢迎来到毛茸茸小镇</text>
@@ -6,7 +6,7 @@
     <text class="intro">和团团一起，寻找消失的星星饼干。</text>
   </view>
 
-  <view class="scene" aria-label="毛茸茸树屋占位场景">
+  <view class="scene" aria-label="毛茸茸树屋背景">
     <view class="sun"></view>
     <view class="cloud cloud-left"></view>
     <view class="cloud cloud-right"></view>
@@ -21,7 +21,8 @@
       <view class="house-window"></view>
       <view class="house-door"></view>
     </view>
-    <view class="scene-label">毛茸茸树屋 · 场景占位</view>
+    <image wx:if="{{!sceneImageFailed}}" class="scene-image" src="{{sceneSrc}}" mode="aspectFill" binderror="onSceneImageError" aria-label="毛茸茸树屋" />
+    <view class="scene-label">毛茸茸树屋</view>
   </view>
 
   <view class="pet-card">
@@ -32,12 +33,15 @@
       <text class="interaction-count">和团团打个招呼 · 累计互动 {{interactionCount}} 次</text>
     </view>
     <button class="pet-button" bindtap="tapPet" aria-label="点击和团团互动">
-      <view class="pet-ear ear-left"></view>
-      <view class="pet-ear ear-right"></view>
-      <view class="pet-face">
-        <view class="pet-eye eye-left"></view>
-        <view class="pet-eye eye-right"></view>
-        <view class="pet-nose"></view>
+      <image wx:if="{{!characterImageFailed}}" class="character-image" src="{{tuantuanVisual.src}}" mode="aspectFit" binderror="onCharacterImageError" aria-label="{{tuantuanVisual.alt}}" />
+      <view wx:else class="character-fallback">
+        <view class="pet-ear ear-left"></view>
+        <view class="pet-ear ear-right"></view>
+        <view class="pet-face">
+          <view class="pet-eye eye-left"></view>
+          <view class="pet-eye eye-right"></view>
+          <view class="pet-nose"></view>
+        </view>
       </view>
     </button>
   </view>
@@ -59,3 +63,4 @@
     <button bindtap="openWords">单词卡</button>
   </view>
 </view>
+
