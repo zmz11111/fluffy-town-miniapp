@@ -16,6 +16,7 @@ const {
   getLearningState
 } = require('./learning-state');
 const { adjustTuantuanAffinity } = require('../pets/affinity');
+const { applyReward, getRewardDefinition } = require('../reward/reward-manager');
 
 function copy(value) {
   return JSON.parse(JSON.stringify(value));
@@ -76,7 +77,9 @@ function getTaskView(message) {
       totalSessions: overview.totalSessions,
       sessionIndex: overview.totalSessions,
       totalSteps: 0,
-      stepIndex: 0
+      stepIndex: 0,
+      adventure: null,
+      audioPlayed: false
     };
   }
   const progress = learning.taskProgressById[session.taskId];
@@ -112,6 +115,8 @@ function getTaskView(message) {
     totalSessions: WELCOME_SESSIONS.length,
     completedSessions: overview.completedSessions,
     step: visibleStep,
+    adventure: copy(session.adventure),
+    audioPlayed: Boolean(progress && (progress.heardAudioStepIds || []).indexOf(step.id) !== -1),
     welcomeProgress: overview,
     message: message || ''
   };
@@ -139,24 +144,42 @@ function startTask(requestedTaskId) {
     learning = getLearningState();
   }
   const progress = learning.taskProgressById[session.taskId];
-  if (!progress || progress.status !== 'in_progress') {
+  if (progress && progress.status === 'in_progress' &&
+      progress.contentVersion !== WELCOME_PREVIEW.contentVersion) {
+    // 冒险步骤升级后，旧步骤编号无法安全映射；未完成分课从新挑战首步继续。
+    const now = new Date().toISOString();
+    updateState((draft) => {
+      const task = draft.learningState.taskProgressById[session.taskId];
+      task.stepIndex = 0;
+      task.heardAudioStepIds = [];
+      task.selectedLetterIds = [];
+      task.contentVersion = WELCOME_PREVIEW.contentVersion;
+      task.updatedAt = now;
+    });
+    learning = getLearningState();
+  }
+  const currentProgress = learning.taskProgressById[session.taskId];
+  if (!currentProgress || currentProgress.status !== 'in_progress') {
     const now = new Date().toISOString();
     updateState((draft) => {
       applyTaskStarted(draft.learningState, session.taskId, 0, now);
+      draft.learningState.taskProgressById[session.taskId].contentVersion = WELCOME_PREVIEW.contentVersion;
     });
   }
   return getTaskView();
 }
 
-function completeSession(session, message, audioSrc) {
+function completeSession(session, message, audioSrc, companionMessage) {
   const result = completeWelcomeSession(session.taskId, session.objectiveIdsToComplete || []);
   if (result.newlyCompletedObjectiveIds.length) {
     adjustTuantuanAffinity(2, `welcome-objectives:${result.newlyCompletedObjectiveIds.join(',')}`);
   }
+  const reward = getRewardDefinition(session.adventure.rewardId);
+  if (!reward) {
+    throw new Error('Welcome 冒险奖励尚未登记');
+  }
+  applyReward(reward.id);
   const overview = getWelcomeProgress();
-  const completionMessage = overview.isComplete
-    ? 'Welcome 的词句和课堂活动都学完啦，Unit 1 已经开放。'
-    : `${session.title}完成啦！团团记住了我们的进度，下次接着认识新内容。`;
   return {
     correct: true,
     completed: true,
@@ -166,29 +189,36 @@ function completeSession(session, message, audioSrc) {
     totalSteps: session.steps.length,
     completedSessions: overview.completedSessions,
     totalSessions: overview.totalSessions,
-    message: overview.isComplete ? completionMessage : message || completionMessage,
+    message: overview.isComplete ? 'Welcome 的词句和课堂活动都学完啦，Unit 1 已经开放。' : `${session.title}完成！`,
+    companionMessage: companionMessage || session.adventure.completionDialogue,
+    rewardMessage: session.adventure.rewardMessage || `完成冒险，获得 ${reward.amount} 颗星星！`,
+    rewardAmount: reward.amount,
+    stars: getGameState().stars,
     audioSrc: audioSrc || ''
   };
 }
 
-function advanceTaskStep(session, message, audioSrc) {
+function advanceTaskStep(session, message, audioSrc, companionMessage) {
   const progress = loadState().learningState.taskProgressById[session.taskId];
   if (!progress || progress.status !== 'in_progress') {
     throw new Error('请先开始当前 Welcome 分课');
   }
   const nextStepIndex = progress.stepIndex + 1;
   if (nextStepIndex >= session.steps.length) {
-    return completeSession(session, message, audioSrc);
+    return completeSession(session, message, audioSrc, companionMessage);
   }
   const now = new Date().toISOString();
   updateState((draft) => {
     applyTaskStep(draft.learningState, session.taskId, nextStepIndex, now);
+    draft.learningState.taskProgressById[session.taskId].contentVersion = WELCOME_PREVIEW.contentVersion;
   });
   return {
     correct: true,
     completed: false,
     stepIndex: nextStepIndex,
     message: message || '我们一起发现了新的表达。',
+    companionMessage: companionMessage || session.adventure.successDialogue,
+    companionEmotion: 'happy',
     audioSrc: audioSrc || ''
   };
 }
@@ -210,24 +240,39 @@ function chooseStep(optionId) {
   if (step.kind === 'companion-interaction' || step.kind === 'recognize-letters') {
     throw new Error('请使用当前步骤对应的互动方式');
   }
+  if (step.requireAudioPlayed && (progress.heardAudioStepIds || []).indexOf(step.id) === -1) {
+    return {
+      correct: false,
+      completed: false,
+      stepIndex: progress.stepIndex,
+      message: '先点“听一听”，听过团团的问候再来选。',
+      companionMessage: '我再读一次给你听，准备好就选一张卡。',
+      companionEmotion: 'thinking'
+    };
+  }
   const option = step && step.options.find((item) => item.id === optionId);
   if (!option) {
     throw new Error('请选择当前步骤中的卡片');
   }
-  if (step.correctOptionId && option.id !== step.correctOptionId) {
-    return { correct: false, completed: false, stepIndex: progress.stepIndex, message: step.retryMessage };
+  if (option.id !== step.correctOptionId) {
+    return {
+      correct: false,
+      completed: false,
+      stepIndex: progress.stepIndex,
+      message: step.retryMessage || session.adventure.retryDialogue,
+      companionMessage: session.adventure.retryDialogue,
+      companionEmotion: 'thinking'
+    };
   }
-
-  if (step.kind === 'learn-vocabulary') {
-    return advanceTaskStep(session, '我们先认识了这一组新词，接下来看看它们怎么出现在句子里。');
+  if (['learn-vocabulary', 'practice-sentence', 'listen-and-identify', 'speak-choice', 'letter-match'].indexOf(step.kind) === -1) {
+    throw new Error('Welcome 当前学习步骤无效');
   }
-  if (step.kind === 'practice-sentence') {
-    return advanceTaskStep(session, '我们一起把这组表达读过啦！');
-  }
-  if (step.kind === 'listen-and-identify') {
-    return advanceTaskStep(session, '团团听到你的问候啦！', option.audioSrc);
-  }
-  throw new Error('Welcome 当前学习步骤无效');
+  return advanceTaskStep(
+    session,
+    step.correctMessage || '答对啦！我们一起找到新的线索。',
+    option.audioSrc,
+    step.correctDialogue || session.adventure.successDialogue
+  );
 }
 
 function completeInteractionStep(interactionResult) {
@@ -243,15 +288,34 @@ function completeInteractionStep(interactionResult) {
       correct: false,
       completed: false,
       stepIndex: active.progress.stepIndex,
-      message: '团团还在休息一小会儿，等一下再轻轻点它吧。'
+      message: '团团还在休息一小会儿，等一下再轻轻点它吧。',
+      companionMessage: active.session.adventure.retryDialogue,
+      companionEmotion: 'thinking'
     };
   }
   const message = interactionResult.dailyLimitReached
     ? '今天的互动次数用完啦，明天再来找团团也可以；这次学习进度已经记下。'
-    : interactionResult.feedbackLevel === 'high'
-      ? '团团开心地回应了你的问候！第一节学习完成啦。'
-      : '团团笑着点点头，第一节学习完成啦。';
-  return advanceTaskStep(active.session, message);
+    : '你和团团一起完成了这次小挑战！';
+  return advanceTaskStep(active.session, message, '', active.session.adventure.completionDialogue);
+}
+
+// 听力选项必须先由孩子主动播放本步骤的本地授权音频。
+function markCurrentAudioPlayed() {
+  const active = requireActiveStep();
+  if (!active.step.requireAudioPlayed || !active.step.audioSrc) {
+    return false;
+  }
+  const heardAudioStepIds = Array.isArray(active.progress.heardAudioStepIds)
+    ? active.progress.heardAudioStepIds.slice() : [];
+  if (heardAudioStepIds.indexOf(active.step.id) === -1) {
+    heardAudioStepIds.push(active.step.id);
+    updateState((draft) => {
+      const task = draft.learningState.taskProgressById[active.session.taskId];
+      task.heardAudioStepIds = heardAudioStepIds;
+      task.updatedAt = new Date().toISOString();
+    });
+  }
+  return true;
 }
 
 function selectWelcomeLetter(letter) {
@@ -295,5 +359,6 @@ module.exports = {
   startTask,
   chooseStep,
   completeInteractionStep,
+  markCurrentAudioPlayed,
   selectWelcomeLetter
 };

@@ -1,13 +1,13 @@
 const { CHAPTER_WELCOME } = require('../chapters/chapter_welcome');
 
-// 收尾告别后进入 Unit 1；此章节没有额外星星奖励。
+// 团团在学习任务完成后接回剧情，并为后续 Welcome 小冒险留出入口。
 const WELCOME_SCENE_002 = {
   id: CHAPTER_WELCOME.sceneIds[1],
   chapterId: CHAPTER_WELCOME.id,
-  title: '一起慢慢来',
+  title: '星星徽章回来了',
   dialogues: [
-    { speakerId: 'tuantuan', text: '认识你真开心！听一听、看一看、试着说一说，都可以按自己的节奏来。' },
-    { speakerId: 'narrator', text: '团团挥挥手，还有几节 Welcome 小课等着你们一起探索。' }
+    { speakerId: 'tuantuan', text: 'Hello，米米！你听懂了我们的问候，还把星星徽章找回来啦！谢谢你陪我一起试着说英语。' },
+    { speakerId: 'narrator', text: '星星徽章回到了团团手上。还有几节 Welcome 小冒险，等你们继续一起探索。' }
   ],
   nextSceneId: null,
   requiredTaskId: null,

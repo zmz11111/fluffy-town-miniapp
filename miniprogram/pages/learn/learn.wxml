@@ -44,54 +44,81 @@
   <button class="back-button" bindtap="backHome">回到树屋</button>
 </view>
 
-<view wx:elif="{{welcomeMode}}" class="learn-page">
+<view wx:elif="{{welcomeMode}}" class="learn-page welcome-adventure-page">
   <view class="learn-hero">
-    <text class="hero-kicker">Welcome · 第 {{welcomeSessionNumber}} / {{welcomeTotalSessions}} 节</text>
-    <text wx:if="{{welcomeTotalSteps}}" class="hero-footnote">本节第 {{welcomeStepNumber}} / {{welcomeTotalSteps}} 步</text>
+    <text class="hero-kicker">Welcome 冒险 · 第 {{welcomeSessionNumber}} / {{welcomeTotalSessions}} 节</text>
+    <text wx:if="{{welcomeTotalSteps}}" class="hero-footnote">挑战 {{welcomeStepNumber}} / {{welcomeTotalSteps}}</text>
     <text class="hero-title">{{welcomeTitle}}</text>
-    <text class="hero-subtitle">第一次见面，我们慢慢认识彼此。</text>
+    <text class="hero-subtitle">跟着团团找线索，用英语完成小任务。</text>
     <text class="hero-count">今天还可以和团团互动 {{interactionsRemaining}} / {{maxDailyInteractions}} 次</text>
     <text class="hero-footnote">{{interactionRecoveryHint}}</text>
     <text class="hero-footnote">Welcome · 已完成 {{welcomeCompletedSessions}} / {{welcomeTotalSessions}} 节</text>
   </view>
 
-  <view wx:if="{{welcomeStatus === 'playing' && welcomeStep}}" class="welcome-task-card">
-    <text class="welcome-step-title">{{welcomeStep.prompt}}</text>
-    <view wx:if="{{welcomeStep.kind === 'learn-vocabulary'}}" class="welcome-word-list">
-      <view class="welcome-word" wx:for="{{welcomeStep.vocabulary}}" wx:key="id">
-        <text class="welcome-word-english">{{item.english}}</text>
-        <text wx:if="{{item.phonetic}}" class="word-phonetic">{{item.phonetic}}</text>
-        <text class="welcome-word-chinese">{{item.chinese}}</text>
-        <button class="pronunciation-button" data-word-id="{{item.id}}" bindtap="playVocabularyAudio" aria-label="播放{{item.english}}发音">🔊 点按朗读</button>
+  <view class="welcome-adventure-card">
+    <view class="welcome-goal-box">
+      <text class="welcome-card-kicker">本节冒险目标</text>
+      <text class="welcome-goal-text">{{welcomeAdventureGoal}}</text>
+    </view>
+    <view class="welcome-scene-stage">
+      <image class="welcome-scene-background" src="{{welcomeSceneBackground}}" mode="aspectFill" aria-label="树屋旁的冒险场景" />
+      <image class="welcome-scene-star" src="{{welcomeStarImage}}" mode="aspectFit" aria-label="星星徽章线索" />
+      <view class="welcome-stage-character">
+        <image wx:if="{{!tuantuanImageFailed}}" class="welcome-stage-tuantu-image" src="{{tuantuanVisual.src}}" mode="aspectFit" binderror="onWelcomeTuantuanImageError" aria-label="{{tuantuanVisual.alt}}" />
+        <text wx:else class="welcome-stage-fallback">团团</text>
+      </view>
+      <view class="welcome-speech-bubble">
+        <text class="welcome-tuantu-name">团团</text>
+        <text class="welcome-tuantu-line">{{tuantuanMessage}}</text>
       </view>
     </view>
-    <view wx:if="{{welcomeStep.kind === 'practice-sentence'}}" class="welcome-sentence-list">
-      <text class="welcome-sentence" wx:for="{{welcomeStep.sentences}}" wx:key="id">{{item.text}}</text>
+    <text class="welcome-star-status">⭐ 当前星星：{{welcomeStars}}</text>
+  </view>
+
+  <view wx:if="{{welcomeStatus === 'playing' && welcomeStep}}" class="welcome-task-card">
+    <text class="welcome-step-title">{{welcomeStep.prompt}}</text>
+    <view wx:if="{{welcomeStep.kind === 'letter-match'}}" class="welcome-letter-challenge">
+      <text class="welcome-letter-target">{{welcomeStep.targetLetter}}</text>
+      <text class="welcome-letter-hint">找到它的小写字母朋友</text>
     </view>
     <view wx:if="{{welcomeStep.kind === 'recognize-letters'}}" class="welcome-letter-grid">
       <button wx:for="{{welcomeStep.letters}}" wx:key="value" class="welcome-letter {{item.selected ? 'selected' : ''}}" data-letter="{{item.value}}" bindtap="tapWelcomeLetter" disabled="{{item.selected}}">
         <text>{{item.value}} {{item.lowercase}}</text>
       </button>
     </view>
-    <button wx:if="{{welcomeStep.kind === 'listen-and-identify'}}" class="welcome-option" bindtap="playWelcomeAudio" disabled="{{choiceBusy}}">🔊 听一听</button>
-    <button wx:if="{{welcomeStep.kind === 'companion-interaction'}}" class="welcome-option" bindtap="interactForWelcome" disabled="{{choiceBusy}}">和团团打个招呼</button>
-    <button wx:for="{{welcomeStep.options}}" wx:key="id" class="welcome-option" data-option-id="{{item.id}}" bindtap="chooseWelcomeOption" disabled="{{choiceBusy}}">
+    <button wx:if="{{welcomeStep.kind === 'listen-and-identify'}}" class="welcome-audio-button" bindtap="playWelcomeAudio" disabled="{{choiceBusy}}">🔊 听团团说</button>
+    <text wx:if="{{welcomeStep.requireAudioPlayed && !welcomeAudioPlayed}}" class="welcome-audio-hint">听过团团的问候后，再选一张卡片。</text>
+    <button wx:if="{{welcomeStep.kind === 'companion-interaction'}}" class="welcome-companion-button" bindtap="interactForWelcome" disabled="{{choiceBusy}}">{{welcomeStep.buttonLabel}}</button>
+    <button wx:for="{{welcomeStep.options}}" wx:key="id" class="welcome-option" data-option-id="{{item.id}}" bindtap="chooseWelcomeOption" disabled="{{choiceBusy || (welcomeStep.requireAudioPlayed && !welcomeAudioPlayed)}}">
       <text class="welcome-option-label">{{item.label}}</text>
-      <text wx:if="{{item.chinese}}" class="welcome-option-translation">{{item.chinese}}</text>
     </button>
-    <text class="welcome-message">{{welcomeMessage}}</text>
+    <text wx:if="{{welcomeMessage}}" class="welcome-message">{{welcomeMessage}}</text>
     <text wx:if="{{pronunciationMessage}}" class="pronunciation-message">{{pronunciationMessage}}</text>
   </view>
-  <view wx:elif="{{welcomeStatus === 'completed'}}" class="welcome-task-card">
+  <view wx:elif="{{welcomeStatus === 'completed'}}" class="welcome-task-card welcome-completion-card">
     <text class="welcome-step-title">{{welcomeMessage}}</text>
-    <button class="back-button" bindtap="backToStory">回到团团身边</button>
+    <view wx:if="{{welcomeRewardMessage}}" class="welcome-reward-result">
+      <text class="welcome-reward-icon">⭐</text>
+      <text class="welcome-reward-copy">{{welcomeRewardMessage}}</text>
+      <text class="welcome-star-count">现在有 {{welcomeStars}} 颗星星</text>
+    </view>
+    <view class="welcome-companion-row welcome-completion-companion">
+      <view class="welcome-tuantu-avatar">
+        <image wx:if="{{!tuantuanImageFailed}}" class="welcome-tuantu-image" src="{{tuantuanVisual.src}}" mode="aspectFit" binderror="onWelcomeTuantuanImageError" aria-label="{{tuantuanVisual.alt}}" />
+        <text wx:else class="welcome-tuantu-fallback">团团</text>
+      </view>
+      <view class="welcome-tuantu-copy">
+        <text class="welcome-tuantu-name">团团</text>
+        <text class="welcome-tuantu-line">{{tuantuanMessage}}</text>
+      </view>
+    </view>
+    <button class="back-button" bindtap="backToStory">带着星星继续冒险</button>
   </view>
   <view wx:else class="welcome-task-card">
     <text class="welcome-message">{{welcomeMessage}}</text>
-    <button class="back-button" bindtap="backToStory">回到故事</button>
+    <button class="back-button" bindtap="backToStory">回到团团身边</button>
   </view>
 </view>
-
 <view wx:elif="{{unit1Mode}}" class="learn-page">
   <view class="learn-hero">
     <text class="hero-kicker">Unit 1 · 核心学习任务</text>

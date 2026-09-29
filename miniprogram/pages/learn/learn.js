@@ -3,7 +3,13 @@ const { getLearnedWordIds, markWordLearned } = require('../../english/learning')
 const { getUnitKnowledgePackage } = require('../../curriculum/curriculum-manager');
 const { WELCOME_UNIT_ID, UNIT1_UNIT_ID } = require('../../english/learning-state-model');
 const { getLearningState, isWelcomeCompleted } = require('../../english/learning-state');
-const { getWelcomeProgress, selectWelcomeLetter } = require('../../english/welcome-learning');
+const { getGameState } = require('../../game/state');
+const { getTuantuanVisual, TREEHOUSE_BACKGROUND } = require('../../assets/visuals');
+const {
+  getWelcomeProgress,
+  markCurrentAudioPlayed,
+  selectWelcomeLetter
+} = require('../../english/welcome-learning');
 const { playVocabularyAudio } = require('../../english/pronunciation');
 const { interactWithTuantuan, getDailyInteractionStatus } = require('../../pets/interaction');
 const { getTuantuanFeedback } = require('../../pets/companion-feedback');
@@ -39,6 +45,15 @@ Page({
     welcomeSessionNumber: 0,
     welcomeTotalSessions: 0,
     welcomeCompletedSessions: 0,
+    welcomeAdventureGoal: '',
+    welcomeAudioPlayed: false,
+    welcomeRewardMessage: '',
+    welcomeStars: 0,
+    welcomeSceneBackground: TREEHOUSE_BACKGROUND,
+    welcomeStarImage: '/assets/pictures/star.png',
+    tuantuanMessage: '',
+    tuantuanVisual: getTuantuanVisual('thinking'),
+    tuantuanImageFailed: false,
     interactionsRemaining: 5,
     maxDailyInteractions: 5,
     interactionRecoveryHint: '互动次数每天零点恢复。',
@@ -69,7 +84,7 @@ Page({
     if (this.welcomeMode) wx.setNavigationBarTitle({ title: 'Welcome · 初次见面' });
     this.audio = wx.createInnerAudioContext();
     this.audio.onError(() => {
-      const message = '声音暂时不能播放，可以看着词卡继续。';
+      const message = '声音暂时不能播放，检查设备音量后再试一次。';
       this.setData(this.courseLibraryMode ? { pronunciationMessage: message } : { welcomeMessage: message });
     });
     if (this.unit1Mode) {
@@ -150,10 +165,11 @@ Page({
   },
 
   // Welcome 使用与现有故事任务相同的学习状态入口，离开后恢复到已保存步骤。
-  refreshWelcomeTask(message) {
+  refreshWelcomeTask(message, companionMessage, companionEmotion, rewardMessage) {
     try {
       const view = startWelcomeTask(this.requestedWelcomeTaskId);
       const interactionStatus = getDailyInteractionStatus();
+      const adventure = view.adventure || {};
       this.setData({
         welcomeMode: true,
         welcomeStatus: view.status,
@@ -164,7 +180,14 @@ Page({
         welcomeSessionNumber: view.sessionIndex || view.welcomeProgress && view.welcomeProgress.currentSessionIndex || 0,
         welcomeTotalSessions: view.totalSessions || 7,
         welcomeCompletedSessions: view.completedSessions || 0,
-        welcomeMessage: message || (view.status === 'completed' ? 'Welcome 已完成，我们回故事告诉团团吧。' : '每一步都可以慢慢来。'),
+        welcomeAdventureGoal: adventure.goal || '',
+        welcomeAudioPlayed: Boolean(view.audioPlayed),
+        welcomeMessage: message || '',
+        welcomeRewardMessage: rewardMessage || '',
+        welcomeStars: getGameState().stars,
+        tuantuanMessage: companionMessage || adventure.openingDialogue || '团团会陪你一起完成这段小冒险。',
+        tuantuanVisual: getTuantuanVisual(companionEmotion || 'thinking'),
+        tuantuanImageFailed: false,
         interactionsRemaining: interactionStatus.remainingDailyInteractions,
         maxDailyInteractions: interactionStatus.maxDailyInteractions,
         interactionRecoveryHint: interactionStatus.recoveryHint,
@@ -173,6 +196,11 @@ Page({
     } catch (error) {
       this.setData({ welcomeMode: true, welcomeStatus: 'locked', welcomeMessage: '先回故事里和团团开始 Welcome 吧。' });
     }
+  },
+
+  // 团团图片加载失败时保留文字伙伴卡，学习任务仍可继续。
+  onWelcomeTuantuanImageError() {
+    this.setData({ tuantuanImageFailed: true });
   },
 
   refreshUnit1Task() {
@@ -230,16 +258,27 @@ Page({
         this.audio.play();
       }
       if (!result.correct) {
-        this.setData({ welcomeMessage: result.message });
+        this.setData({
+          welcomeMessage: result.message,
+          tuantuanMessage: result.companionMessage || '没关系，我们再看看线索。',
+          tuantuanVisual: getTuantuanVisual(result.companionEmotion || 'thinking')
+        });
         this.releaseChoiceAfterDelay();
         return;
       }
       if (result.completed) {
-        this.setData({ welcomeStatus: 'completed', welcomeStep: null, welcomeMessage: result.message });
-        this.returnTimer = setTimeout(() => this.backToStory(), 700);
+        this.setData({
+          welcomeStatus: 'completed',
+          welcomeStep: null,
+          welcomeMessage: result.message,
+          welcomeRewardMessage: result.rewardMessage,
+          welcomeStars: result.stars,
+          tuantuanMessage: result.companionMessage,
+          tuantuanVisual: getTuantuanVisual('happy')
+        });
         return;
       }
-      this.refreshWelcomeTask(result.message);
+      this.refreshWelcomeTask(result.message, result.companionMessage, result.companionEmotion || 'happy');
       this.releaseChoiceAfterDelay();
     } catch (error) {
       this.setData({ welcomeMessage: '这一步暂时没有保存好，再试一次吧。' });
@@ -256,6 +295,13 @@ Page({
     this.audio.stop();
     this.audio.src = step.audioSrc;
     this.audio.play();
+    if (step.requireAudioPlayed && markCurrentAudioPlayed()) {
+      this.setData({
+        welcomeAudioPlayed: true,
+        welcomeMessage: '听到了吗？选一张和团团声音相同的问候卡。',
+        tuantuanMessage: '我刚刚说了 Hello，听清楚了吗？'
+      });
+    }
   },
 
   // Welcome 伙伴互动调用统一每日限额，再由学习模块记录当前任务步骤。
@@ -271,6 +317,8 @@ Page({
       if (!interaction.interactionAccepted && !interaction.dailyLimitReached) {
         this.setData({
           welcomeMessage: feedback.message,
+          tuantuanMessage: feedback.message,
+          tuantuanVisual: getTuantuanVisual('thinking'),
           interactionsRemaining: feedback.remaining,
           maxDailyInteractions: feedback.maximum,
           interactionRecoveryHint: feedback.recoveryHint
@@ -285,11 +333,22 @@ Page({
         interactionRecoveryHint: feedback.recoveryHint
       });
       if (result.completed) {
-        this.setData({ welcomeStatus: 'completed', welcomeStep: null, welcomeMessage: result.message });
-        this.returnTimer = setTimeout(() => this.backToStory(), 700);
+        this.setData({
+          welcomeStatus: 'completed',
+          welcomeStep: null,
+          welcomeMessage: result.message,
+          welcomeRewardMessage: result.rewardMessage,
+          welcomeStars: result.stars,
+          tuantuanMessage: result.companionMessage,
+          tuantuanVisual: getTuantuanVisual('happy')
+        });
         return;
       }
-      this.setData({ welcomeMessage: result.message });
+      this.setData({
+        welcomeMessage: result.message,
+        tuantuanMessage: result.companionMessage || feedback.message,
+        tuantuanVisual: getTuantuanVisual(result.companionEmotion || 'happy')
+      });
       this.releaseChoiceAfterDelay();
     } catch (error) {
       this.setData({ welcomeMessage: '团团暂时没有回应，我们稍后再试一次。' });
@@ -334,11 +393,18 @@ Page({
     try {
       const result = selectWelcomeLetter(event.currentTarget.dataset.letter);
       if (result.sessionCompleted) {
-        this.setData({ welcomeStatus: 'completed', welcomeStep: null, welcomeMessage: result.message });
-        this.returnTimer = setTimeout(() => this.backToStory(), 700);
+        this.setData({
+          welcomeStatus: 'completed',
+          welcomeStep: null,
+          welcomeMessage: result.message,
+          welcomeRewardMessage: result.rewardMessage,
+          welcomeStars: result.stars,
+          tuantuanMessage: result.companionMessage,
+          tuantuanVisual: getTuantuanVisual('happy')
+        });
         return;
       }
-      this.refreshWelcomeTask(result.message);
+      this.refreshWelcomeTask(result.message, result.companionMessage, result.companionEmotion);
     } catch (error) {
       this.setData({ welcomeMessage: '这张字母卡暂时没有记下，再点一次试试。' });
     }

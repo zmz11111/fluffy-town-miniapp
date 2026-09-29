@@ -17,10 +17,10 @@ const CHAPTER_WELCOME = {
     'wj-g3-v1:welcome:scene-goodbye'
   ],
   completion: {
-    title: '欢迎来到毛茸茸小镇！',
-    message: '我们一起打过招呼、认识了新朋友，也知道可以慢慢来。',
+    title: '星星徽章找回来啦！',
+    message: '你和团团用问候和名字找到了米米，也一起找回了星星徽章。',
     actionLabel: '回到树屋',
-    nextStep: '下一步：回到树屋，继续和团团认识更多新词和表达。'
+    nextStep: '下一步：团团还想和你继续完成 Welcome 的小冒险。'
   },
   source: { kind: 'welcome-learning-preview', reference: WELCOME_PREVIEW.unitId }
 };

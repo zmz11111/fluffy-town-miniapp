@@ -1,4 +1,4 @@
-/* 单词预览页仅使用原生文字与色块，避免接入未授权资源。 */
+/* 学习页以原生文字与色块为主；Welcome 只引用项目登记的场景和角色资源。 */
 .learn-page { padding: 34rpx 28rpx 60rpx; }
 .learn-hero { display: flex; flex-direction: column; padding: 38rpx 35rpx; border-radius: 32rpx; background: #dcebd6; }
 .hero-kicker { color: #628267; font-size: 25rpx; font-weight: 600; }
@@ -19,7 +19,6 @@
 .welcome-step-title { color: #344f3c; font-size: 32rpx; font-weight: 700; line-height: 1.55; }
 .welcome-option { display: flex; flex-direction: column; justify-content: center; min-height: 90rpx; margin: 20rpx 0 0; padding: 14rpx 20rpx; border: 3rpx solid #dce8d9; border-radius: 22rpx; background: #f4f9ef; color: #36553f; line-height: 1.4; }
 .welcome-option-label { font-size: 30rpx; font-weight: 700; }
-.welcome-option-translation { margin-top: 6rpx; color: #718273; font-size: 24rpx; }
 .welcome-message { margin-top: 22rpx; color: #53715a; font-size: 25rpx; line-height: 1.5; }
 .unit1-task-card { display: flex; flex-direction: column; margin-top: 28rpx; padding: 32rpx 28rpx; border-radius: 30rpx; background: #fffdf7; }
 .unit1-prompt { color: #344f3c; font-size: 32rpx; font-weight: 700; line-height: 1.5; }
@@ -48,3 +47,45 @@
 .welcome-letter-grid { display: flex; flex-wrap: wrap; justify-content: space-between; margin-top: 20rpx; }
 .welcome-letter { box-sizing: border-box; width: 22%; height: 82rpx; margin: 0 0 12rpx; border: 2rpx solid #dce8d9; border-radius: 18rpx; background: #f4f9ef; color: #36553f; font-size: 25rpx; font-weight: 700; }
 .welcome-letter.selected { background: #5a8f69; color: #fff; }
+
+/* Welcome 冒险卡突出孩子的目标、伙伴对话和可操作挑战。 */
+.welcome-adventure-card { display: flex; flex-direction: column; margin-top: 22rpx; padding: 24rpx; border: 2rpx solid #d7e6d2; border-radius: 28rpx; background: #f3f8ef; }
+.welcome-goal-box { display: flex; flex-direction: column; padding: 18rpx 20rpx; border-radius: 20rpx; background: #fffdf7; }
+.welcome-card-kicker { color: #748b77; font-size: 22rpx; font-weight: 600; }
+.welcome-goal-text { margin-top: 7rpx; color: #36553f; font-size: 27rpx; font-weight: 700; line-height: 1.45; }
+.welcome-companion-row { display: flex; align-items: center; margin-top: 20rpx; padding: 14rpx; border-radius: 22rpx; background: #fffdf7; }
+.welcome-tuantu-avatar { display: flex; flex: none; align-items: center; justify-content: center; width: 112rpx; height: 112rpx; overflow: hidden; border-radius: 50%; background: #e8f0e3; }
+.welcome-tuantu-image { width: 100%; height: 100%; }
+.welcome-tuantu-fallback { color: #4f7457; font-size: 27rpx; font-weight: 700; }
+.welcome-tuantu-copy { display: flex; flex: 1; flex-direction: column; margin-left: 16rpx; }
+.welcome-tuantu-name { color: #56765d; font-size: 23rpx; font-weight: 700; }
+.welcome-tuantu-line { margin-top: 5rpx; color: #405b46; font-size: 24rpx; line-height: 1.45; }
+.welcome-star-status { align-self: flex-end; margin-top: 15rpx; color: #92743e; font-size: 23rpx; font-weight: 700; }
+.welcome-audio-button,.welcome-companion-button { height: 84rpx; margin-top: 20rpx; border: 2rpx solid #d4e4ce; border-radius: 22rpx; background: #eaf3e4; color: #42684c; font-size: 28rpx; font-weight: 700; line-height: 80rpx; }
+.welcome-audio-hint { margin-top: 12rpx; color: #7a846f; font-size: 22rpx; text-align: center; }
+.welcome-sentence-card { display: flex; flex-direction: column; padding: 12rpx 17rpx; border-radius: 18rpx; background: #f2f7ee; }
+.welcome-sentence-chinese { margin-top: 5rpx; color: #718273; font-size: 22rpx; }
+.welcome-letter-challenge { display: flex; align-items: center; justify-content: center; flex-direction: column; margin-top: 18rpx; padding: 22rpx; border-radius: 22rpx; background: #f2f7ee; }
+.welcome-letter-target { color: #36553f; font-size: 68rpx; font-weight: 800; line-height: 1.1; }
+.welcome-letter-hint { margin-top: 8rpx; color: #718273; font-size: 23rpx; }
+.welcome-completion-card { border: 2rpx solid #e5d7a8; background: #fffaf0; }
+.welcome-reward-result { display: flex; align-items: center; flex-direction: column; margin-top: 24rpx; padding: 24rpx; border-radius: 24rpx; background: #fff2c8; }
+.welcome-reward-icon { font-size: 58rpx; line-height: 1.1; }
+.welcome-reward-copy { margin-top: 10rpx; color: #806126; font-size: 27rpx; font-weight: 700; text-align: center; line-height: 1.45; }
+.welcome-star-count { margin-top: 8rpx; color: #917744; font-size: 23rpx; }
+.welcome-completion-companion { border: 2rpx solid #f0e3bf; }
+
+/* 用已有自制场景与角色图构成冒险舞台，让团团在课程里一直可见。 */
+.welcome-scene-stage { position: relative; height: 390rpx; overflow: hidden; margin-top: 20rpx; border: 3rpx solid #fffdf7; border-radius: 26rpx; background: #b8d9bd; box-shadow: 0 10rpx 24rpx rgba(77, 105, 79, .13); }
+.welcome-scene-background { position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; }
+.welcome-stage-character { position: absolute; z-index: 2; bottom: 18rpx; left: 18rpx; display: flex; align-items: flex-end; justify-content: center; width: 278rpx; height: 285rpx; animation: welcome-character-float 2.6s ease-in-out infinite; }
+.welcome-stage-tuantu-image { width: 100%; height: 100%; }
+.welcome-stage-fallback { display: flex; align-items: center; justify-content: center; width: 220rpx; height: 220rpx; border-radius: 50%; background: #fff3d5; color: #755b42; font-size: 36rpx; font-weight: 800; }
+.welcome-scene-star { position: absolute; z-index: 3; right: 28rpx; bottom: 32rpx; width: 88rpx; height: 88rpx; animation: welcome-star-glow 1.8s ease-in-out infinite; }
+.welcome-speech-bubble { position: absolute; z-index: 4; top: 26rpx; right: 20rpx; display: flex; flex-direction: column; box-sizing: border-box; width: 350rpx; min-height: 152rpx; padding: 18rpx 22rpx; border: 3rpx solid #e6eedf; border-radius: 26rpx; background: rgba(255, 253, 247, .96); box-shadow: 0 7rpx 16rpx rgba(59, 82, 61, .12); animation: welcome-bubble-in .35s ease-out both; }
+.welcome-speech-bubble::after { position: absolute; bottom: -18rpx; left: 52rpx; width: 28rpx; height: 28rpx; border-right: 3rpx solid #e6eedf; border-bottom: 3rpx solid #e6eedf; background: #fffdf7; content: ''; transform: rotate(45deg); }
+.welcome-tuantu-name { color: #56765d; font-size: 23rpx; font-weight: 700; }
+.welcome-tuantu-line { margin-top: 7rpx; color: #405b46; font-size: 23rpx; line-height: 1.42; }
+@keyframes welcome-character-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8rpx); } }
+@keyframes welcome-star-glow { 0%, 100% { transform: scale(.94) rotate(-5deg); opacity: .88; } 50% { transform: scale(1.08) rotate(5deg); opacity: 1; } }
+@keyframes welcome-bubble-in { from { opacity: 0; transform: translateY(9rpx); } to { opacity: 1; transform: translateY(0); } }

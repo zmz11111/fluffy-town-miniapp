@@ -1,18 +1,18 @@
 const { CHAPTER_WELCOME } = require('../chapters/chapter_welcome');
 const { WELCOME_PREVIEW } = require('../../curriculum/welcome/preview-content');
 
-// 初次见面先邀请孩子选择问候；是否完成由 Welcome 学习任务模块记录。
+// 第一段剧情把教材问候任务变成团团找回星星徽章的明确目标。
 const WELCOME_SCENE_001 = {
   id: CHAPTER_WELCOME.sceneIds[0],
   chapterId: CHAPTER_WELCOME.id,
-  title: '团团来打招呼',
+  title: '团团的星星徽章不见了',
   dialogues: [
-    { speakerId: 'narrator', text: '树屋里传来轻轻的脚步声，一个毛茸茸的小伙伴探出头来。' },
-    { speakerId: 'tuantuan', text: '嗨，我是团团！你愿意和我打个招呼、认识一位新朋友吗？' }
+    { speakerId: 'narrator', text: '树屋边传来轻轻的滚动声，一枚星星徽章滚到了书架后面。' },
+    { speakerId: 'tuantuan', text: '我想请米米帮忙找，可我有点着急。你陪我听听问候、挑句子，一起把星星找回来，好吗？' }
   ],
   nextSceneId: CHAPTER_WELCOME.sceneIds[1],
   requiredTaskId: WELCOME_PREVIEW.taskId,
-  tuantuanEmotion: 'curious',
+  tuantuanEmotion: 'worried',
   taskTriggers: [{ when: 'enter', taskId: WELCOME_PREVIEW.taskId }]
 };
 
