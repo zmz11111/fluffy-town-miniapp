@@ -2,7 +2,7 @@
 <view class="learn-page">
   <view class="learn-hero">
     <text class="hero-kicker">树屋小冒险</text>
-    <text class="hero-title">今天认识这 5 个词</text>
+    <text class="hero-title">今天认识这 {{total}} 个词</text>
     <text class="hero-subtitle">轻轻点一下，记下你已经认识的单词。</text>
     <text class="hero-count">已认识 {{completed}} / {{total}}</text>
   </view>
@@ -21,3 +21,4 @@
 
   <button class="back-button" bindtap="backHome">返回树屋</button>
 </view>
+
