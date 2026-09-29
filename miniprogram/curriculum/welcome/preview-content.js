@@ -39,6 +39,11 @@ function shuffleOptions(options) {
   return shuffled;
 }
 
+// 课程释义允许缺省；缺失时使用可读的英文或通用提示继续生成任务。
+function getTextOrFallback(value, fallback) {
+  return typeof value === 'string' && value.trim() ? value : fallback;
+}
+
 // 首课把找词、听辨、句型选择和伙伴互动串成同一条找回星星的任务链。
 const FIRST_SESSION_STEPS = [
   {
@@ -100,36 +105,47 @@ const FIRST_SESSION_STEPS = [
 ];
 
 // 后续分课也使用有答案、有反馈的互动挑战，不再用“我看过了”按钮代替学习行为。
-function buildReleaseSessionSteps(session) {
+function buildReleaseSessionSteps(session, sessionIndex) {
+  const safeSessionIndex = Number.isInteger(sessionIndex) && sessionIndex >= 0 ? sessionIndex : 0;
   const adventure = WELCOME_ADVENTURES[session.id];
   const steps = [];
   const vocabulary = (session.vocabularyIds || []).map((id) => VOCABULARY_BY_ID[id]).filter(Boolean);
   if (vocabulary.length) {
     const choices = vocabulary.slice(0, 3);
-    const target = choices[session.index % choices.length];
+    const target = choices[safeSessionIndex % choices.length] || choices[0];
+    const targetEnglish = getTextOrFallback(target && target.english, '这个单词');
+    const targetMeaning = getTextOrFallback(target && target.chinese, targetEnglish);
     steps.push({
       id: `${session.id}:vocabulary`,
       kind: 'learn-vocabulary',
-      prompt: `团团需要找到“${target.chinese}”这张词卡，帮它选一选。`,
+      prompt: `团团需要找到“${targetMeaning}”这张词卡，帮它选一选。`,
       vocabularyIds: session.vocabularyIds,
-      options: shuffleOptions(choices.map((entry) => ({ id: entry.id, label: entry.english }))),
+      options: shuffleOptions(choices.map((entry) => ({
+        id: entry.id,
+        label: getTextOrFallback(entry.english, '单词卡')
+      }))),
       correctOptionId: target.id,
-      correctMessage: `找到了！${target.english} 是“${target.chinese}”。`,
+      correctMessage: `找到了！${targetEnglish} 是“${targetMeaning}”。`,
       retryMessage: `再看看中文线索，团团陪你一起找。`
     });
   }
   const sentences = (session.sentenceIds || []).map((id) => SENTENCES_BY_ID[id]).filter(Boolean);
   if (sentences.length) {
     const choices = sentences.slice(0, 3);
-    const target = choices[session.index % choices.length];
+    const target = choices[safeSessionIndex % choices.length] || choices[0];
+    const targetText = getTextOrFallback(target && target.text, '这句话');
+    const targetMeaning = getTextOrFallback(target && target.chinese, targetText);
     steps.push({
       id: `${session.id}:sentences`,
       kind: 'practice-sentence',
-      prompt: `团团想找到“${target.chinese || target.text}”这句话，帮它读一读再选择。`,
+      prompt: `团团想找到“${targetMeaning}”这句话，帮它读一读再选择。`,
       sentenceIds: session.sentenceIds,
-      options: shuffleOptions(choices.map((entry) => ({ id: entry.id, label: entry.text }))),
+      options: shuffleOptions(choices.map((entry) => ({
+        id: entry.id,
+        label: getTextOrFallback(entry.text, '句子卡')
+      }))),
       correctOptionId: target.id,
-      correctMessage: `选对啦！${target.text} 这句话找到了。`,
+      correctMessage: `选对啦！${targetText} 这句话找到了。`,
       retryMessage: '再读一读中文线索，团团会陪你一起想。'
     });
   }
@@ -159,11 +175,13 @@ function buildReleaseSessionSteps(session) {
   return steps;
 }
 
-const WELCOME_SESSIONS = WELCOME_DAILY_PLAN.releaseSessions.map((session, index) => Object.assign({}, session, {
-  index,
-  adventure: WELCOME_ADVENTURES[session.id],
-  steps: index === 0 ? FIRST_SESSION_STEPS : buildReleaseSessionSteps(session)
-}));
+const WELCOME_SESSIONS = WELCOME_DAILY_PLAN.releaseSessions.map((session, index) => {
+  const indexedSession = Object.assign({}, session, { index });
+  return Object.assign(indexedSession, {
+    adventure: WELCOME_ADVENTURES[session.id],
+    steps: index === 0 ? FIRST_SESSION_STEPS : buildReleaseSessionSteps(indexedSession, index)
+  });
+});
 
 // Welcome 保留原有七节次序和教材映射，每一节只释放自己的互动任务。
 const WELCOME_PREVIEW = Object.freeze({
@@ -183,4 +201,10 @@ const WELCOME_PREVIEW = Object.freeze({
   sourceReferences: WELCOME_UNIT_INFO.sourceReferences
 });
 
-module.exports = { WELCOME_PREVIEW, WELCOME_SESSIONS, WELCOME_KNOWLEDGE, WELCOME_DAILY_PLAN };
+module.exports = {
+  WELCOME_PREVIEW,
+  WELCOME_SESSIONS,
+  WELCOME_KNOWLEDGE,
+  WELCOME_DAILY_PLAN,
+  buildReleaseSessionSteps
+};
