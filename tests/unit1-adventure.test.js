@@ -21,8 +21,7 @@ const { UNIT1_PREVIEW } = require('../miniprogram/curriculum/unit1/preview-conte
 const { WELCOME_PREVIEW, WELCOME_DAILY_PLAN } = require('../miniprogram/curriculum/welcome/preview-content');
 const story = require('../miniprogram/story/story-manager');
 const learning = require('../miniprogram/english/unit1-learning');
-const welcomeLearning = require('../miniprogram/english/welcome-learning');
-const { getLearningState, getNextCourseEntry } = require('../miniprogram/english/learning-state');
+const { getLearningState, getNextCourseEntry, completeWelcomeSession } = require('../miniprogram/english/learning-state');
 const greetings = require('../miniprogram/games/unit1-greetings/game-manager');
 const { INTERACTION_COOLDOWN_MS, MAX_DAILY_INTERACTIONS, interactWithTuantuan } = require('../miniprogram/pets/interaction');
 const { updateState } = require('../miniprogram/storage/local');
@@ -48,37 +47,14 @@ function advanceUntilTaskRequired() {
   throw new Error('没有遇到任务门槛');
 }
 
-function completeWelcomeChapter() {
-  story.startChapter(CHAPTER_WELCOME.id);
-  const taskGate = advanceUntilTaskRequired();
-  assert.equal(taskGate.taskId, WELCOME_PREVIEW.taskId);
-  const firstView = welcomeLearning.startTask();
-  assert.equal(firstView.stepIndex, 0);
-  assert.equal(firstView.step.kind, 'learn-vocabulary');
-  assert.deepEqual(firstView.step.vocabulary.map((word) => word.english), ['hello', 'hi', 'name']);
-  assert.equal(welcomeLearning.chooseStep('seen-vocabulary').completed, false);
-  assert.equal(getLearningState().currentTaskId, WELCOME_PREVIEW.taskId);
-  const wrongIntroduction = welcomeLearning.chooseStep('hello');
-  assert.equal(wrongIntroduction.correct, false);
-  assert.equal(welcomeLearning.getTaskView().stepIndex, 1);
-  assert.equal(welcomeLearning.getTaskView().step.kind, 'practice-sentence');
-  assert.equal(welcomeLearning.chooseStep('my-name-is').completed, false);
-  assert.equal(welcomeLearning.getTaskView().stepIndex, 2);
-  assert.equal(welcomeLearning.getTaskView().step.kind, 'listen-and-identify');
-  assert.equal(welcomeLearning.chooseStep('hello').completed, false);
-  assert.equal(welcomeLearning.getTaskView().stepIndex, 3);
-  assert.equal(welcomeLearning.getTaskView().step.kind, 'companion-interaction');
-  const companionInteraction = interactWithTuantuan();
-  assert.equal(companionInteraction.feedbackLevel, 'high');
-  assert.equal(welcomeLearning.completeInteractionStep(companionInteraction).completed, true);
-  assert.ok(getGameState().completedTaskIds.includes(WELCOME_PREVIEW.taskId));
-  assert.equal(getLearningState().taskProgressById[WELCOME_PREVIEW.taskId].status, 'completed');
-  assert.equal(WELCOME_DAILY_PLAN.activities.map((item) => item.type).join(','), 'new-word-learning,sentence-practice,listening-task,companion-interaction');
-  while (story.getCurrentStory()) {
-    const result = story.advanceStory();
-    assert.notEqual(result.status, 'task_required');
-  }
-  assert.ok(getLearningState().completedUnitIds.includes(WELCOME_PREVIEW.unitId));
+// Unit 1 测试使用已完成 Welcome 的档案前置条件；首课挑战由 Sprint 10 专项测试覆盖。
+function prepareCompletedWelcomeProfileForUnit1Test() {
+  WELCOME_PREVIEW.sessions.forEach((session) => {
+    completeWelcomeSession(session.taskId, session.objectiveIdsToComplete || []);
+  });
+  const welcomeInteraction = interactWithTuantuan();
+  assert.equal(welcomeInteraction.interactionAccepted, true);
+  assert.equal(welcomeInteraction.feedbackLevel, 'high');
   assert.equal(getNextCourseEntry().chapterId, CHAPTER_UNIT1.id);
   assert.equal(getLearningState().currentChapterId, CHAPTER_UNIT1.id);
 }
@@ -87,7 +63,7 @@ test('Unit 1 完成核心学习、问候游戏、故事奖励和团团互动', (
   resetStorage();
   assert.equal(getNextCourseEntry().chapterId, CHAPTER_WELCOME.id);
   assert.throws(() => story.startChapter(CHAPTER_UNIT1.id), /请先和团团完成 Welcome/);
-  completeWelcomeChapter();
+  prepareCompletedWelcomeProfileForUnit1Test();
   assert.throws(() => learning.startLearningTask(), /请先在故事里/);
 
   updateState((draft) => {

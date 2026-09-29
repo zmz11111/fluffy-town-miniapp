@@ -58,6 +58,13 @@ function isUniqueIdList(value) {
   return Array.isArray(value) && value.every(isContentId) && new Set(value).size === value.length;
 }
 
+function isAnswerDraftMap(value) {
+  return value === undefined || Boolean(
+    value && typeof value === 'object' && !Array.isArray(value) &&
+    Object.keys(value).every((stepId) => isContentId(stepId) && isUniqueIdList(value[stepId]))
+  );
+}
+
 function isProgressMap(value, allowedStatuses, requiresChapter) {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value) &&
     Object.keys(value).every((id) => {
@@ -68,7 +75,8 @@ function isProgressMap(value, allowedStatuses, requiresChapter) {
         (!requiresChapter || isUniqueIdList(entry.completedTaskIds)) &&
         (entry.stepIndex === undefined || (Number.isInteger(entry.stepIndex) && entry.stepIndex >= 0)) &&
         (entry.startedAt === undefined || entry.startedAt === null || typeof entry.startedAt === 'string') &&
-        (entry.completedAt === undefined || entry.completedAt === null || typeof entry.completedAt === 'string');
+        (entry.completedAt === undefined || entry.completedAt === null || typeof entry.completedAt === 'string') &&
+        isAnswerDraftMap(entry.answerDraftByStepId);
     }));
 }
 

@@ -20,7 +20,10 @@ const {
 const {
   startTask: startWelcomeTask,
   chooseStep: chooseWelcomeStep,
-  completeInteractionStep: completeWelcomeInteractionStep
+  completeInteractionStep: completeWelcomeInteractionStep,
+  completeGreetingInputStep,
+  markGreetingVocabularyAudioPlayed,
+  selectSentenceBuildTile
 } = require('../../english/welcome-learning');
 
 Page({
@@ -46,6 +49,7 @@ Page({
     welcomeTotalSessions: 0,
     welcomeCompletedSessions: 0,
     welcomeAdventureGoal: '',
+    welcomeChallengeTask: null,
     welcomeAudioPlayed: false,
     welcomeRewardMessage: '',
     welcomeStars: 0,
@@ -180,12 +184,14 @@ Page({
         welcomeSessionNumber: view.sessionIndex || view.welcomeProgress && view.welcomeProgress.currentSessionIndex || 0,
         welcomeTotalSessions: view.totalSessions || 7,
         welcomeCompletedSessions: view.completedSessions || 0,
-        welcomeAdventureGoal: adventure.goal || '',
+        welcomeAdventureGoal: view.challengeTask ? view.challengeTask.story.goal : adventure.goal || '',
+        welcomeChallengeTask: view.challengeTask || null,
         welcomeAudioPlayed: Boolean(view.audioPlayed),
         welcomeMessage: message || '',
         welcomeRewardMessage: rewardMessage || '',
         welcomeStars: getGameState().stars,
-        tuantuanMessage: companionMessage || adventure.openingDialogue || '团团会陪你一起完成这段小冒险。',
+        tuantuanMessage: companionMessage || view.challengeTask && view.challengeTask.story.openingDialogue ||
+          adventure.openingDialogue || '团团会陪你一起完成这段小冒险。',
         tuantuanVisual: getTuantuanVisual(companionEmotion || 'thinking'),
         tuantuanImageFailed: false,
         interactionsRemaining: interactionStatus.remainingDailyInteractions,
@@ -282,6 +288,72 @@ Page({
       this.releaseChoiceAfterDelay();
     } catch (error) {
       this.setData({ welcomeMessage: '这一步暂时没有保存好，再试一次吧。' });
+      this.releaseChoiceAfterDelay();
+    }
+  },
+
+  // Hello 和 Hi 必须分别播放过，学习页才开放下一步听力挑战。
+  playWelcomeGreetingAudio(event) {
+    const wordId = event.currentTarget.dataset.wordId;
+    const step = this.data.welcomeStep;
+    const word = step && (step.vocabulary || []).find((entry) => entry.id === wordId);
+    const result = playVocabularyAudio(this.audio, word);
+    if (!result.played || !markGreetingVocabularyAudioPlayed(wordId)) {
+      this.setData({ pronunciationMessage: result.message || '这张问候卡的声音暂时无法播放。' });
+      return;
+    }
+    this.refreshWelcomeTask('听清楚啦！再听另一张问候卡，之后帮团团辨认米米的声音。',
+      '一张是 Hello，一张是 Hi。你听得很认真，徽章好像亮了一点。', 'curious');
+  },
+
+  // 只有两张问候词卡都实际播放过，才能进入听音选择。
+  completeWelcomeGreetingInputStep() {
+    if (this.choiceBusy) {
+      return;
+    }
+    this.choiceBusy = true;
+    this.setData({ choiceBusy: true });
+    try {
+      const result = completeGreetingInputStep();
+      if (!result.correct) {
+        this.setData({
+          welcomeMessage: result.message,
+          tuantuanMessage: result.companionMessage,
+          tuantuanVisual: getTuantuanVisual(result.companionEmotion || 'thinking')
+        });
+        this.releaseChoiceAfterDelay();
+        return;
+      }
+      this.refreshWelcomeTask(result.message, result.companionMessage, result.companionEmotion || 'happy');
+      this.releaseChoiceAfterDelay();
+    } catch (error) {
+      this.setData({ welcomeMessage: '两张问候卡都听过后，团团就能继续找线索啦。' });
+      this.releaseChoiceAfterDelay();
+    }
+  },
+
+  // 句子拼组逐块检查；错误时保留已拼部分，鼓励孩子重新观察顺序。
+  chooseSentenceBuildTile(event) {
+    if (this.choiceBusy) {
+      return;
+    }
+    this.choiceBusy = true;
+    this.setData({ choiceBusy: true });
+    try {
+      const result = selectSentenceBuildTile(event.currentTarget.dataset.tileId);
+      if (!result.correct) {
+        this.setData({
+          welcomeMessage: result.message,
+          tuantuanMessage: result.companionMessage || '没关系，再看看词块的顺序。',
+          tuantuanVisual: getTuantuanVisual(result.companionEmotion || 'thinking')
+        });
+        this.releaseChoiceAfterDelay();
+        return;
+      }
+      this.refreshWelcomeTask(result.message, result.companionMessage, result.companionEmotion || 'happy');
+      this.releaseChoiceAfterDelay();
+    } catch (error) {
+      this.setData({ welcomeMessage: '这块词语暂时没有放好，再试一次吧。' });
       this.releaseChoiceAfterDelay();
     }
   },

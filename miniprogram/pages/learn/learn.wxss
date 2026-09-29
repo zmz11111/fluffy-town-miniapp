@@ -63,6 +63,21 @@
 .welcome-star-status { align-self: flex-end; margin-top: 15rpx; color: #92743e; font-size: 23rpx; font-weight: 700; }
 .welcome-audio-button,.welcome-companion-button { height: 84rpx; margin-top: 20rpx; border: 2rpx solid #d4e4ce; border-radius: 22rpx; background: #eaf3e4; color: #42684c; font-size: 28rpx; font-weight: 700; line-height: 80rpx; }
 .welcome-audio-hint { margin-top: 12rpx; color: #7a846f; font-size: 22rpx; text-align: center; }
+.welcome-greeting-input { display: flex; flex-direction: column; margin-top: 18rpx; }
+.welcome-greeting-word + .welcome-greeting-word { margin-top: 12rpx; }
+.welcome-greeting-word { display: flex; align-items: center; justify-content: space-between; padding: 16rpx 20rpx; border: 2rpx solid #dce9d6; border-radius: 20rpx; background: #fffdf7; }
+.welcome-greeting-word-copy { display: flex; flex-direction: column; }
+.welcome-greeting-word-text { color: #36553f; font-size: 34rpx; font-weight: 800; }
+.welcome-greeting-phonetic { margin-top: 4rpx; color: #7a887b; font-size: 23rpx; }
+.welcome-greeting-heard { margin-top: 6rpx; color: #79917a; font-size: 21rpx; }
+.welcome-greeting-audio { width: 82rpx; height: 72rpx; margin: 0; border-radius: 18rpx; background: #eaf3e4; color: #42684c; font-size: 30rpx; line-height: 68rpx; }
+.welcome-sentence-build { margin-top: 18rpx; }
+.welcome-sentence-result { display: flex; flex-wrap: wrap; align-items: center; min-height: 86rpx; padding: 12rpx; border: 2rpx dashed #c8dbc1; border-radius: 20rpx; background: #fffdf7; }
+.welcome-sentence-placeholder { color: #849184; font-size: 23rpx; }
+.welcome-sentence-piece { margin: 4rpx; padding: 11rpx 15rpx; border-radius: 14rpx; background: #eaf3e4; color: #36553f; font-size: 26rpx; font-weight: 700; }
+.welcome-sentence-tiles { display: flex; flex-wrap: wrap; justify-content: center; margin: 9rpx -6rpx 0; }
+.welcome-sentence-tile { margin: 6rpx; padding: 0 23rpx; border: 2rpx solid #d9e5d4; border-radius: 18rpx; background: #f8fbf5; color: #42684c; font-size: 27rpx; }
+
 .welcome-sentence-card { display: flex; flex-direction: column; padding: 12rpx 17rpx; border-radius: 18rpx; background: #f2f7ee; }
 .welcome-sentence-chinese { margin-top: 5rpx; color: #718273; font-size: 22rpx; }
 .welcome-letter-challenge { display: flex; align-items: center; justify-content: center; flex-direction: column; margin-top: 18rpx; padding: 22rpx; border-radius: 22rpx; background: #f2f7ee; }

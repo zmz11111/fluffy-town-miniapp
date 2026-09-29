@@ -86,8 +86,29 @@
         <text>{{item.value}} {{item.lowercase}}</text>
       </button>
     </view>
-    <button wx:if="{{welcomeStep.kind === 'listen-and-identify'}}" class="welcome-audio-button" bindtap="playWelcomeAudio" disabled="{{choiceBusy}}">🔊 听团团说</button>
-    <text wx:if="{{welcomeStep.requireAudioPlayed && !welcomeAudioPlayed}}" class="welcome-audio-hint">听过团团的问候后，再选一张卡片。</text>
+    <view wx:if="{{welcomeStep.kind === 'greeting-input'}}" class="welcome-greeting-input">
+      <view wx:for="{{welcomeStep.vocabulary}}" wx:key="id" class="welcome-greeting-word">
+        <view class="welcome-greeting-word-copy">
+          <text class="welcome-greeting-word-text">{{item.english}}</text>
+          <text wx:if="{{item.phonetic}}" class="welcome-greeting-phonetic">{{item.phonetic}}</text>
+          <text class="welcome-greeting-heard">{{item.audioPlayed ? '已经听过啦' : '点一下听发音'}}</text>
+        </view>
+        <button class="welcome-greeting-audio" data-word-id="{{item.id}}" bindtap="playWelcomeGreetingAudio" disabled="{{choiceBusy}}">🔊</button>
+      </view>
+      <button class="welcome-audio-button" bindtap="completeWelcomeGreetingInputStep" disabled="{{choiceBusy || !welcomeStep.inputReady}}">听好啦，开始听辨</button>
+      <text class="welcome-audio-hint">两张问候卡都听过后，才会开始找声音。</text>
+    </view>
+    <view wx:if="{{welcomeStep.kind === 'sentence-build'}}" class="welcome-sentence-build">
+      <view class="welcome-sentence-result">
+        <text wx:if="{{!welcomeStep.hasSelectedTiles}}" class="welcome-sentence-placeholder">把词块按顺序放进句子里</text>
+        <text wx:for="{{welcomeStep.selectedTiles}}" wx:key="id" class="welcome-sentence-piece">{{item.label}}</text>
+      </view>
+      <view class="welcome-sentence-tiles">
+        <button wx:for="{{welcomeStep.availableTiles}}" wx:key="id" class="welcome-sentence-tile" data-tile-id="{{item.id}}" bindtap="chooseSentenceBuildTile" disabled="{{choiceBusy}}">{{item.label}}</button>
+      </view>
+    </view>
+    <button wx:if="{{welcomeStep.kind === 'listen-and-identify'}}" class="welcome-audio-button" bindtap="playWelcomeAudio" disabled="{{choiceBusy}}">🔊 听米米说</button>
+    <text wx:if="{{welcomeStep.kind === 'listen-and-identify' && !welcomeAudioPlayed}}" class="welcome-audio-hint">先听米米的问候，再选一张声音相同的卡片。</text>
     <button wx:if="{{welcomeStep.kind === 'companion-interaction'}}" class="welcome-companion-button" bindtap="interactForWelcome" disabled="{{choiceBusy}}">{{welcomeStep.buttonLabel}}</button>
     <button wx:for="{{welcomeStep.options}}" wx:key="id" class="welcome-option" data-option-id="{{item.id}}" bindtap="chooseWelcomeOption" disabled="{{choiceBusy || (welcomeStep.requireAudioPlayed && !welcomeAudioPlayed)}}">
       <text class="welcome-option-label">{{item.label}}</text>

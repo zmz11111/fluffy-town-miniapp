@@ -5,6 +5,7 @@ const {
   WELCOME_TASK_ID
 } = require('../../english/learning-state-model');
 const { getUnitKnowledgePackage } = require('../curriculum-manager');
+const { createChallengeTask } = require('../../english/challenge-task-model');
 const { WELCOME_ADVENTURES } = require('../../story/welcome-adventures');
 const WELCOME_UNIT_INFO = require('./unit-info.runtime');
 const WELCOME_DAILY_PLAN = require('./daily-plan.runtime');
@@ -23,9 +24,7 @@ const listeningActivity = DAILY_ACTIVITIES.listening;
 const interactionActivity = DAILY_ACTIVITIES['tuantuan-interaction'];
 const hello = VOCABULARY_BY_ID['wj-g3-v1:welcome:hello'];
 const hi = VOCABULARY_BY_ID['wj-g3-v1:welcome:hi'];
-const nameWord = VOCABULARY_BY_ID['wj-g3-v1:welcome:name'];
-const nameSentence = SENTENCES_BY_ID['wj-g3-v1:welcome:sentence-my-name-is'];
-const helloSentence = SENTENCES_BY_ID['wj-g3-v1:welcome:sentence-hello'];
+const imSentence = SENTENCES_BY_ID['wj-g3-v1:welcome:sentence-im'];
 
 // 每次载入课程时打乱选项，避免正确答案固定在同一位置。
 function shuffleOptions(options) {
@@ -44,63 +43,60 @@ function getTextOrFallback(value, fallback) {
   return typeof value === 'string' && value.trim() ? value : fallback;
 }
 
-// 首课把找词、听辨、句型选择和伙伴互动串成同一条找回星星的任务链。
+// 首课先听读 Hello / Hi，再完成听音辨认和句子拼组，最后和团团一起找回星星。
 const FIRST_SESSION_STEPS = [
   {
-    id: wordActivity.id,
-    kind: 'learn-vocabulary',
-    prompt: '团团想找回表示“名字”的单词卡。你能从三张卡里找出来吗？',
-    vocabularyIds: wordActivity.vocabularyIds,
-    options: shuffleOptions([hello, hi, nameWord].map((word) => ({ id: word.id, label: word.english }))),
-    correctOptionId: nameWord.id,
-    correctMessage: '找到了！name 是“名字”。团团可以向米米介绍自己了。',
-    retryMessage: '再看看哪张单词卡表示“名字”，团团陪你一起找。'
+    id: wordActivity.id + ':greeting-input',
+    kind: 'greeting-input',
+    prompt: '书架后传来轻轻的声音。先听听 Hello 和 Hi，帮团团认出两种问候。',
+    vocabularyIds: [hello.id, hi.id],
+    requiredAudioVocabularyIds: [hello.id, hi.id],
+    retryMessage: '再听一听两张问候卡，听过 Hello 和 Hi 后才能继续找声音。',
+    correctMessage: 'Hello 和 Hi 都听过啦！团团听见书架后有动静。',
+    correctDialogue: '你把两种问候都听清楚了！书架后好像有星星徽章的声音。'
   },
   {
     id: listeningActivity.id,
     kind: 'listen-and-identify',
-    prompt: '团团听见米米走近了。先听声音，再选出团团说的问候。',
-    audioSrc: '/assets/audio/hello.wav',
+    prompt: '米米从书架后喊了一声。听一听，再选出她说的问候。',
+    audioSrc: hi.audioSrc || '/assets/audio/hi.wav',
     requireAudioPlayed: true,
     options: shuffleOptions([
       { id: hello.id, label: hello.english, audioSrc: hello.audioSrc || '/assets/audio/hello.wav' },
       { id: hi.id, label: hi.english, audioSrc: hi.audioSrc || '/assets/audio/hi.wav' }
     ]),
-    correctOptionId: hello.id,
-    correctMessage: '你听对了！团团说的是 Hello。',
-    retryMessage: '再听一次，注意团团说的是哪句问候。'
+    correctOptionId: hi.id,
+    correctMessage: '听对啦！米米说的是 Hi！',
+    retryMessage: '再听一次，注意米米的声音和 Hello、Hi 哪张卡相同。',
+    correctDialogue: '米米听见你认出了 Hi！她指了指书架旁边闪闪发亮的角落。',
+    retryDialogue: '没关系，我们再听听。米米就在书架后等着我们。'
   },
   {
-    id: sentenceActivity.id,
-    kind: 'practice-sentence',
-    prompt: '米米问团团的名字。团团应该怎样介绍自己？',
-    sentenceIds: sentenceActivity.sentenceIds.concat([helloSentence.id]),
-    options: shuffleOptions([
-      { id: 'my-name-is', label: 'My name is Mimi.', sentenceId: nameSentence.id },
-      { id: 'hello', label: helloSentence.text, sentenceId: helloSentence.id }
-    ]),
-    correctOptionId: 'my-name-is',
-    correctMessage: '对啦！My name is Mimi. 可以介绍名字。',
-    retryMessage: '再看看米米问的是什么，选一句介绍名字的话。'
-  },
-  {
-    id: `${interactionActivity.id}:choose-greeting`,
-    kind: 'speak-choice',
-    prompt: '轮到我们向米米打招呼了。选一句适合初次见面的问候，也可以轻轻读出来。',
-    options: shuffleOptions([
-      { id: 'greet-hello', label: 'Hello, Mimi!' },
-      { id: 'greet-goodbye', label: 'Goodbye, Mimi!' }
-    ]),
-    correctOptionId: 'greet-hello',
-    correctMessage: '这句问候很合适！米米听见我们啦。',
-    retryMessage: '我们刚见到米米，选一句见面时的问候吧。'
+    id: sentenceActivity.id + ':build-greeting',
+    kind: 'sentence-build',
+    prompt: '团团想向米米介绍自己。按顺序拼出这句话，看看星星徽章藏在哪里。',
+    sentenceIds: [imSentence.id],
+    tiles: [
+      { id: 'session-01-hi', label: 'Hi!' },
+      { id: 'session-01-im', label: "I'm" },
+      { id: 'session-01-mimi', label: 'Mimi.' },
+      { id: 'session-01-hello', label: 'Hello.' },
+      { id: 'session-01-name', label: 'name' }
+    ],
+    correctTileIds: ['session-01-hi', 'session-01-im', 'session-01-mimi'],
+    correctMessage: '句子拼好啦：Hi! I\'m Mimi. 米米笑着指向星星徽章！',
+    retryMessage: '顺序不太对，再想想问候之后，团团要怎样介绍自己。',
+    correctDialogue: '太棒了！团团用完整句子介绍了自己。米米从书架后找到了星星徽章！',
+    retryDialogue: '不着急，团团陪你一起看看词块的顺序。'
   },
   {
     id: interactionActivity.id,
     kind: 'companion-interaction',
     prompt: WELCOME_ADVENTURES['welcome-session-01'].companionPrompt,
     buttonLabel: WELCOME_ADVENTURES['welcome-session-01'].companionButtonLabel,
-    objectiveIds: interactionActivity.objectiveIds
+    objectiveIds: interactionActivity.objectiveIds,
+    retryMessage: '团团还在等你的鼓励，轻轻点一下，和它一起收下徽章吧。',
+    correctMessage: '你和团团一起找回了星星徽章！'
   }
 ];
 
@@ -175,11 +171,41 @@ function buildReleaseSessionSteps(session, sessionIndex) {
   return steps;
 }
 
+const firstSessionDefinition = WELCOME_DAILY_PLAN.releaseSessions[0];
+const firstSessionAdventure = WELCOME_ADVENTURES[firstSessionDefinition.id];
+const FIRST_SESSION_CHALLENGE_TASK = createChallengeTask({
+  id: firstSessionDefinition.taskId,
+  unitId: WELCOME_UNIT_ID,
+  sessionId: firstSessionDefinition.id,
+  story: {
+    goal: firstSessionAdventure.goal,
+    openingDialogue: firstSessionAdventure.openingDialogue
+  },
+  englishInput: [
+    { kind: 'vocabulary', contentIds: [hello.id, hi.id] },
+    { kind: 'listening', contentIds: [hello.id, hi.id] },
+    { kind: 'sentence', contentIds: [imSentence.id] }
+  ],
+  childActions: FIRST_SESSION_STEPS,
+  feedback: {
+    error: firstSessionAdventure.retryDialogue,
+    success: firstSessionAdventure.successDialogue,
+    completion: firstSessionAdventure.completionDialogue
+  },
+  reward: {
+    id: firstSessionAdventure.rewardId,
+    type: 'star',
+    amount: 1,
+    message: firstSessionAdventure.rewardMessage
+  }
+});
+
 const WELCOME_SESSIONS = WELCOME_DAILY_PLAN.releaseSessions.map((session, index) => {
   const indexedSession = Object.assign({}, session, { index });
   return Object.assign(indexedSession, {
     adventure: WELCOME_ADVENTURES[session.id],
-    steps: index === 0 ? FIRST_SESSION_STEPS : buildReleaseSessionSteps(indexedSession, index)
+    challengeTask: index === 0 ? FIRST_SESSION_CHALLENGE_TASK : null,
+    steps: index === 0 ? FIRST_SESSION_CHALLENGE_TASK.childActions : buildReleaseSessionSteps(indexedSession, index)
   });
 });
 
@@ -189,7 +215,7 @@ const WELCOME_PREVIEW = Object.freeze({
   unitId: WELCOME_UNIT_ID,
   chapterId: WELCOME_CHAPTER_ID,
   taskId: WELCOME_TASK_ID,
-  contentVersion: 'sprint-9-welcome-adventure-2',
+  contentVersion: 'sprint-10-welcome-challenge-1',
   title: WELCOME_UNIT_INFO.title,
   displayTitle: WELCOME_UNIT_INFO.displayTitle,
   taskTitle: WELCOME_DAILY_PLAN.title,
@@ -206,5 +232,6 @@ module.exports = {
   WELCOME_SESSIONS,
   WELCOME_KNOWLEDGE,
   WELCOME_DAILY_PLAN,
+  FIRST_SESSION_CHALLENGE_TASK,
   buildReleaseSessionSteps
 };

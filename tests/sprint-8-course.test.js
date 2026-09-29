@@ -23,6 +23,7 @@ const { CHAPTER_UNIT1 } = require('../miniprogram/story/chapters/chapter_unit1')
 const { CHAPTER_WELCOME } = require('../miniprogram/story/chapters/chapter_welcome');
 const story = require('../miniprogram/story/story-manager');
 const { getLearningState, getNextCourseEntry } = require('../miniprogram/english/learning-state');
+const { getGameState } = require('../miniprogram/game/state');
 const welcomeLearning = require('../miniprogram/english/welcome-learning');
 const { WELCOME_PREVIEW, WELCOME_DAILY_PLAN } = require('../miniprogram/curriculum/welcome/preview-content');
 const curriculum = require('../miniprogram/curriculum/curriculum-manager');
@@ -130,7 +131,7 @@ test('米米入口和空故事页不会绕过 Welcome', () => {
     '完成Welcome后，小游戏的空入口进入Unit 1');
 });
 
-test('完成 Welcome 学习任务和剧情后才开放 Unit 1', () => {
+test('完成 Welcome 第1节仍保留课程顺序，不提前开放 Unit 1', () => {
   resetStorage();
   assert.equal(getNextCourseEntry().chapterId, CHAPTER_WELCOME.id);
   assert.throws(() => story.startChapter(CHAPTER_UNIT1.id), /请先和团团完成 Welcome/);
@@ -138,26 +139,40 @@ test('完成 Welcome 学习任务和剧情后才开放 Unit 1', () => {
   story.startChapter(CHAPTER_WELCOME.id);
   assert.equal(story.advanceStory().status, 'advanced');
   assert.equal(story.advanceStory().status, 'task_required');
-  welcomeLearning.startTask();
-  assert.equal(welcomeLearning.getTaskView().step.vocabulary.length, 3);
-  welcomeLearning.chooseStep('seen-vocabulary');
-  assert.equal(welcomeLearning.chooseStep('hello').correct, false);
-  welcomeLearning.chooseStep('my-name-is');
-  welcomeLearning.chooseStep('hello');
+  const view = welcomeLearning.startTask();
+  assert.equal(view.step.kind, 'greeting-input');
+  assert.deepEqual(view.step.vocabulary.map((entry) => entry.id), [
+    'wj-g3-v1:welcome:hello', 'wj-g3-v1:welcome:hi'
+  ]);
+
+  const helloId = 'wj-g3-v1:welcome:hello';
+  const hiId = 'wj-g3-v1:welcome:hi';
+  assert.equal(welcomeLearning.completeGreetingInputStep().correct, false);
+  welcomeLearning.markGreetingVocabularyAudioPlayed(helloId);
+  assert.equal(welcomeLearning.completeGreetingInputStep().correct, false);
+  welcomeLearning.markGreetingVocabularyAudioPlayed(hiId);
+  assert.equal(welcomeLearning.completeGreetingInputStep().correct, true);
+  assert.equal(welcomeLearning.chooseStep(hiId).correct, false, '先播放听力题后才能选择');
+  welcomeLearning.markCurrentAudioPlayed();
+  assert.equal(welcomeLearning.chooseStep(hiId).correct, true);
+  assert.equal(welcomeLearning.getTaskView().step.kind, 'sentence-build');
+
+  ['session-01-hi', 'session-01-im', 'session-01-mimi'].forEach((tileId) => {
+    welcomeLearning.selectSentenceBuildTile(tileId);
+  });
+  assert.equal(welcomeLearning.getTaskView().step.kind, 'companion-interaction');
   const interactionResult = require('../miniprogram/pets/interaction').interactWithTuantuan();
-  assert.equal(welcomeLearning.completeInteractionStep(interactionResult).completed, true);
-  const taskState = loadState().learningState.taskProgressById[WELCOME_PREVIEW.taskId];
-  assert.equal(taskState.status, 'completed');
-  assert.equal(taskState.stepIndex, WELCOME_PREVIEW.steps.length - 1);
+  const completion = welcomeLearning.completeInteractionStep(interactionResult);
+  assert.equal(completion.completed, true);
+  assert.equal(getGameState().stars, 1);
+  assert.equal(loadState().learningState.taskProgressById[WELCOME_PREVIEW.taskId].status, 'completed');
 
   assert.equal(story.advanceStory().status, 'advanced');
   assert.equal(story.advanceStory().status, 'advanced');
   assert.equal(story.advanceStory().status, 'chapter_completed');
-  assert.equal(getLearningState().completedUnitIds.includes(WELCOME_PREVIEW.unitId), true);
-  assert.equal(getNextCourseEntry().chapterId, CHAPTER_UNIT1.id);
-
-  story.startChapter(CHAPTER_UNIT1.id);
-  assert.equal(getLearningState().currentChapterId, CHAPTER_UNIT1.id);
+  assert.equal(getLearningState().completedUnitIds.includes(WELCOME_PREVIEW.unitId), false);
+  assert.equal(getNextCourseEntry().chapterId, CHAPTER_WELCOME.id);
+  assert.throws(() => story.startChapter(CHAPTER_UNIT1.id), /请先和团团完成 Welcome/);
 });
 
 test('故事推进有连点锁，完成页只保留一个出口按钮', () => {
