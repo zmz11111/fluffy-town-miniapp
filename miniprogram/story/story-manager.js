@@ -1,5 +1,6 @@
 const { CHAPTER_001 } = require('./chapters/chapter_001');
 const { CHAPTER_UNIT1 } = require('./chapters/chapter_unit1');
+const { CHAPTER_WELCOME } = require('./chapters/chapter_welcome');
 const { SCENE_001 } = require('./scenes/scene_001');
 const { SCENE_002 } = require('./scenes/scene_002');
 const { SCENE_003 } = require('./scenes/scene_003');
@@ -9,26 +10,32 @@ const { UNIT1_SCENE_001 } = require('./scenes/unit1_scene_001');
 const { UNIT1_SCENE_002 } = require('./scenes/unit1_scene_002');
 const { UNIT1_SCENE_003 } = require('./scenes/unit1_scene_003');
 const { UNIT1_SCENE_004 } = require('./scenes/unit1_scene_004');
+const { WELCOME_SCENE_001 } = require('./scenes/welcome_scene_001');
+const { WELCOME_SCENE_002 } = require('./scenes/welcome_scene_002');
 const { getTuantuanDialogue } = require('../pets/tuantuan-dialogues');
 const { getGameState, updateGameState } = require('../game/state');
 const { isValidContentId } = require('../game/model');
 const { applyReward } = require('../reward/reward-manager');
 const { UNIT1_PREVIEW } = require('../curriculum/unit1/preview-content');
+const { beginLearningChapter, setCurrentTask, completeLearningChapter } = require('../english/learning-state');
 
-// 当前只登记第一章；内容与孩子的个人进度始终分离。
+// 故事内容集中登记，章节定义与孩子的个人进度始终分离。
 const CHAPTERS = Object.create(null);
 const SCENES = Object.create(null);
 CHAPTERS[CHAPTER_001.id] = CHAPTER_001;
 CHAPTERS[CHAPTER_UNIT1.id] = CHAPTER_UNIT1;
+CHAPTERS[CHAPTER_WELCOME.id] = CHAPTER_WELCOME;
 [
   SCENE_001, SCENE_002, SCENE_003, SCENE_004, SCENE_005,
-  UNIT1_SCENE_001, UNIT1_SCENE_002, UNIT1_SCENE_003, UNIT1_SCENE_004
+  UNIT1_SCENE_001, UNIT1_SCENE_002, UNIT1_SCENE_003, UNIT1_SCENE_004,
+  WELCOME_SCENE_001, WELCOME_SCENE_002
 ].forEach((scene) => {
   SCENES[scene.id] = scene;
 });
 
 // 每个章节只从目录取奖励 ID；第一章旧奖励继续保留，Unit 1 只发一颗星。
 const CHAPTER_REWARD_IDS = Object.freeze({
+  [CHAPTER_WELCOME.id]: Object.freeze([]),
   [CHAPTER_001.id]: Object.freeze([
     'demo-grade-3:reward-chapter-001-stars',
     'demo-grade-3:reward-mimi-unlock'
@@ -114,14 +121,22 @@ function startChapter(chapterId) {
   if (state.currentStory && state.currentStory.chapterId !== chapterId) {
     throw new Error('请先继续当前冒险，再开始另一段故事');
   }
+  const resumingSameStory = Boolean(state.currentStory && state.currentStory.chapterId === chapterId);
+  if (chapter.learningUnitId && !resumingSameStory) {
+    beginLearningChapter(chapter.courseId, chapter.learningUnitId, chapter.id);
+  }
   if (state.chapterProgress[chapterId] && state.chapterProgress[chapterId].status === 'completed') {
     return ensureChapterRewards(chapterId);
   }
-  if (state.currentStory && state.currentStory.chapterId === chapterId) {
+  if (resumingSameStory) {
     return state;
   }
   const scene = requireScene(chapter, chapter.firstSceneId);
-  return updateGameState((draft) => { enterScene(draft, chapter, scene); });
+  const updated = updateGameState((draft) => { enterScene(draft, chapter, scene); });
+  if (chapter.learningUnitId && scene.requiredTaskId) {
+    setCurrentTask(scene.requiredTaskId, 0);
+  }
+  return updated;
 }
 
 // 返回当前对白与场景位置，页面只读取展示所需信息。
@@ -203,8 +218,14 @@ function advanceStory() {
   });
 
   if (updated.chapterProgress[chapter.id].status === 'completed') {
+    if (chapter.learningUnitId) {
+      completeLearningChapter(chapter.learningUnitId, chapter.id);
+    }
     ensureChapterRewards(chapter.id);
     return { status: 'chapter_completed' };
+  }
+  if (chapter.learningUnitId && nextScene && nextScene.requiredTaskId) {
+    setCurrentTask(nextScene.requiredTaskId, 0);
   }
   return { status: 'advanced' };
 }

@@ -1,5 +1,88 @@
 <!-- 默认展示 Sprint 1 测试词卡；Unit 1 核心任务由查询模式单独渲染。 -->
-<view wx:if="{{unit1Mode}}" class="learn-page">
+<view wx:if="{{courseLibraryMode}}" class="learn-page">
+  <view class="learn-hero">
+    <text class="hero-kicker">教材知识预览</text>
+    <text class="hero-title">{{knowledgeTitle}}</text>
+    <text class="hero-subtitle">{{knowledgeTopic}}</text>
+    <text class="hero-count">{{knowledgeVocabulary.length}} 个词条 · {{knowledgeSentences.length}} 条句型 · {{knowledgeObjectives.length}} 项目标</text>
+  </view>
+
+  <view class="knowledge-unit-switch">
+    <button class="knowledge-unit {{isWelcomeKnowledge ? 'selected' : ''}}" data-unit-id="wj-g3-v1:welcome" bindtap="selectKnowledgeUnit">Welcome</button>
+    <button class="knowledge-unit {{isUnit1Knowledge ? 'selected' : ''}}" data-unit-id="wj-g3-v1:unit-1" bindtap="selectKnowledgeUnit" disabled="{{!unit1KnowledgeUnlocked}}">Unit 1</button>
+  </view>
+
+  <view class="knowledge-note">
+    <text>这里可以随时查看课程知识；每日任务由课程冒险单独安排。</text>
+    <text>教材内容仍是校对预览，不代表已经掌握。</text>
+  </view>
+
+  <view class="knowledge-section">
+    <text class="knowledge-heading">词汇</text>
+    <view class="knowledge-row" wx:for="{{knowledgeVocabulary}}" wx:key="id">
+      <view class="knowledge-copy">
+        <text class="word-english">{{item.english}}</text>
+        <text wx:if="{{item.printedEnglish && item.printedEnglish !== item.english}}" class="word-chinese">{{item.printedEnglish}}</text>
+        <text class="word-chinese">{{item.chinese}}</text>
+      </view>
+      <text wx:if="{{item.learningGroup}}" class="knowledge-tag">{{item.learningGroup}}</text>
+    </view>
+  </view>
+
+  <view class="knowledge-section">
+    <text class="knowledge-heading">句型与表达</text>
+    <view class="knowledge-row sentence-row" wx:for="{{knowledgeSentences}}" wx:key="id">
+      <text class="sentence-text">{{item.text}}</text>
+      <text class="word-chinese">{{item.chinese || item.meaning}}</text>
+    </view>
+  </view>
+
+  <view class="knowledge-section">
+    <text class="knowledge-heading">学习目标</text>
+    <view class="knowledge-row objective-row" wx:for="{{knowledgeObjectives}}" wx:key="id">
+      <text class="sentence-text">{{item.description}}</text>
+    </view>
+  </view>
+  <button class="back-button" bindtap="backHome">回到树屋</button>
+</view>
+
+<view wx:elif="{{welcomeMode}}" class="learn-page">
+  <view class="learn-hero">
+    <text class="hero-kicker">Welcome · 第 {{welcomeStepNumber}} / {{welcomeTotalSteps}} 步</text>
+    <text class="hero-title">{{welcomeTitle}}</text>
+    <text class="hero-subtitle">第一次见面，我们慢慢认识彼此。</text>
+  </view>
+
+  <view wx:if="{{welcomeStatus === 'playing' && welcomeStep}}" class="welcome-task-card">
+    <text class="welcome-step-title">{{welcomeStep.prompt}}</text>
+    <view wx:if="{{welcomeStep.kind === 'learn-vocabulary'}}" class="welcome-word-list">
+      <view class="welcome-word" wx:for="{{welcomeStep.vocabulary}}" wx:key="id">
+        <text class="welcome-word-english">{{item.english}}</text>
+        <text class="welcome-word-chinese">{{item.chinese}}</text>
+      </view>
+    </view>
+    <view wx:if="{{welcomeStep.kind === 'practice-sentence'}}" class="welcome-sentence-list">
+      <text class="welcome-sentence" wx:for="{{welcomeStep.sentences}}" wx:key="id">{{item.text}}</text>
+    </view>
+    <button wx:if="{{welcomeStep.kind === 'listen-and-identify'}}" class="welcome-option" bindtap="playWelcomeAudio" disabled="{{choiceBusy}}">🔊 听一听</button>
+    <button wx:if="{{welcomeStep.kind === 'companion-interaction'}}" class="welcome-option" bindtap="interactForWelcome" disabled="{{choiceBusy}}">和团团打个招呼</button>
+    <button wx:for="{{welcomeStep.options}}" wx:key="id" class="welcome-option" data-option-id="{{item.id}}" bindtap="chooseWelcomeOption" disabled="{{choiceBusy}}">
+      <text class="welcome-option-label">{{item.label}}</text>
+      <text wx:if="{{item.chinese}}" class="welcome-option-translation">{{item.chinese}}</text>
+    </button>
+    <text class="welcome-message">{{welcomeMessage}}</text>
+  </view>
+  <view wx:elif="{{welcomeStatus === 'completed'}}" class="welcome-task-card">
+    <text class="welcome-step-title">{{welcomeMessage}}</text>
+    <button class="back-button" bindtap="backToStory">回到团团身边</button>
+  </view>
+  <view wx:else class="welcome-task-card">
+    <text class="welcome-message">{{welcomeMessage}}</text>
+    <button class="back-button" bindtap="backToStory">回到故事</button>
+  </view>
+</view>
+
+<view wx:elif="{{unit1Mode}}" class="learn-page">
   <view class="learn-hero">
     <text class="hero-kicker">Unit 1 · 核心学习任务</text>
     <text class="hero-title">{{unit1Title}}</text>
@@ -10,7 +93,7 @@
   <view wx:if="{{unit1Status === 'playing'}}" class="unit1-task-card">
     <text class="unit1-prompt">{{unit1Prompt}}</text>
     <text class="unit1-support">{{unit1Support}}</text>
-    <button wx:for="{{unit1Options}}" wx:key="id" class="unit1-option" data-option-id="{{item.id}}" bindtap="chooseIntroduction">
+    <button wx:for="{{unit1Options}}" wx:key="id" class="unit1-option" data-option-id="{{item.id}}" bindtap="chooseIntroduction" disabled="{{choiceBusy}}">
       {{item.label}}
     </button>
     <text class="unit1-message">{{unit1Message}}</text>

@@ -5,6 +5,8 @@ const { getStoryAvatar, TREEHOUSE_BACKGROUND } = require('../../assets/visuals')
 const { TASK_ID, REWARD_ID } = require('../../games/find-cookie/data');
 const { getRewardDefinition } = require('../../reward/reward-manager');
 const { UNIT1_PREVIEW } = require('../../curriculum/unit1/preview-content');
+const { WELCOME_PREVIEW } = require('../../curriculum/welcome/preview-content');
+const { getNextCourseEntry } = require('../../english/learning-state');
 
 Page({
   data: {
@@ -26,6 +28,7 @@ Page({
     completionTitle: '',
     completionMessage: '',
     finishActionLabel: '回到树屋',
+    actionBusy: false,
     notice: '',
     sceneSrc: TREEHOUSE_BACKGROUND,
     sceneImageFailed: false,
@@ -35,15 +38,17 @@ Page({
     avatarImageFailed: false
   },
 
-  // 允许首页打开 Unit 1；没有参数时保持旧版饼干故事入口兼容。
+  // 没有指定剧情时进入当前课程单元，避免旧剧情成为首次课程入口。
   onLoad(options) {
-    this.chapterId = options && options.chapterId ? options.chapterId : CHAPTER_001.id;
+    this.chapterId = options && options.chapterId ? options.chapterId : getNextCourseEntry().chapterId;
   },
 
   // 返回故事页时从管理器恢复游标，小游戏完成后即可接着推进。
   onShow() {
+    this.clearActionTimer();
+    this.actionBusy = false;
     try {
-      const chapter = getChapter(this.chapterId || CHAPTER_001.id);
+      const chapter = getChapter(this.chapterId || getNextCourseEntry().chapterId);
       if (!chapter) {
         throw new Error('未知剧情章节');
       }
@@ -51,15 +56,17 @@ Page({
       startChapter(chapter.id);
       this.refreshStory();
     } catch (error) {
-      this.setData({ notice: '故事暂时无法打开，请稍后再试。' });
+      this.actionBusy = false;
+      this.setData({ actionBusy: false, notice: '故事暂时无法打开，请稍后再试。' });
     }
   },
 
   refreshStory() {
     const state = getGameState();
     const current = getCurrentStory();
-    const chapter = getChapter(this.chapterId || CHAPTER_001.id);
+    const chapter = getChapter(this.chapterId || getNextCourseEntry().chapterId);
     const isUnit1 = chapter.id === UNIT1_PREVIEW.chapterId;
+    const isWelcome = chapter.id === WELCOME_PREVIEW.chapterId;
     const chapterProgress = state.chapterProgress[chapter.id];
     const completed = chapterProgress && chapterProgress.status === 'completed';
     const avatar = current
@@ -69,43 +76,49 @@ Page({
     const oldTaskCompleted = state.completedTaskIds.indexOf(TASK_ID) !== -1;
     const coreTaskCompleted = state.completedTaskIds.indexOf(UNIT1_PREVIEW.coreTaskId) !== -1;
     const greetingTaskCompleted = state.completedTaskIds.indexOf(UNIT1_PREVIEW.gameTaskId) !== -1;
+    const welcomeTaskCompleted = state.completedTaskIds.indexOf(WELCOME_PREVIEW.taskId) !== -1;
     const gameReward = getRewardDefinition(REWARD_ID);
-    const chapterRewardId = isUnit1 ? UNIT1_PREVIEW.rewardId : 'demo-grade-3:reward-chapter-001-stars';
-    const chapterReward = getRewardDefinition(chapterRewardId);
+    const chapterRewardId = isUnit1 ? UNIT1_PREVIEW.rewardId : !isWelcome ? 'demo-grade-3:reward-chapter-001-stars' : null;
+    const chapterReward = chapterRewardId ? getRewardDefinition(chapterRewardId) : null;
     const claimed = state.rewards.claimedRewardIds;
-    const taskStatus = isUnit1
-      ? `团团介绍卡：${coreTaskCompleted ? '已完成' : '待完成'} · 问候卡：${greetingTaskCompleted ? '已完成' : '待完成'}`
-      : oldTaskCompleted ? '线索任务：已完成' : '线索任务：待探索';
+    const taskStatus = isWelcome
+      ? `初次问候和自我介绍：${welcomeTaskCompleted ? '已完成' : '待完成'}`
+      : isUnit1
+        ? `团团介绍卡：${coreTaskCompleted ? '已完成' : '待完成'} · 问候卡：${greetingTaskCompleted ? '已完成' : '待完成'}`
+        : oldTaskCompleted ? '线索任务：已完成' : '线索任务：待探索';
     const requiredTaskId = current && current.scene.requiredTaskId;
     const actionLabel = requiredTaskId && state.completedTaskIds.indexOf(requiredTaskId) === -1
-      ? requiredTaskId === UNIT1_PREVIEW.coreTaskId ? '开始学习任务'
-        : requiredTaskId === UNIT1_PREVIEW.gameTaskId ? '开始听问候卡'
-          : '开始听音找图'
+      ? requiredTaskId === WELCOME_PREVIEW.taskId ? '和团团打个招呼'
+        : requiredTaskId === UNIT1_PREVIEW.coreTaskId ? '开始学习任务'
+          : requiredTaskId === UNIT1_PREVIEW.gameTaskId ? '开始听问候卡'
+            : '开始听音找图'
       : '继续故事';
     const nextStep = completed
-      ? isUnit1 ? chapter.completion.nextStep : '下一步：去伙伴页看看米米，或回顾故事。'
+      ? isWelcome || isUnit1 ? chapter.completion.nextStep : '下一步：去伙伴页看看米米，或回顾故事。'
       : requiredTaskId && state.completedTaskIds.indexOf(requiredTaskId) === -1
-        ? requiredTaskId === UNIT1_PREVIEW.coreTaskId ? '下一步：帮团团选一张介绍自己的卡片。'
-          : requiredTaskId === UNIT1_PREVIEW.gameTaskId ? '下一步：听一听，把问候卡放好。'
-            : '下一步：听一听，一起找图片线索。'
+        ? requiredTaskId === WELCOME_PREVIEW.taskId ? '下一步：选一句问候，再认识米米。'
+          : requiredTaskId === UNIT1_PREVIEW.coreTaskId ? '下一步：帮团团选一张介绍自己的卡片。'
+            : requiredTaskId === UNIT1_PREVIEW.gameTaskId ? '下一步：听一听，把问候卡放好。'
+              : '下一步：听一听，一起找图片线索。'
         : '下一步：点“继续故事”，看看接下来会发现什么。';
     const chapterRewardStars = chapterReward && claimed.indexOf(chapterReward.id) !== -1
       ? chapterReward.amount : 0;
     this.setData({
       title: chapter.title,
-      chapterLabel: isUnit1 ? 'Unit 1 学习冒险' : '第一章',
+      chapterLabel: isWelcome ? 'Welcome 入门章节' : isUnit1 ? 'Unit 1 学习冒险' : '第一章',
       sceneTotal: chapter.sceneIds.length,
       completed: Boolean(completed),
       stars: state.stars,
       taskStatus,
       nextStep,
       actionLabel,
-      gameRewardStars: !isUnit1 && gameReward && claimed.indexOf(REWARD_ID) !== -1 ? gameReward.amount : 0,
+      gameRewardStars: !isUnit1 && !isWelcome && gameReward && claimed.indexOf(REWARD_ID) !== -1 ? gameReward.amount : 0,
       chapterRewardStars,
-      mimiUnlocked: !isUnit1 && state.companions.mimi.unlocked,
+      mimiUnlocked: !isUnit1 && !isWelcome && state.companions.mimi.unlocked,
       completionTitle: chapter.completion ? chapter.completion.title : '星星饼干找到了！',
       completionMessage: chapter.completion ? chapter.completion.message : '我们一起找到了星星饼干！真开心！',
       finishActionLabel: chapter.completion ? chapter.completion.actionLabel : '去看看米米',
+      actionBusy: this.actionBusy,
       sceneTitle: current ? current.scene.title : '',
       sceneNumber: current ? current.sceneIndex : chapter.sceneIds.length,
       speaker: current ? ({ tuantuan: '团团', mimi: '米米', narrator: '故事' }[current.dialogue.speakerId] || '伙伴') : '',
@@ -129,10 +142,17 @@ Page({
 
   // 剧情推进、任务门槛和章节奖励全部交给 story-manager。
   next() {
+    if (this.actionBusy) {
+      return;
+    }
+    this.actionBusy = true;
+    this.setData({ actionBusy: true });
     try {
       const result = advanceStory();
       if (result.status === 'task_required') {
-        if (result.taskId === UNIT1_PREVIEW.coreTaskId) {
+        if (result.taskId === WELCOME_PREVIEW.taskId) {
+          wx.navigateTo({ url: '/pages/learn/learn?mode=welcome' });
+        } else if (result.taskId === UNIT1_PREVIEW.coreTaskId) {
           wx.navigateTo({ url: '/pages/learn/learn?mode=unit1-core' });
         } else if (result.taskId === UNIT1_PREVIEW.gameTaskId) {
           wx.navigateTo({ url: '/pages/games/games?mode=unit1-greetings' });
@@ -142,8 +162,27 @@ Page({
         return;
       }
       this.refreshStory();
+      this.releaseActionAfterDelay();
     } catch (error) {
       this.setData({ notice: '这一页暂时走不过去，再试一次吧。' });
+      this.releaseActionAfterDelay();
+    }
+  },
+
+  // 短暂保留提交锁，避免快速连点推进多句或叠出多个页面。
+  releaseActionAfterDelay() {
+    this.clearActionTimer();
+    this.actionTimer = setTimeout(() => {
+      this.actionBusy = false;
+      this.setData({ actionBusy: false });
+      this.actionTimer = null;
+    }, 300);
+  },
+
+  clearActionTimer() {
+    if (this.actionTimer) {
+      clearTimeout(this.actionTimer);
+      this.actionTimer = null;
     }
   },
 
@@ -151,16 +190,20 @@ Page({
     wx.navigateTo({ url: '/pages/pets/pets' });
   },
 
-  // Unit 1 章节只回到树屋，不重复触发旧章节的伙伴解锁入口。
+  // Welcome 和 Unit 1 回到树屋；旧第一章的唯一出口带孩子查看已解锁伙伴。
   finishAction() {
-    if (this.chapterId === UNIT1_PREVIEW.chapterId) {
+    if (this.actionBusy) {
+      return;
+    }
+    this.actionBusy = true;
+    if (this.chapterId === UNIT1_PREVIEW.chapterId || this.chapterId === WELCOME_PREVIEW.chapterId) {
       wx.reLaunch({ url: '/pages/home/home' });
       return;
     }
     this.openFriends();
   },
 
-  backHome() {
-    wx.reLaunch({ url: '/pages/home/home' });
+  onUnload() {
+    this.clearActionTimer();
   }
 });

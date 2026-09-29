@@ -2,6 +2,7 @@ const { startGame, chooseImage } = require('../../games/find-cookie/game-manager
 const { getGameState } = require('../../game/state');
 const { REWARD_ID, TASK_ID } = require('../../games/find-cookie/data');
 const { getRewardDefinition } = require('../../reward/reward-manager');
+const { getNextCourseEntry } = require('../../english/learning-state');
 const {
   startGame: startGreetingGame,
   getGameView: getGreetingGameView,
@@ -18,6 +19,7 @@ Page({
     audioSrc: '',
     fallbackWord: '',
     audioFailed: false,
+    submitting: false,
     message: '听一听，找出对应的图片。',
     foundCount: 0,
     taskStatus: '',
@@ -44,6 +46,8 @@ Page({
   },
 
   onShow() {
+    this.clearSubmitTimer();
+    this.submitting = false;
     if (this.gameMode === 'unit1-greetings') {
       try {
         this.showGreetingGame(startGreetingGame());
@@ -60,6 +64,7 @@ Page({
   },
 
   onUnload() {
+    this.clearSubmitTimer();
     if (this.audio) {
       this.audio.destroy();
     }
@@ -77,6 +82,7 @@ Page({
       roundNumber: view.roundNumber || 0,
       total: view.total,
       options: view.options || [],
+      submitting: this.submitting,
       audioSrc: view.audioSrc || '',
       fallbackWord: view.fallbackWord || '',
       audioFailed: false,
@@ -96,6 +102,7 @@ Page({
       roundNumber: view.roundNumber || 0,
       total: view.total,
       options: view.options || [],
+      submitting: this.submitting,
       audioSrc: view.audioSrc || '',
       fallbackWord: view.fallbackWord || '',
       audioFailed: false,
@@ -118,6 +125,10 @@ Page({
 
   // 只传词条 ID 给规则层；答错时保留回合并鼓励重听。
   selectImage(event) {
+    if (this.isSubmittingLocked()) {
+      return;
+    }
+    this.lockSubmitting();
     try {
       const result = chooseImage(event.currentTarget.dataset.wordId);
       this.showRound(startGame());
@@ -131,16 +142,24 @@ Page({
       }
     } catch (error) {
       this.setData({ message: '图片暂时没选上，再试一次吧。' });
+    } finally {
+      this.releaseSubmittingAfterDelay();
     }
   },
 
   chooseGreeting(event) {
+    if (this.isSubmittingLocked()) {
+      return;
+    }
+    this.lockSubmitting();
     try {
       const result = chooseGreetingCard(event.currentTarget.dataset.optionId);
       this.showGreetingGame(getGreetingGameView());
       this.setData({ message: result.message });
     } catch (error) {
       this.setData({ message: '问候卡暂时没有放好，再试一次吧。' });
+    } finally {
+      this.releaseSubmittingAfterDelay();
     }
   },
 
@@ -149,10 +168,37 @@ Page({
   },
 
   openStory() {
-    if (this.gameMode === 'unit1-greetings') {
+    if (getGameState().currentStory) {
       wx.navigateBack({ delta: 1 });
       return;
     }
-    wx.navigateTo({ url: '/pages/story/story' });
+    const chapterId = getNextCourseEntry().chapterId;
+    wx.navigateTo({ url: `/pages/story/story?chapterId=${chapterId}` });
+  },
+
+  isSubmittingLocked() {
+    return Boolean(this.submitting || (this.lastChoiceAt && Date.now() - this.lastChoiceAt < 300));
+  },
+
+  lockSubmitting() {
+    this.submitting = true;
+    this.lastChoiceAt = Date.now();
+    this.setData({ submitting: true });
+  },
+
+  releaseSubmittingAfterDelay() {
+    this.clearSubmitTimer();
+    this.submitTimer = setTimeout(() => {
+      this.submitting = false;
+      this.setData({ submitting: false });
+      this.submitTimer = null;
+    }, 300);
+  },
+
+  clearSubmitTimer() {
+    if (this.submitTimer) {
+      clearTimeout(this.submitTimer);
+      this.submitTimer = null;
+    }
   }
 });

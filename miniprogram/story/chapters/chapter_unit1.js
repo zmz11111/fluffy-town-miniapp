@@ -6,6 +6,7 @@ const CHAPTER_UNIT1 = {
   grade: 3,
   courseId: 'wj-g3-v1',
   unitId: UNIT1_PREVIEW.unitId,
+  learningUnitId: UNIT1_PREVIEW.unitId,
   contentVersion: UNIT1_PREVIEW.contentVersion,
   reviewStatus: UNIT1_PREVIEW.reviewStatus,
   releaseStatus: UNIT1_PREVIEW.releaseStatus,

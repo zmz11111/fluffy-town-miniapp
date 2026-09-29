@@ -1,9 +1,12 @@
 const { getCharacterOverview, greetMimi } = require('../../pets/character-manager');
+const { CHAPTER_001 } = require('../../story/chapters/chapter_001');
+const { getNextCourseEntry, isWelcomeCompleted } = require('../../english/learning-state');
 
 Page({
   data: {
     tuantuan: {},
     mimi: {},
+    welcomeCompleted: false,
     notice: ''
   },
 
@@ -15,7 +18,11 @@ Page({
   refresh() {
     try {
       const characters = getCharacterOverview();
-      this.setData({ tuantuan: characters.tuantuan, mimi: characters.mimi });
+      this.setData({
+        tuantuan: characters.tuantuan,
+        mimi: characters.mimi,
+        welcomeCompleted: isWelcomeCompleted()
+      });
     } catch (error) {
       this.setData({ notice: '伙伴档案暂时打不开。' });
     }
@@ -32,6 +39,7 @@ Page({
   },
 
   openStory() {
-    wx.navigateTo({ url: '/pages/story/story' });
+    const chapterId = isWelcomeCompleted() ? CHAPTER_001.id : getNextCourseEntry().chapterId;
+    wx.navigateTo({ url: `/pages/story/story?chapterId=${chapterId}` });
   }
 });

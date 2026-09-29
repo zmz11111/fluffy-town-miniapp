@@ -1,17 +1,19 @@
 const { DEMO_COURSE_ID } = require('../english/words');
 const { TUANTUAN } = require('../pets/pet');
 const { createInitialGameState, isValidLegacyGameState, isValidV3GameState, isValidGameState } = require('../game/model');
+const { createInitialLearningState, createLearningStateFromLegacy, isValidLearningState } = require('../english/learning-state-model');
 
-// 新键保存第一章角色与小游戏状态；旧键保留以便迁移。
-const STORAGE_KEY = 'fluffy-town:local:v4';
-const PREVIOUS_STORAGE_KEY = 'fluffy-town:local:v3';
+// 新键增加课程学习状态；旧键保留以便安全迁移。
+const STORAGE_KEY = 'fluffy-town:local:v5';
+const PREVIOUS_STORAGE_KEY = 'fluffy-town:local:v4';
+const V3_STORAGE_KEY = 'fluffy-town:local:v3';
 const OLDER_STORAGE_KEY = 'fluffy-town:local:v2';
 const LEGACY_STORAGE_KEY = 'fluffy-town:local:v1';
-const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 5;
 
 /**
  * 生成当前设备的初始档案；不收集真实姓名或其他身份信息。
- * @returns {{schemaVersion: number, progress: object, petState: object, learningRecords: Array<object>, gameState: object}}
+ * @returns {{schemaVersion: number, progress: object, petState: object, learningRecords: Array<object>, gameState: object, learningState: object}}
  */
 function createInitialState() {
   return {
@@ -26,10 +28,13 @@ function createInitialState() {
       petId: TUANTUAN.id,
       interactionCount: 0,
       mood: 'happy',
-      lastInteractedAt: null
+      lastInteractedAt: null,
+      dailyInteractionDate: null,
+      dailyInteractionCount: 0
     },
     learningRecords: [],
-    gameState: createInitialGameState()
+    gameState: createInitialGameState(),
+    learningState: createInitialLearningState()
   };
 }
 
@@ -80,6 +85,17 @@ function isValidState(value) {
     Array.isArray(value.progress.completedWordIds) &&
     value.petState &&
     Array.isArray(value.learningRecords) &&
+    isValidGameState(value.gameState) &&
+    isValidLearningState(value.learningState)
+  );
+}
+
+// v4 已保存剧情、奖励和伙伴；迁移时只补入学习进度模型。
+function isValidV4State(value) {
+  return Boolean(
+    value && value.schemaVersion === 4 &&
+    value.progress && Array.isArray(value.progress.completedWordIds) &&
+    value.petState && Array.isArray(value.learningRecords) &&
     isValidGameState(value.gameState)
   );
 }
@@ -102,7 +118,8 @@ function migrateV1State(legacy) {
     progress: copied.progress,
     petState: copied.petState,
     learningRecords: copied.learningRecords,
-    gameState: createInitialGameState()
+    gameState: createInitialGameState(),
+    learningState: createInitialLearningState()
   };
 }
 
@@ -115,7 +132,8 @@ function migrateV2State(previous) {
     progress: copied.progress,
     petState: copied.petState,
     learningRecords: copied.learningRecords,
-    gameState
+    gameState,
+    learningState: createLearningStateFromLegacy(gameState)
   };
 }
 
@@ -137,7 +155,21 @@ function migrateV3State(previous) {
     progress: copied.progress,
     petState: copied.petState,
     learningRecords: copied.learningRecords,
-    gameState
+    gameState,
+    learningState: createLearningStateFromLegacy(gameState)
+  };
+}
+
+// 从现有 v4 档案迁移时保留全部 Alpha 数据，并兼容已开始的 Unit 1 进度。
+function migrateV4State(previous) {
+  const copied = JSON.parse(JSON.stringify(previous));
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    progress: copied.progress,
+    petState: copied.petState,
+    learningRecords: copied.learningRecords,
+    gameState: copied.gameState,
+    learningState: createLearningStateFromLegacy(copied.gameState)
   };
 }
 
@@ -160,8 +192,13 @@ function loadState() {
     }
 
     const previous = wx.getStorageSync(PREVIOUS_STORAGE_KEY);
-    if (isValidV3State(previous)) {
-      return saveMigratedState(migrateV3State(previous));
+    if (isValidV4State(previous)) {
+      return saveMigratedState(migrateV4State(previous));
+    }
+
+    const v3 = wx.getStorageSync(V3_STORAGE_KEY);
+    if (isValidV3State(v3)) {
+      return saveMigratedState(migrateV3State(v3));
     }
 
     const older = wx.getStorageSync(OLDER_STORAGE_KEY);
@@ -199,6 +236,7 @@ function updateState(change) {
 module.exports = {
   STORAGE_KEY,
   PREVIOUS_STORAGE_KEY,
+  V3_STORAGE_KEY,
   OLDER_STORAGE_KEY,
   LEGACY_STORAGE_KEY,
   createInitialState,

@@ -18,7 +18,7 @@
     <view class="dialogue">{{dialogue}}</view>
     <view class="task-status">{{taskStatus}}</view>
     <view class="next-step">{{nextStep}}</view>
-    <button class="primary" bindtap="next">{{actionLabel}}</button>
+    <button class="primary" bindtap="next" disabled="{{actionBusy}}">{{actionLabel}}</button>
   </view>
   <view wx:else class="story-card finish">
     <view class="finish-icon">⭐</view>
@@ -29,8 +29,7 @@
     <view wx:if="{{mimiUnlocked}}" class="reward-detail">新伙伴：米米加入啦！</view>
     <view class="reward-total">现在共有 {{stars}} 颗星星</view>
     <view class="next-step">{{nextStep}}</view>
-    <button class="primary" bindtap="finishAction">{{finishActionLabel}}</button>
-    <button class="secondary" bindtap="backHome">回树屋</button>
+    <button class="primary" bindtap="finishAction" disabled="{{actionBusy}}">{{finishActionLabel}}</button>
   </view>
   <view wx:if="{{notice}}" class="notice">{{notice}}</view>
 </view>

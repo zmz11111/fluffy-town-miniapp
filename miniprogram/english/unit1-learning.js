@@ -1,5 +1,6 @@
 const { getGameState, updateGameState } = require('../game/state');
 const { UNIT1_PREVIEW } = require('../curriculum/unit1/preview-content');
+const { setCurrentTask, completeTask } = require('./learning-state');
 
 const TASK_ID = UNIT1_PREVIEW.coreTaskId;
 
@@ -40,6 +41,7 @@ function startLearningTask() {
       draft.currentGame = { gameId: TASK_ID, roundIndex: 0, correctCount: 0, wrongAttempts: 0 };
     });
   }
+  setCurrentTask(TASK_ID, 0);
   return getLearningTaskView();
 }
 
@@ -67,6 +69,7 @@ function chooseIntroduction(optionId) {
       draft.completedTaskIds.push(TASK_ID);
     }
   });
+  completeTask(TASK_ID);
   return { correct: true, completed: true, message: UNIT1_PREVIEW.coreTask.feedback };
 }
 

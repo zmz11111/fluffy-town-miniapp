@@ -3,6 +3,15 @@ const { DEMO_TEXTBOOK } = require('./textbooks/demo-grade3-volume1');
 const { DEMO_UNIT_1 } = require('./units/demo-grade3-unit1');
 const { DEMO_VOCABULARY } = require('./vocabulary/demo-grade3-unit1');
 const { DEMO_SENTENCES } = require('./sentences/demo-grade3-unit1');
+const { WELCOME_UNIT_ID, UNIT1_UNIT_ID } = require('../english/learning-state-model');
+const WELCOME_UNIT_INFO = require('./welcome/unit-info.json');
+const WELCOME_VOCABULARY = require('./welcome/vocabulary.json');
+const WELCOME_SENTENCES = require('./welcome/sentences.json');
+const WELCOME_OBJECTIVES = require('./welcome/learning-objectives.json');
+const UNIT1_UNIT_INFO = require('./unit1/unit-info.json');
+const UNIT1_VOCABULARY = require('./unit1/vocabulary.json');
+const UNIT1_SENTENCES = require('./unit1/sentences.json');
+const UNIT1_OBJECTIVES = require('./unit1/learning-objectives.json');
 
 // 内容目录只收录本阶段的原创模拟教材；后续教材须先核实授权与审校状态。
 const catalog = {
@@ -12,6 +21,21 @@ const catalog = {
   sentences: DEMO_SENTENCES
 };
 validateCatalog(catalog);
+
+const textbookUnits = Object.freeze({
+  [WELCOME_UNIT_ID]: {
+    unitInfo: WELCOME_UNIT_INFO,
+    vocabulary: WELCOME_VOCABULARY,
+    sentences: WELCOME_SENTENCES,
+    objectives: WELCOME_OBJECTIVES
+  },
+  [UNIT1_UNIT_ID]: {
+    unitInfo: UNIT1_UNIT_INFO,
+    vocabulary: UNIT1_VOCABULARY,
+    sentences: UNIT1_SENTENCES,
+    objectives: UNIT1_OBJECTIVES
+  }
+});
 
 // 所有查询均返回副本，调用方不能改写教材定义。
 function copy(value) {
@@ -59,6 +83,37 @@ function getVocabulary(wordId) {
 function getSentence(sentenceId) {
   const sentence = findById(catalog.sentences, sentenceId);
   return sentence ? copy(sentence) : null;
+}
+
+// 教材知识展示和每日任务分别读取；全量词库不会自动转换成每日任务。
+function getUnitKnowledgePackage(unitId) {
+  const content = textbookUnits[unitId];
+  if (!content) {
+    return null;
+  }
+  const unit = content.unitInfo;
+  const textbook = unit.textbook || {};
+  return copy({
+    unitId,
+    textbookId: unit.textbookId || textbook.id,
+    title: unit.title || unit.unit && unit.unit.title,
+    displayTitle: unit.displayTitle || unit.title || unit.unit && unit.unit.title,
+    topic: unit.topic || unit.unit && unit.unit.topic || '',
+    reviewStatus: unit.reviewStatus,
+    releaseStatus: unit.releaseStatus,
+    vocabulary: content.vocabulary.entries.map((entry) => Object.assign({}, entry, {
+      contentRole: 'knowledge-display',
+      dailyTaskEligible: false
+    })),
+    sentences: content.sentences.entries.map((entry) => Object.assign({}, entry, {
+      contentRole: 'knowledge-display',
+      dailyTaskEligible: false
+    })),
+    objectives: content.objectives.objectives.map((objective) => Object.assign({}, objective, {
+      contentRole: 'learning-objective',
+      dailyTaskEligible: false
+    }))
+  });
 }
 
 // 学习接口投影到现有 EnglishWord 字段，不调用旧学习记录写入函数。
@@ -161,6 +216,7 @@ module.exports = {
   getVocabulary,
   getSentence,
   getLearningWords,
+  getUnitKnowledgePackage,
   buildStoryTask,
   buildMiniGameQuestion,
   buildRewardTask

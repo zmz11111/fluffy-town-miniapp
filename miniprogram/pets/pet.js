@@ -1,7 +1,7 @@
 /**
  * Sprint 1 沿用 pets 目录；团团的角色定位是陪伴伙伴，不按宠物养成规则处理。
  * @typedef {{id: string, name: string, role: string, kind: string, introduction: string}} Companion
- * @typedef {{petId: string, interactionCount: number, mood: string, lastInteractedAt: string|null}} PetState
+ * @typedef {{petId: string, interactionCount: number, mood: string, lastInteractedAt: string|null, dailyInteractionDate?: string|null, dailyInteractionCount?: number}} PetState
  */
 
 // 团团是项目原创角色；当前视觉形象由页面内的简单占位图形表达。
