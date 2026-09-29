@@ -8,5 +8,6 @@
 .name { margin-top: 18rpx; color: #344a39; font-size: 36rpx; font-weight: 700; }
 .description { margin-top: 7rpx; color: #68766a; font-size: 25rpx; }
 .detail { margin-top: 17rpx; color: #9a7555; font-size: 24rpx; }
+.greeting-recovery { margin-top: 7rpx; color: #8b897e; font-size: 21rpx; line-height: 1.4; }
 .action { margin-top: 24rpx; border-radius: 22rpx; background: #5a8f69; color: white; font-size: 27rpx; }
 .notice { margin: 20rpx 8rpx; color: #607b62; font-size: 25rpx; }

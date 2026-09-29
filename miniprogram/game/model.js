@@ -6,7 +6,7 @@
  * @typedef {{itemIds: string[], furnitureIds: string[], clothingIds: string[]}} Inventory
  * @typedef {{claimedRewardIds: string[], achievementIds: string[]}} Rewards
  * @typedef {{gameId: string, roundIndex: number, correctCount: number, wrongAttempts: number}|null} CurrentGame
- * @typedef {{tuantuan: {emotion: string, lastStorySceneId: string|null}, mimi: {unlocked: boolean, friendship: number, storyProgress: string}}} Companions
+ * @typedef {{tuantuan: {emotion: string, lastStorySceneId: string|null}, mimi: {unlocked: boolean, friendship: number, storyProgress: string, dailyGreetingDate?: string|null, dailyGreetingCount?: number, lastGreetedAt?: string|null}}} Companions
  * @typedef {{playerLevel: number, stars: number, unlockedMapIds: string[], chapterProgress: Object<string, ChapterProgress>, triggeredTaskIds: string[], completedTaskIds: string[], currentStory: CurrentStory, inventory: Inventory, rewards: Rewards, currentGame: CurrentGame, companions: Companions}} GameState
  */
 
@@ -32,7 +32,14 @@ function createInitialGameState() {
     currentGame: null,
     companions: {
       tuantuan: { emotion: 'curious', lastStorySceneId: null },
-      mimi: { unlocked: false, friendship: 0, storyProgress: 'not_met' }
+      mimi: {
+        unlocked: false,
+        friendship: 0,
+        storyProgress: 'not_met',
+        dailyGreetingDate: null,
+        dailyGreetingCount: 0,
+        lastGreetedAt: null
+      }
     }
   };
 }
@@ -101,6 +108,9 @@ function isValidGameState(value) {
       (tuantuan.lastStorySceneId !== null && !isValidContentId(tuantuan.lastStorySceneId)) ||
       typeof mimi.unlocked !== 'boolean' ||
       !Number.isInteger(mimi.friendship) || mimi.friendship < 0 ||
+      (mimi.dailyGreetingDate !== undefined && mimi.dailyGreetingDate !== null && typeof mimi.dailyGreetingDate !== 'string') ||
+      (mimi.dailyGreetingCount !== undefined && (!Number.isInteger(mimi.dailyGreetingCount) || mimi.dailyGreetingCount < 0)) ||
+      (mimi.lastGreetedAt !== undefined && mimi.lastGreetedAt !== null && typeof mimi.lastGreetedAt !== 'string') ||
       ['not_met', 'met', 'joined'].indexOf(mimi.storyProgress) === -1) {
     return false;
   }

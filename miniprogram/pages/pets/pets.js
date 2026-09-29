@@ -22,7 +22,8 @@ Page({
       this.setData({
         tuantuan: characters.tuantuan,
         mimi: characters.mimi,
-        welcomeCompleted: isWelcomeCompleted()
+        welcomeCompleted: isWelcomeCompleted(),
+        notice: ''
       });
     } catch (error) {
       this.setData({ notice: '伙伴档案暂时打不开。' });
@@ -31,9 +32,16 @@ Page({
 
   greet() {
     try {
-      greetMimi();
+      const result = greetMimi();
       this.refresh();
-      this.setData({ notice: '米米眨眨眼：哼，我也正想和你打招呼呢！' });
+      const notice = result.greetingAccepted
+        ? result.friendshipChange
+          ? '米米眨眨眼：哼，我也正想和你打招呼呢！今天的招呼次数已经记下啦。'
+          : '米米眨眨眼：你们已经是很好的伙伴啦！'
+        : result.dailyLimitReached
+          ? '今天和米米打招呼的次数用完啦，明天再来找她吧。'
+          : '米米还在回应刚才的招呼，等一小会儿再试试。';
+      this.setData({ notice });
     } catch (error) {
       this.setData({ notice: '先和团团一起完成第一章，再来认识米米吧。' });
     }
