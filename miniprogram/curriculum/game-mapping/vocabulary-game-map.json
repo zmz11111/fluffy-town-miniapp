@@ -1,0 +1,635 @@
+{
+  "schemaVersion": "0.1-draft",
+  "mappingId": "wj-g3-v1:unit-1:vocabulary-game-map",
+  "textbookId": "wj-g3-v1",
+  "unitId": "wj-g3-v1:unit-1",
+  "enabled": false,
+  "reviewStatus": "pending_human_review",
+  "sourceFile": "../imports/unit1/vocabulary.json",
+  "gameTypes": {
+    "listen_match": {
+      "description": "听音后选文字或经授权的画面；听音题必须有已授权录音。",
+      "requires": [
+        "reviewed_text",
+        "authorized_audio"
+      ],
+      "runtimeImplemented": false
+    },
+    "character_dialogue": {
+      "description": "在原创互动对白中选择友善表达；不复制教材人物或原文剧情。",
+      "requires": [
+        "reviewed_text",
+        "approved_original_dialogue"
+      ],
+      "runtimeImplemented": false
+    },
+    "context_choice": {
+      "description": "看原创情境选择词义或用法；功能词不强制配图。",
+      "requires": [
+        "reviewed_text",
+        "approved_original_context"
+      ],
+      "runtimeImplemented": false
+    }
+  },
+  "rewardRule": {
+    "meaning": "rewards 仅表示关联教学目标达成后可考虑的奖励类型，不表示单词答对即发奖。",
+    "condition": "对应目标经人工审核、活动完成证据可靠且奖励目录已登记",
+    "deduplication": "按 textbookId + unitId + objectiveId + learnerId 每目标最多一次",
+    "runtimeImplemented": false
+  },
+  "entries": [
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:let-s",
+      "term": "let's",
+      "sense": "让我们",
+      "type": "function_word",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:let-s]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:friend",
+      "term": "friend",
+      "sense": "朋友",
+      "type": "relationship",
+      "games": [
+        "character_dialogue",
+        "context_choice"
+      ],
+      "rewards": [
+        "star"
+      ],
+      "rewardObjectiveId": "greet-friends",
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:friend]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:to",
+      "term": "to",
+      "sense": "（用于动词、名词或形容词后，使意思完整）；向，到，往",
+      "type": "function_word",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:to]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:meet",
+      "term": "meet",
+      "sense": "认识，结识",
+      "type": "greeting",
+      "games": [
+        "listen_match",
+        "character_dialogue"
+      ],
+      "rewards": [
+        "star"
+      ],
+      "rewardObjectiveId": "greet-friends",
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:meet]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:you",
+      "term": "you",
+      "sense": "你；你们",
+      "type": "pronoun",
+      "games": [
+        "context_choice",
+        "character_dialogue"
+      ],
+      "rewards": [
+        "star"
+      ],
+      "rewardObjectiveId": "introduce-people",
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:you]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:play",
+      "term": "play",
+      "sense": "玩，玩耍",
+      "type": "action",
+      "games": [
+        "listen_match",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:play]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:happy",
+      "term": "happy",
+      "sense": "高兴的，快乐的",
+      "type": "feeling",
+      "games": [
+        "character_dialogue",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:happy]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:new",
+      "term": "new",
+      "sense": "新的",
+      "type": "description",
+      "games": [
+        "listen_match",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:new]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:do",
+      "term": "do",
+      "sense": "（构成疑问句或否定句）；做",
+      "type": "action",
+      "games": [
+        "listen_match",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:do]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:they",
+      "term": "they",
+      "sense": "他们",
+      "type": "pronoun",
+      "games": [
+        "context_choice",
+        "character_dialogue"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:they]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:welcome",
+      "term": "welcome",
+      "sense": "欢迎",
+      "type": "greeting",
+      "games": [
+        "listen_match",
+        "character_dialogue"
+      ],
+      "rewards": [
+        "star"
+      ],
+      "rewardObjectiveId": "greet-friends",
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:welcome]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:everyone",
+      "term": "everyone",
+      "sense": "每个人，人人",
+      "type": "relationship",
+      "games": [
+        "character_dialogue",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:everyone]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:nine",
+      "term": "nine",
+      "sense": "九",
+      "type": "number",
+      "games": [
+        "listen_match",
+        "context_choice"
+      ],
+      "rewards": [
+        "star"
+      ],
+      "rewardObjectiveId": "introduce-people",
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:nine]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:she",
+      "term": "she",
+      "sense": "她",
+      "type": "pronoun",
+      "games": [
+        "context_choice",
+        "character_dialogue"
+      ],
+      "rewards": [
+        "star"
+      ],
+      "rewardObjectiveId": "introduce-people",
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:she]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:too",
+      "term": "too",
+      "sense": "也",
+      "type": "function_word",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:too]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:we",
+      "term": "we",
+      "sense": "我们",
+      "type": "pronoun",
+      "games": [
+        "context_choice",
+        "character_dialogue"
+      ],
+      "rewards": [
+        "star"
+      ],
+      "rewardObjectiveId": "introduce-people",
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:we]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:from",
+      "term": "from",
+      "sense": "从",
+      "type": "function_word",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:from]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:the",
+      "term": "the",
+      "sense": "（用于表示正在谈论一个已经提到过、已经知道，或是唯一存在的人或物）",
+      "type": "function_word",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:the]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:twin",
+      "term": "twin",
+      "sense": "双胞胎中的一个",
+      "type": "relationship",
+      "games": [
+        "character_dialogue",
+        "context_choice"
+      ],
+      "rewards": [
+        "star"
+      ],
+      "rewardObjectiveId": "introduce-people",
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:twin]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:he",
+      "term": "he",
+      "sense": "他",
+      "type": "pronoun",
+      "games": [
+        "context_choice",
+        "character_dialogue"
+      ],
+      "rewards": [
+        "star"
+      ],
+      "rewardObjectiveId": "introduce-people",
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:he]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:come",
+      "term": "come",
+      "sense": "来；来到",
+      "type": "action",
+      "games": [
+        "listen_match",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:come]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:and",
+      "term": "and",
+      "sense": "然后，接着；和",
+      "type": "function_word",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:and]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:oh",
+      "term": "oh",
+      "sense": "噢",
+      "type": "feeling",
+      "games": [
+        "character_dialogue",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:oh]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:no",
+      "term": "no",
+      "sense": "不，不行",
+      "type": "function_word",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:no]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:help",
+      "term": "help",
+      "sense": "帮助，帮忙",
+      "type": "action",
+      "games": [
+        "listen_match",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:help]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:here-location",
+      "term": "here",
+      "sense": "在这里",
+      "type": "location",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:here-location]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:here-giving",
+      "term": "here",
+      "sense": "给你",
+      "type": "polite_exchange",
+      "games": [
+        "character_dialogue",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:here-giving]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:thank",
+      "term": "thank",
+      "sense": "感谢；向……表示谢意",
+      "type": "action",
+      "games": [
+        "listen_match",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:thank]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:together",
+      "term": "together",
+      "sense": "一起，一块儿",
+      "type": "relationship",
+      "games": [
+        "character_dialogue",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:together]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:ok",
+      "term": "OK",
+      "sense": "行，可以",
+      "type": "function_word",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:ok]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:great",
+      "term": "great",
+      "sense": "极棒的，极好的",
+      "type": "feeling",
+      "games": [
+        "character_dialogue",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:great]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:song",
+      "term": "song",
+      "sense": "歌曲",
+      "type": "music",
+      "games": [
+        "listen_match"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:song]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:dear",
+      "term": "dear",
+      "sense": "亲爱的",
+      "type": "feeling",
+      "games": [
+        "character_dialogue",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:dear]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:sing",
+      "term": "sing",
+      "sense": "唱，歌唱",
+      "type": "action",
+      "games": [
+        "listen_match",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:sing]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:now",
+      "term": "now",
+      "sense": "现在",
+      "type": "time",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:now]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:know",
+      "term": "know",
+      "sense": "认识",
+      "type": "action",
+      "games": [
+        "listen_match",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:know]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:our",
+      "term": "our",
+      "sense": "我们的",
+      "type": "pronoun",
+      "games": [
+        "context_choice",
+        "character_dialogue"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:our]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:everybody",
+      "term": "everybody",
+      "sense": "每个人，人人",
+      "type": "relationship",
+      "games": [
+        "character_dialogue",
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:everybody]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:with",
+      "term": "with",
+      "sense": "和……一起",
+      "type": "function_word",
+      "games": [
+        "context_choice"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:with]"
+    },
+    {
+      "vocabularyId": "wj-g3-v1:unit-1:me",
+      "term": "me",
+      "sense": "我",
+      "type": "pronoun",
+      "games": [
+        "context_choice",
+        "character_dialogue"
+      ],
+      "rewards": [],
+      "rewardObjectiveId": null,
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/vocabulary.json#entries[id=wj-g3-v1:unit-1:me]"
+    }
+  ],
+  "welcomePrerequisiteExample": {
+    "term": "hello",
+    "sourceScope": "Welcome",
+    "sourceVocabularyId": null,
+    "sourceLocation": {
+      "documentId": "word-list",
+      "pdfPage": 1,
+      "locator": "Welcome 词表 hello"
+    },
+    "type": "greeting",
+    "games": [
+      "listen_match",
+      "character_dialogue"
+    ],
+    "rewards": [
+      "star"
+    ],
+    "rewardObjectiveId": "greet-friends",
+    "status": "example_pending_welcome_import",
+    "note": "hello 在 Unit 1 课文复现，但单词表归属 Welcome；正式关联须先建立 Welcome 词条 ID 并审校。"
+  },
+  "notes": [
+    "全部 40 个 Unit 1 词条按原导入 ID 映射；同形词 here 的两个释义保持独立。",
+    "不绑定既有试玩章节、小游戏或奖励 ID。",
+    "所有游戏类型是内容用途建议，缺少授权录音或原创情境时不得生成可玩题目。"
+  ]
+}

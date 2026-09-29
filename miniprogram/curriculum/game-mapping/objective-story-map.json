@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "0.1-draft",
+  "mappingId": "wj-g3-v1:unit-1:objective-story-map",
+  "textbookId": "wj-g3-v1",
+  "unitId": "wj-g3-v1:unit-1",
+  "enabled": false,
+  "reviewStatus": "pending_human_review",
+  "sourceFile": "../imports/unit1/learning-objectives.json",
+  "entries": [
+    {
+      "objectiveId": "greet-friends",
+      "storyTask": {
+        "intent": "在新朋友相遇情境中主动选择友好问候",
+        "requiredKnowledgePointIds": [
+          "greetings"
+        ],
+        "completionEvidence": "完成一次适合情境的问候选择"
+      },
+      "petInteraction": {
+        "targetRole": "companion",
+        "interactionIntent": "团团以朋友身份回应孩子的问候尝试",
+        "feedbackStyle": "温暖、共同发现"
+      },
+      "adventureGoal": {
+        "intent": "与新伙伴建立初次联系",
+        "completionCondition": "问候任务完成"
+      },
+      "reward": {
+        "type": "star",
+        "grantKey": "wj-g3-v1:unit-1:objective:greet-friends"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/learning-objectives.json#objectives[id=greet-friends]"
+    },
+    {
+      "objectiveId": "introduce-people",
+      "storyTask": {
+        "intent": "根据说话者和图片关系介绍自己或朋友",
+        "requiredKnowledgePointIds": [
+          "self-introduction",
+          "friend-introduction"
+        ],
+        "completionEvidence": "在不同人物视角下完成合适的介绍"
+      },
+      "petInteraction": {
+        "targetRole": "companion",
+        "interactionIntent": "团团陪孩子辨认谁在说话，再一起尝试介绍",
+        "feedbackStyle": "鼓励探索，不纠错说教"
+      },
+      "adventureGoal": {
+        "intent": "认识伙伴并记住其基本信息",
+        "completionCondition": "人物介绍任务完成"
+      },
+      "reward": {
+        "type": "star",
+        "grantKey": "wj-g3-v1:unit-1:objective:introduce-people"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/learning-objectives.json#objectives[id=introduce-people]"
+    },
+    {
+      "objectiveId": "draw-write-friend",
+      "storyTask": {
+        "intent": "用少量经审校的词句描述一位朋友",
+        "requiredKnowledgePointIds": [
+          "friend-introduction"
+        ],
+        "completionEvidence": "完成简短文字或选择式朋友描述"
+      },
+      "petInteraction": {
+        "targetRole": "companion",
+        "interactionIntent": "团团与孩子一起发现朋友的特点",
+        "feedbackStyle": "表达欣赏与鼓励"
+      },
+      "adventureGoal": {
+        "intent": "整理朋友线索卡",
+        "completionCondition": "朋友描述任务完成"
+      },
+      "reward": {
+        "type": "star",
+        "grantKey": "wj-g3-v1:unit-1:objective:draw-write-friend"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/learning-objectives.json#objectives[id=draw-write-friend]"
+    },
+    {
+      "objectiveId": "make-poster",
+      "storyTask": {
+        "intent": "整理朋友信息并介绍给伙伴",
+        "requiredKnowledgePointIds": [
+          "friend-poster"
+        ],
+        "completionEvidence": "完成海报草稿并主动介绍至少一条朋友信息"
+      },
+      "petInteraction": {
+        "targetRole": "companion",
+        "interactionIntent": "团团一起欣赏孩子原创的朋友海报",
+        "feedbackStyle": "肯定分享与发现"
+      },
+      "adventureGoal": {
+        "intent": "完成朋友展示目标",
+        "completionCondition": "海报介绍任务完成"
+      },
+      "reward": {
+        "type": "star",
+        "grantKey": "wj-g3-v1:unit-1:objective:make-poster"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/learning-objectives.json#objectives[id=make-poster]"
+    }
+  ],
+  "policy": {
+    "characterRole": "团团是聪明、温暖的陪伴伙伴，不是老师，也不作为宠物养成对象。",
+    "storyScope": "这里只写任务意图和完成证据，正式剧情需原创编写和独立审核。",
+    "rewardScope": "星星是候选奖励；须登记到奖励目录并校验一次性发放，当前不会发放。",
+    "parentControls": "未来家长端可查看目标和进度摘要；语音采集和内容发布另行取得监护人授权。"
+  }
+}

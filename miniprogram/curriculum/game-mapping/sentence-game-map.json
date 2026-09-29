@@ -1,0 +1,282 @@
+{
+  "schemaVersion": "0.1-draft",
+  "mappingId": "wj-g3-v1:unit-1:sentence-game-map",
+  "textbookId": "wj-g3-v1",
+  "unitId": "wj-g3-v1:unit-1",
+  "enabled": false,
+  "reviewStatus": "pending_human_review",
+  "sourceFile": "../imports/unit1/sentences.json",
+  "entries": [
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-greeting-hello",
+      "pattern": "Hello!",
+      "storyDialogue": {
+        "intent": "greeting",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "choose_greeting",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "listen_and_repeat",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-greeting-hello]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-greeting-hi",
+      "pattern": "Hi, ...!",
+      "storyDialogue": {
+        "intent": "greeting",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "choose_greeting",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "listen_and_repeat",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-greeting-hi]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-nice-to-meet-you",
+      "pattern": "Nice to meet you.",
+      "storyDialogue": {
+        "intent": "first_meeting",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "respond_to_introduction",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "listen_and_repeat",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-nice-to-meet-you]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-lets-be-friends",
+      "pattern": "Let’s be friends!",
+      "storyDialogue": {
+        "intent": "invite_friendship",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "choose_friendly_invitation",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "listen_and_repeat",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-lets-be-friends]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-lets-play",
+      "pattern": "Let’s play.",
+      "storyDialogue": {
+        "intent": "invite_to_play",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "choose_invitation",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "listen_and_repeat",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-lets-play]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-i-am",
+      "pattern": "I’m + 姓名。",
+      "storyDialogue": {
+        "intent": "self_introduction",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "choose_speaker_name",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "guided_speaking",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-i-am]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-he-is",
+      "pattern": "He’s / He is + 姓名。",
+      "storyDialogue": {
+        "intent": "introduce_boy",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "match_person_reference",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "guided_speaking",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-he-is]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-she-is",
+      "pattern": "She’s / She is + 姓名。",
+      "storyDialogue": {
+        "intent": "introduce_girl",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "match_person_reference",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "guided_speaking",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-she-is]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-we-are",
+      "pattern": "We’re / We are + ...",
+      "storyDialogue": {
+        "intent": "introduce_group",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "match_group_reference",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "guided_speaking",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-we-are]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-come-and-play",
+      "pattern": "Come and play!",
+      "storyDialogue": {
+        "intent": "invite_to_play",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "choose_invitation",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "listen_and_repeat",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-come-and-play]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-lets-help",
+      "pattern": "Let’s help.",
+      "storyDialogue": {
+        "intent": "offer_help",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "choose_helpful_action",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "listen_and_repeat",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-lets-help]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-here-you-are",
+      "pattern": "Here you are.",
+      "storyDialogue": {
+        "intent": "give_object",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "choose_polite_response",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "listen_and_repeat",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-here-you-are]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-thank-you",
+      "pattern": "Thank you.",
+      "storyDialogue": {
+        "intent": "express_thanks",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "choose_polite_response",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "listen_and_repeat",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-thank-you]"
+    },
+    {
+      "sentenceId": "wj-g3-v1:unit-1:sentence-my-friend",
+      "pattern": "... is my friend.",
+      "storyDialogue": {
+        "intent": "introduce_friend",
+        "usage": "仅供未来原创对白引用句型意图；无正式剧情文本"
+      },
+      "interactiveTask": {
+        "type": "select_friend_facts",
+        "completionEvidence": "经审核活动中的有效选择或主动表达"
+      },
+      "speakingPractice": {
+        "mode": "guided_speaking",
+        "feedback": "鼓励尝试与共同发现；不使用冷冰冰评分",
+        "audioCapture": "off_by_default"
+      },
+      "status": "proposal_only",
+      "sourcePointer": "../imports/unit1/sentences.json#entries[id=wj-g3-v1:unit-1:sentence-my-friend]"
+    }
+  ],
+  "notes": [
+    "storyDialogue 只记录对白用途，不含正式故事、人物台词或场景。",
+    "speakingPractice 目前只是交互意图；不调用麦克风、不保存儿童声音。",
+    "Hello、Hi 所在句型来自 Unit 1 课文，但词汇归属 Welcome。"
+  ]
+}
