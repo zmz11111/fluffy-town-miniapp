@@ -4,7 +4,8 @@ const TUANTUAN_DIALOGUES = Object.freeze({
   missingCookie: { text: '星星饼干不见了？别着急，我们一起找线索。', emotion: 'worried' },
   clueSearch: { text: '我念一个英语词，你找找对应的图片，好吗？', emotion: 'curious' },
   foundCookie: { text: '找到了！原来它躲在小篮子后面。', emotion: 'happy' },
-  welcomeMimi: { text: '当然！米米，欢迎和我们一起冒险。', emotion: 'excited' }
+  welcomeMimi: { text: '当然！米米，欢迎和我们一起冒险。', emotion: 'excited' },
+  unit1Greeting: { text: '嗨！我正准备一张朋友卡，要和我一起看看吗？', emotion: 'curious' }
 });
 
 // 返回副本，避免场景或页面修改对白池。

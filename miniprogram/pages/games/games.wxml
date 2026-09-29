@@ -1,5 +1,34 @@
 <!-- 图片与声音均来自独立内容模块，页面只提交用户选择。 -->
-<view class="game-page">
+<view wx:if="{{mode === 'unit1-greetings'}}" class="game-page">
+  <view class="header">听听问候卡</view>
+  <view wx:if="{{status === 'playing'}}" class="game-card">
+    <view class="round">第 {{roundNumber}} / {{total}} 张问候卡</view>
+    <view class="task-status">{{taskStatus}}</view>
+    <view class="instruction">听一听，把问候词放到朋友墙上</view>
+    <button class="listen" bindtap="playWord">🔊 再听一次</button>
+    <view wx:if="{{audioFailed}}" class="fallback">{{fallbackWord}}</view>
+    <view class="greeting-options">
+      <button wx:for="{{options}}" wx:key="id" class="greeting-option" data-option-id="{{item.id}}" bindtap="chooseGreeting">
+        <text class="greeting-english">{{item.label}}</text>
+        <text class="greeting-chinese">{{item.chinese}}</text>
+      </button>
+    </view>
+  </view>
+  <view wx:elif="{{status === 'completed'}}" class="game-card complete">
+    <view class="finish-icon">👋</view>
+    <view class="instruction">问候卡都放好啦！</view>
+    <view class="reward-detail">没有计时，可以回故事继续冒险。</view>
+    <button class="listen" bindtap="backStory">回到故事</button>
+  </view>
+  <view wx:else class="game-card">
+    <view class="instruction">问候卡任务暂时不能开始</view>
+    <button class="listen" bindtap="openStory">回到故事</button>
+  </view>
+  <view class="message">{{message}}</view>
+  <view wx:if="{{status === 'playing'}}" class="next-step">{{nextStep}}</view>
+</view>
+
+<view wx:else class="game-page">
   <view class="header">寻找星星饼干的线索</view>
   <view wx:if="{{status === 'playing'}}" class="game-card">
     <view class="round">第 {{roundNumber}} / {{total}} 条线索</view>

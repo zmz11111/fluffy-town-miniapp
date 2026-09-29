@@ -1,5 +1,31 @@
-<!-- 此页是 Sprint 1 的数据与导航预览，不包含正式练习玩法。 -->
-<view class="learn-page">
+<!-- 默认展示 Sprint 1 测试词卡；Unit 1 核心任务由查询模式单独渲染。 -->
+<view wx:if="{{unit1Mode}}" class="learn-page">
+  <view class="learn-hero">
+    <text class="hero-kicker">Unit 1 · 核心学习任务</text>
+    <text class="hero-title">{{unit1Title}}</text>
+    <text class="hero-subtitle">先看团团的介绍，再选一张合适的句型卡。</text>
+    <text wx:if="{{unit1Keyword}}" class="hero-count">{{unit1Keyword.english}} · {{unit1Keyword.chinese}}</text>
+  </view>
+
+  <view wx:if="{{unit1Status === 'playing'}}" class="unit1-task-card">
+    <text class="unit1-prompt">{{unit1Prompt}}</text>
+    <text class="unit1-support">{{unit1Support}}</text>
+    <button wx:for="{{unit1Options}}" wx:key="id" class="unit1-option" data-option-id="{{item.id}}" bindtap="chooseIntroduction">
+      {{item.label}}
+    </button>
+    <text class="unit1-message">{{unit1Message}}</text>
+  </view>
+  <view wx:elif="{{unit1Status === 'completed'}}" class="unit1-task-card">
+    <text class="unit1-prompt">{{unit1Message}}</text>
+    <button class="back-button" bindtap="backToStory">回到团团身边</button>
+  </view>
+  <view wx:else class="unit1-task-card">
+    <text class="unit1-message">{{unit1Message}}</text>
+    <button class="back-button" bindtap="backToStory">回到故事</button>
+  </view>
+</view>
+
+<view wx:else class="learn-page">
   <view class="learn-hero">
     <text class="hero-kicker">树屋小冒险</text>
     <text class="hero-title">今天认识这 {{total}} 个词</text>
@@ -21,4 +47,3 @@
 
   <button class="back-button" bindtap="backHome">返回树屋</button>
 </view>
-

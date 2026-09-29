@@ -15,3 +15,7 @@
 .task-status { margin-top: 12rpx; color: #6d8669; font-size: 25rpx; }
 .reward-detail { margin-top: 16rpx; color: #8d6245; font-size: 29rpx; }
 .next-step { margin: 0 10rpx 24rpx; color: #53715a; font-size: 26rpx; line-height: 1.5; }
+.greeting-options { display: flex; gap: 18rpx; margin-top: 30rpx; }
+.greeting-option { display: flex; flex: 1; min-height: 150rpx; flex-direction: column; align-items: center; justify-content: center; margin: 0; padding: 14rpx 8rpx; border: 4rpx solid #dce8d9; border-radius: 25rpx; background: #f4f9ef; }
+.greeting-english { color: #36553f; font-size: 34rpx; font-weight: 700; }
+.greeting-chinese { margin-top: 9rpx; color: #718273; font-size: 24rpx; }

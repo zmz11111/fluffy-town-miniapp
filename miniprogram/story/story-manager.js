@@ -1,20 +1,39 @@
 const { CHAPTER_001 } = require('./chapters/chapter_001');
+const { CHAPTER_UNIT1 } = require('./chapters/chapter_unit1');
 const { SCENE_001 } = require('./scenes/scene_001');
 const { SCENE_002 } = require('./scenes/scene_002');
 const { SCENE_003 } = require('./scenes/scene_003');
 const { SCENE_004 } = require('./scenes/scene_004');
 const { SCENE_005 } = require('./scenes/scene_005');
+const { UNIT1_SCENE_001 } = require('./scenes/unit1_scene_001');
+const { UNIT1_SCENE_002 } = require('./scenes/unit1_scene_002');
+const { UNIT1_SCENE_003 } = require('./scenes/unit1_scene_003');
+const { UNIT1_SCENE_004 } = require('./scenes/unit1_scene_004');
 const { getTuantuanDialogue } = require('../pets/tuantuan-dialogues');
 const { getGameState, updateGameState } = require('../game/state');
 const { isValidContentId } = require('../game/model');
 const { applyReward } = require('../reward/reward-manager');
+const { UNIT1_PREVIEW } = require('../curriculum/unit1/preview-content');
 
 // 当前只登记第一章；内容与孩子的个人进度始终分离。
 const CHAPTERS = Object.create(null);
 const SCENES = Object.create(null);
 CHAPTERS[CHAPTER_001.id] = CHAPTER_001;
-[SCENE_001, SCENE_002, SCENE_003, SCENE_004, SCENE_005].forEach((scene) => {
+CHAPTERS[CHAPTER_UNIT1.id] = CHAPTER_UNIT1;
+[
+  SCENE_001, SCENE_002, SCENE_003, SCENE_004, SCENE_005,
+  UNIT1_SCENE_001, UNIT1_SCENE_002, UNIT1_SCENE_003, UNIT1_SCENE_004
+].forEach((scene) => {
   SCENES[scene.id] = scene;
+});
+
+// 每个章节只从目录取奖励 ID；第一章旧奖励继续保留，Unit 1 只发一颗星。
+const CHAPTER_REWARD_IDS = Object.freeze({
+  [CHAPTER_001.id]: Object.freeze([
+    'demo-grade-3:reward-chapter-001-stars',
+    'demo-grade-3:reward-mimi-unlock'
+  ]),
+  [CHAPTER_UNIT1.id]: Object.freeze([UNIT1_PREVIEW.rewardId])
 });
 
 // 返回内容副本，防止页面意外修改剧情定义。
@@ -92,6 +111,9 @@ function startChapter(chapterId) {
     throw new Error('未知剧情章节');
   }
   const state = getGameState();
+  if (state.currentStory && state.currentStory.chapterId !== chapterId) {
+    throw new Error('请先继续当前冒险，再开始另一段故事');
+  }
   if (state.chapterProgress[chapterId] && state.chapterProgress[chapterId].status === 'completed') {
     return ensureChapterRewards(chapterId);
   }
@@ -128,15 +150,15 @@ function getCurrentStory() {
 
 // 第一章完成后按奖励 ID 补发，重复进入不会重复增加星星或角色。
 function ensureChapterRewards(chapterId) {
-  if (chapterId !== CHAPTER_001.id) {
+  const rewardIds = CHAPTER_REWARD_IDS[chapterId];
+  if (!rewardIds) {
     throw new Error('未知剧情章节');
   }
   const state = getGameState();
   if (!state.chapterProgress[chapterId] || state.chapterProgress[chapterId].status !== 'completed') {
     return state;
   }
-  applyReward('demo-grade-3:reward-chapter-001-stars');
-  applyReward('demo-grade-3:reward-mimi-unlock');
+  rewardIds.forEach((rewardId) => applyReward(rewardId));
   return getGameState();
 }
 

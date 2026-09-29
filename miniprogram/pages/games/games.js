@@ -2,9 +2,15 @@ const { startGame, chooseImage } = require('../../games/find-cookie/game-manager
 const { getGameState } = require('../../game/state');
 const { REWARD_ID, TASK_ID } = require('../../games/find-cookie/data');
 const { getRewardDefinition } = require('../../reward/reward-manager');
+const {
+  startGame: startGreetingGame,
+  getGameView: getGreetingGameView,
+  chooseGreetingCard
+} = require('../../games/unit1-greetings/game-manager');
 
 Page({
   data: {
+    mode: 'cookie',
     status: 'loading',
     roundNumber: 0,
     total: 0,
@@ -19,15 +25,33 @@ Page({
     rewardStars: 0
   },
 
-  onLoad() {
+  onLoad(options) {
+    this.gameMode = options && options.mode === 'unit1-greetings' ? 'unit1-greetings' : 'cookie';
+    this.setData({ mode: this.gameMode });
+    if (this.gameMode === 'unit1-greetings') {
+      wx.setNavigationBarTitle({ title: '听听问候卡' });
+    }
     // 音频实例只供播放；答题进度始终由小游戏管理器保存。
     this.audio = wx.createInnerAudioContext();
     this.audio.onError(() => {
-      this.setData({ audioFailed: true, message: '声音暂时不能播放，看看单词再找图片吧。' });
+      this.setData({
+        audioFailed: true,
+        message: this.gameMode === 'unit1-greetings'
+          ? '声音暂时不能播放，可以看问候词后继续。'
+          : '声音暂时不能播放，看看单词再找图片吧。'
+      });
     });
   },
 
   onShow() {
+    if (this.gameMode === 'unit1-greetings') {
+      try {
+        this.showGreetingGame(startGreetingGame());
+      } catch (error) {
+        this.setData({ status: 'locked', message: '先回故事里看看问候卡吧。' });
+      }
+      return;
+    }
     try {
       this.showRound(startGame());
     } catch (error) {
@@ -64,6 +88,25 @@ Page({
     });
   },
 
+  showGreetingGame(view) {
+    const completed = view.status === 'completed';
+    this.setData({
+      mode: 'unit1-greetings',
+      status: view.status,
+      roundNumber: view.roundNumber || 0,
+      total: view.total,
+      options: view.options || [],
+      audioSrc: view.audioSrc || '',
+      fallbackWord: view.fallbackWord || '',
+      audioFailed: false,
+      rewardStars: 0,
+      foundCount: completed ? view.total : Math.max(0, (view.roundNumber || 1) - 1),
+      taskStatus: completed ? '问候卡：已放好' : '问候卡：一起寻找中',
+      nextStep: completed ? '下一步：回故事看看朋友墙。' : '下一步：听一听，再选问候卡。',
+      message: completed ? '团团：两张卡都找到啦！' : '团团：我们慢慢听，可以再放一次。'
+    });
+  },
+
   playWord() {
     if (!this.audio || !this.data.audioSrc) {
       return;
@@ -91,11 +134,25 @@ Page({
     }
   },
 
+  chooseGreeting(event) {
+    try {
+      const result = chooseGreetingCard(event.currentTarget.dataset.optionId);
+      this.showGreetingGame(getGreetingGameView());
+      this.setData({ message: result.message });
+    } catch (error) {
+      this.setData({ message: '问候卡暂时没有放好，再试一次吧。' });
+    }
+  },
+
   backStory() {
     wx.navigateBack();
   },
 
   openStory() {
+    if (this.gameMode === 'unit1-greetings') {
+      wx.navigateBack({ delta: 1 });
+      return;
+    }
     wx.navigateTo({ url: '/pages/story/story' });
   }
 });
