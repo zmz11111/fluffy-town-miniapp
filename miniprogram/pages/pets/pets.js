@@ -1,9 +1,6 @@
-const { getCharacterOverview, greetMimi } = require('../../pets/character-manager');
+const { greetMimi } = require('../../pets/character-manager');
+const { getCompanionPageState } = require('../../pets/companion-progress');
 const { getCompanionGreeting, recordCompanionGreeting } = require('../../pets/companion-greetings');
-const { getGameState } = require('../../game/state');
-const { CHAPTER_001 } = require('../../story/chapters/chapter_001');
-const { getNextCourseEntry, isWelcomeCompleted, getLearningState } = require('../../english/learning-state');
-const { WELCOME_PREVIEW } = require('../../curriculum/welcome/preview-content');
 
 Page({
   data: {
@@ -13,7 +10,13 @@ Page({
     welcomeCompleted: false,
     notice: '',
     mimiGreetingLine: '',
-    mimiActionLabel: ''
+    mimiActionLabel: '',
+    storyCompleted: false,
+    taskCompleted: false,
+    completedMilestones: 0,
+    totalMilestones: 3,
+    storyStatus: '',
+    taskStatus: ''
   },
 
   // 角色卡片读取合并视图，解锁状态由章节奖励更新。
@@ -23,17 +26,23 @@ Page({
 
   refresh() {
     try {
-      const state = getGameState();
-      const characters = getCharacterOverview(state);
+      const view = getCompanionPageState();
+      const characters = view.characters;
       const greeting = characters.mimi.unlocked ? getCompanionGreeting('mimi') : null;
       this.pendingMimiGreeting = greeting;
       this.setData({
         tuantuan: characters.tuantuan,
-        stars: state.stars,
+        stars: view.stars,
         mimi: characters.mimi,
-        welcomeCompleted: isWelcomeCompleted(),
+        welcomeCompleted: view.welcomeCompleted,
+        storyCompleted: view.storyCompleted,
+        taskCompleted: view.taskCompleted,
+        completedMilestones: view.completedMilestones,
+        totalMilestones: view.totalMilestones,
+        storyStatus: view.storyStatus,
+        taskStatus: view.taskStatus,
         mimiGreetingLine: greeting ? greeting.text : '',
-        mimiActionLabel: greeting ? greeting.actionLabel : '',
+        mimiActionLabel: view.action.label,
         notice: ''
       });
     } catch (error) {
@@ -56,22 +65,15 @@ Page({
           : '米米还在回应刚才的招呼，等一小会儿再试试。';
       this.setData({ notice });
     } catch (error) {
-      this.setData({ notice: '先和团团一起完成第一章，再来认识米米吧。' });
+      this.refresh();
+      this.setData({ notice: this.data.mimi.unlocked ? '招呼暂时没有保存好，稍后再试试吧。' : '米米还在故事中等着和你见面。' });
     }
   },
 
   openStory() {
-    const gameState = getGameState();
-    if (gameState.currentStory) {
-      wx.navigateTo({ url: `/pages/story/story?chapterId=${gameState.currentStory.chapterId}` });
-      return;
-    }
-    const welcomeTask = getLearningState().taskProgressById[WELCOME_PREVIEW.taskId];
-    if (!isWelcomeCompleted() && welcomeTask && welcomeTask.status === 'completed') {
-      wx.navigateTo({ url: '/pages/learn/learn?mode=welcome' });
-      return;
-    }
-    const chapterId = isWelcomeCompleted() ? CHAPTER_001.id : getNextCourseEntry().chapterId;
-    wx.navigateTo({ url: `/pages/story/story?chapterId=${chapterId}` });
+    // 点击时再读最新状态，不使用之前渲染过的按钮目标。
+    const action = getCompanionPageState().action;
+    if (action.kind === 'home') wx.reLaunch({ url: action.url });
+    else wx.navigateTo({ url: action.url });
   }
 });

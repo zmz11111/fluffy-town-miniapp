@@ -12,6 +12,8 @@
     <view class="avatar mimi">🐱</view>
     <view class="name">{{mimi.name}}</view>
     <view class="description">橘色小猫 · 陪你观察线索、一起探索的侦探伙伴</view>
+    <view class="detail">侦探进度：{{completedMilestones}} / {{totalMilestones}}</view>
+    <view class="detail">{{storyStatus}} · {{taskStatus}}</view>
     <view wx:if="{{mimi.unlocked}}">
       <view class="mimi-greeting">{{mimiGreetingLine}}</view>
       <view class="detail">已加入 · 友谊 {{mimi.friendship}}</view>
@@ -20,12 +22,11 @@
       <button class="action" bindtap="greet" disabled="{{mimi.greetingRemaining < 1}}">
         {{mimi.greetingRemaining < 1 ? '明天再来找米米' : '和米米打招呼'}}
       </button>
-      <button class="action companion-action" bindtap="openStory">{{mimiActionLabel || '和米米继续探索'}}</button>
     </view>
     <view wx:else>
       <view class="detail">在第一章故事中相遇</view>
-      <button class="action" bindtap="openStory">{{welcomeCompleted ? '一起去找米米' : '先完成 Welcome 初次见面'}}</button>
     </view>
+    <button class="action companion-action" bindtap="openStory">{{mimiActionLabel}}</button>
   </view>
   <view wx:if="{{notice}}" class="notice">{{notice}}</view>
 </view>
