@@ -30,6 +30,7 @@ function createInitialGameState() {
     },
     rewards: {
       claimedRewardIds: [],
+      seenStarRewardIds: [],
       achievementIds: []
     },
     currentGame: null,
@@ -129,6 +130,10 @@ function isValidGameState(value) {
   }
   const tuantuan = value.companions.tuantuan;
   const mimi = value.companions.mimi;
+  // 展示记录是可选字段，兼容旧档；它不影响领奖资格或星星余额。
+  if (value.rewards.seenStarRewardIds !== undefined && !isValidIdList(value.rewards.seenStarRewardIds)) {
+    return false;
+  }
   if ((value.studyDayKeys !== undefined && !isValidDateKeyList(value.studyDayKeys)) ||
       ['curious', 'happy', 'worried', 'excited'].indexOf(tuantuan.emotion) === -1 ||
       (tuantuan.lastStorySceneId !== null && !isValidContentId(tuantuan.lastStorySceneId)) ||

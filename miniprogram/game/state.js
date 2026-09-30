@@ -1,9 +1,22 @@
 const { loadState, updateState } = require('../storage/local');
 const { isValidContentId, isValidGameState } = require('./model');
+const { deriveStarGrowth, buildStarFeedback } = require('./star-growth');
 
 // 页面只读取副本，避免绕过统一存储入口修改游戏状态。
 function getGameState() {
-  return loadState().gameState;
+  const state = loadState().gameState;
+  return Object.assign(state, { starGrowth: deriveStarGrowth(state.stars) });
+}
+
+// 首页消费展示记录；多次返回首页不重复庆祝，写入失败可在下次重试。
+function consumeStarGrowthFeedback() {
+  const state = loadState().gameState;
+  const feedback = buildStarFeedback(state);
+  const seenIds = state.rewards.seenStarRewardIds;
+  if (seenIds === undefined || JSON.stringify(seenIds) !== JSON.stringify(feedback.seenStarRewardIds)) {
+    updateGameState((draft) => { draft.rewards.seenStarRewardIds = feedback.seenStarRewardIds; });
+  }
+  return feedback;
 }
 
 // 所有游戏状态写入均经本地仓库和结构校验；仅供剧情、奖励等业务模块调用。
@@ -15,7 +28,7 @@ function updateGameState(change) {
       throw new Error('游戏状态结构无效');
     }
   });
-  return state.gameState;
+  return Object.assign(state.gameState, { starGrowth: deriveStarGrowth(state.gameState.stars) });
 }
 
 // 检查内容 ID，后续由内容发布流程确保 ID 唯一与版本稳定。
@@ -105,6 +118,7 @@ function setChapterProgress(chapterId, status, currentNodeId) {
 
 module.exports = {
   getGameState,
+  consumeStarGrowthFeedback,
   updateGameState,
   setPlayerLevel,
   setStars,

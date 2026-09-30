@@ -29,8 +29,24 @@
       <view class="house-door"></view>
     </view>
     <image wx:if="{{!sceneImageFailed}}" class="scene-image" src="{{sceneSrc}}" mode="aspectFill" binderror="onSceneImageError" aria-label="毛茸茸树屋" />
-    <view class="scene-label">毛茸茸树屋</view>
+    <!-- 灯光与装饰始终覆盖图片，背景加载失败时同样可见。 -->
+    <view wx:if="{{starGrowth.lightsOn}}" class="growth-lights {{sceneImageFailed ? 'growth-lights-fallback' : ''}}" aria-label="树屋小灯已点亮">
+      <view class="growth-lamp"></view><view class="growth-lamp"></view><view class="growth-lamp"></view><view class="growth-lamp"></view><view class="growth-lamp"></view>
+    </view>
+    <view wx:if="{{starGrowth.lightsOn}}" class="window-glow {{sceneImageFailed ? 'window-glow-fallback' : ''}}"></view>
+    <view wx:if="{{starGrowth.decorationsOn}}" class="growth-decorations" aria-label="树屋增加了星星挂饰和花盆">
+      <view class="star-ornament ornament-left">★</view>
+      <view class="star-ornament ornament-right">★</view>
+      <view class="growth-planter"><view class="flower-stem"></view><view class="flower-head">✿</view><view class="flower-pot"></view></view>
+    </view>
+    <view wx:if="{{showStarFeedback}}" class="star-sparkle" aria-hidden="true">★</view>
+    <view class="scene-label">{{starGrowth.title}}</view>
   </view>
+  <view wx:if="{{showStarFeedback}}" class="star-feedback" role="status">
+    <text class="star-feedback-amount">⭐ +{{starFeedbackAmount}}</text>
+    <text>{{starFeedbackMessage}}</text>
+  </view>
+  <view class="growth-hint">{{starGrowth.hint}}</view>
 
   <view class="pet-card">
     <view class="pet-copy">

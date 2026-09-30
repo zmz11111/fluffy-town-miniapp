@@ -63,3 +63,23 @@
 .quick-links { display: flex; gap: 20rpx; margin-top: 18rpx; }
 .quick-links button { flex: 1; margin: 0; border-radius: 22rpx; background: #fffdf7; color: #4e7457; font-size: 26rpx; }
 .dev-entry { margin-top: 36rpx; background: transparent; color: #8a8a8a; font-size: 21rpx; }
+/* 成长效果叠加在既有场景上，使用原创样式，不依赖新增图片。 */
+.growth-lights { position: absolute; z-index: 7; top: 53%; left: 34%; display: flex; justify-content: space-between; width: 29%; height: 14rpx; border-top: 3rpx solid #b48e45; }
+.growth-lights-fallback { top: 45%; left: 39%; width: 26%; }
+.growth-lamp { width: 14rpx; height: 20rpx; margin-top: -3rpx; border-radius: 50%; background: #fff7b9; box-shadow: 0 0 12rpx 7rpx rgba(255, 225, 120, .7); }
+.window-glow { position: absolute; z-index: 6; top: 63%; left: 43%; width: 48rpx; height: 48rpx; transform: translate(-50%, -50%); border-radius: 50%; background: rgba(255, 237, 132, .55); box-shadow: 0 0 36rpx 22rpx rgba(255, 227, 120, .45); }
+.window-glow-fallback { top: 59%; left: 46%; }
+.growth-decorations { position: absolute; z-index: 7; top: 0; right: 0; bottom: 0; left: 0; }
+.star-ornament { position: absolute; top: 58%; color: #fff2a1; font-size: 34rpx; text-shadow: 0 2rpx 4rpx #aa7f39; }
+.star-ornament::before { content: ''; position: absolute; bottom: 100%; left: 50%; height: 22rpx; border-left: 2rpx solid #d6ae59; }
+.ornament-left { left: 37%; }
+.ornament-right { left: 58%; }
+.growth-planter { position: absolute; left: 65%; bottom: 14%; width: 44rpx; height: 70rpx; }
+.flower-stem { position: absolute; left: 22rpx; top: 16rpx; height: 30rpx; border-left: 4rpx solid #4f8254; }
+.flower-head { position: absolute; top: -6rpx; left: 5rpx; color: #f59e91; font-size: 38rpx; }
+.flower-pot { position: absolute; bottom: 0; width: 44rpx; height: 30rpx; border-radius: 4rpx 4rpx 12rpx 12rpx; background: #bc8057; }
+.star-sparkle { position: absolute; z-index: 8; top: 15%; left: 48%; color: #fff5a0; font-size: 68rpx; text-shadow: 0 0 18rpx #edb644; animation: star-arrival 1.2s ease-out both; }
+@keyframes star-arrival { from { opacity: 0; transform: translateY(70rpx) scale(.4); } 35% { opacity: 1; transform: translateY(0) scale(1.15); } to { opacity: 0; transform: translateY(-35rpx) scale(.8); } }
+.star-feedback { display: flex; align-items: center; gap: 18rpx; margin-top: 18rpx; padding: 20rpx 24rpx; border-radius: 22rpx; background: #fff1c9; color: #72512d; font-size: 25rpx; line-height: 1.5; }
+.star-feedback-amount { flex: none; font-weight: bold; font-size: 30rpx; }
+.growth-hint { margin: 16rpx 12rpx 0; color: #657c59; font-size: 23rpx; line-height: 1.5; }

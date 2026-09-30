@@ -3,7 +3,8 @@ const { interactWithTuantuan, getDailyInteractionStatus } = require('../../pets/
 const { getTuantuanFeedback } = require('../../pets/companion-feedback');
 const { getTuantuanVisual, getStoryAvatar, TREEHOUSE_BACKGROUND } = require('../../assets/visuals');
 const { getCompanionGreeting, recordCompanionGreeting } = require('../../pets/companion-greetings');
-const { getGameState } = require('../../game/state');
+const { getGameState, consumeStarGrowthFeedback } = require('../../game/state');
+const { deriveStarGrowth } = require('../../game/star-growth');
 const { UNIT1_PREVIEW } = require('../../curriculum/unit1/preview-content');
 const { WELCOME_PREVIEW } = require('../../curriculum/welcome/preview-content');
 const { needsWelcome, markWelcomeSeen } = require('../../guidance/welcome');
@@ -16,6 +17,10 @@ Page({
     pet: TUANTUAN,
     completed: 0,
     stars: 0,
+    starGrowth: deriveStarGrowth(0),
+    showStarFeedback: false,
+    starFeedbackAmount: 0,
+    starFeedbackMessage: '',
     total: 3,
     taskTitle: '和团团一起认识树屋的新朋友',
     startLabel: '开始学习冒险',
@@ -92,6 +97,7 @@ Page({
     this.setData({
       completed,
       stars: gameState.stars,
+      starGrowth: gameState.starGrowth,
       total,
       progressPercent: Math.round((completed / total) * 100),
       tuantuanVisual: getStoryAvatar('tuantuan', gameState.companions.tuantuan.emotion),
@@ -114,6 +120,36 @@ Page({
       welcomeSessionProgress: welcomeCompleted ? '' : `Welcome · 已完成 ${welcomeProgress.completedSessions} / ${welcomeProgress.totalSessions} 节`,
       welcomeSessionPercent: welcomeCompleted ? 100 : Math.round((welcomeProgress.completedSessions / welcomeProgress.totalSessions) * 100)
     });
+    this.showStarGrowthFeedback();
+  },
+
+  // 回树屋时展示离开期间获得的星星，动画只控制画面，不再次发奖。
+  showStarGrowthFeedback() {
+    this.clearStarFeedbackTimer();
+    try {
+      const feedback = consumeStarGrowthFeedback();
+      this.setData({
+        showStarFeedback: feedback.visible,
+        starFeedbackAmount: feedback.amount,
+        starFeedbackMessage: feedback.message
+      });
+      if (feedback.visible) {
+        this.starFeedbackTimer = setTimeout(() => {
+          this.setData({ showStarFeedback: false });
+          this.starFeedbackTimer = null;
+        }, 4000);
+      }
+    } catch (error) {
+      // 提示记录写入失败时仍显示正确树屋阶段，后续进入可以重试。
+      this.setData({ showStarFeedback: false });
+    }
+  },
+
+  clearStarFeedbackTimer() {
+    if (this.starFeedbackTimer) {
+      clearTimeout(this.starFeedbackTimer);
+      this.starFeedbackTimer = null;
+    }
   },
 
   // 欢迎卡只出现一次；即使存储暂时不可用，也允许继续体验。
@@ -125,10 +161,12 @@ Page({
   // 页面离开后清除短暂的表情恢复计时，避免改动已退出页面。
   onHide() {
     this.clearVisualTimer();
+    this.clearStarFeedbackTimer();
   },
 
   onUnload() {
     this.clearVisualTimer();
+    this.clearStarFeedbackTimer();
   },
 
   clearVisualTimer() {
