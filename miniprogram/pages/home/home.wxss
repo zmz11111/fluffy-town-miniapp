@@ -62,3 +62,4 @@
 /* 入口只负责导航，进度与角色状态由业务模块维护。 */
 .quick-links { display: flex; gap: 20rpx; margin-top: 18rpx; }
 .quick-links button { flex: 1; margin: 0; border-radius: 22rpx; background: #fffdf7; color: #4e7457; font-size: 26rpx; }
+.dev-entry { margin-top: 36rpx; background: transparent; color: #8a8a8a; font-size: 21rpx; }

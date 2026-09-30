@@ -1,0 +1,6 @@
+.debug-page { padding: 30rpx; background: #f5f5f5; min-height: 100vh; box-sizing: border-box; }
+.dev-label { display: block; color: #a43a30; font-size: 30rpx; font-weight: bold; }
+.panel { display: flex; flex-direction: column; gap: 14rpx; margin-top: 24rpx; padding: 24rpx; border-radius: 16rpx; background: #fff; font-size: 24rpx; word-break: break-all; }
+.panel button { width: 100%; font-size: 26rpx; }
+.picker { padding: 20rpx; background: #eef3ef; }
+.message { display: block; margin-top: 24rpx; color: #6b4b37; font-size: 24rpx; }

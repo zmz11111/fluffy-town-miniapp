@@ -4,7 +4,8 @@
     "pages/learn/learn",
     "pages/story/story",
     "pages/games/games",
-    "pages/pets/pets"
+    "pages/pets/pets",
+    "pages/debug/debug"
   ],
   "window": {
     "navigationBarTitleText": "团团和它的毛茸茸朋友",

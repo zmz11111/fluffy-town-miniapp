@@ -9,6 +9,7 @@ const { WELCOME_PREVIEW } = require('../../curriculum/welcome/preview-content');
 const { needsWelcome, markWelcomeSeen } = require('../../guidance/welcome');
 const { getNextCourseEntry, isWelcomeCompleted, getLearningState } = require('../../english/learning-state');
 const { getWelcomeProgress } = require('../../english/welcome-learning');
+const { isDevTools } = require('../../debug/debug-manager');
 
 Page({
   data: {
@@ -33,12 +34,14 @@ Page({
     interactionRecoveryHint: '互动次数每天零点恢复。',
     tuantuanBondLabel: '刚认识',
     welcomeSessionProgress: '',
-    welcomeSessionPercent: 0
+    welcomeSessionPercent: 0,
+    showDevEntry: false
   },
 
   // 页面每次显示时读取本地状态，返回树屋后立即更新今日任务。
   onShow() {
     this.actionBusy = false;
+    this.setData({ showDevEntry: isDevTools() });
     const gameState = getGameState();
     const welcomeCompleted = isWelcomeCompleted();
     const welcomeProgress = getWelcomeProgress();
@@ -214,5 +217,10 @@ Page({
 
   openWords() {
     wx.navigateTo({ url: '/pages/learn/learn?mode=course-library' });
+  },
+
+  // 调试入口仅在开发者工具开发版出现，调试模块仍逐次校验环境。
+  openDevTools() {
+    if (isDevTools()) wx.navigateTo({ url: '/pages/debug/debug' });
   }
 });

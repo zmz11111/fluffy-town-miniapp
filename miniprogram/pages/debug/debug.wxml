@@ -1,0 +1,28 @@
+<view class="debug-page">
+  <text class="dev-label">DEV ONLY · 仅开发者工具测试档案</text>
+  <view wx:if="{{snapshot}}" class="panel">
+    <text>当前课程：{{snapshot.courseId}}</text>
+    <text>当前单元：{{snapshot.unitId}}</text>
+    <text>当前章节：{{snapshot.chapterId}}</text>
+    <text>当前任务：{{snapshot.taskId}}</text>
+    <text>已完成章节：{{snapshot.completedChapterText}}</text>
+    <text>Welcome 已完成：{{snapshot.completedLessonText}} / 7</text>
+    <text>星星：{{snapshot.stars}}</text>
+    <text>团团今日互动：{{snapshot.tuantuanUsed}} 次，剩余 {{snapshot.tuantuanRemaining}} 次</text>
+    <text>米米今日问候：{{snapshot.mimiUsed}} 次，剩余 {{snapshot.mimiRemaining}} 次</text>
+  </view>
+  <view class="panel">
+    <button bindtap="resetWelcome">重置 Welcome</button>
+    <picker mode="selector" range="{{lessonOptions}}" bindchange="selectLesson">
+      <view class="picker">目标课次：第 {{lessonNumber}} 课（点此选择）</view>
+    </picker>
+    <button bindtap="jumpLesson">跳转指定课次</button>
+    <button bindtap="completeLesson">模拟完成当前课</button>
+    <button bindtap="unlockUnit1">解锁 Unit 1（仅测试）</button>
+  </view>
+  <view class="panel">
+    <button bindtap="clearLearning">清除学习存档（含剧情、星星）</button>
+    <button bindtap="clearCompanions">清除伙伴互动记录</button>
+  </view>
+  <text class="message">{{message}}</text>
+</view>

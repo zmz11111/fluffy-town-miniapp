@@ -74,4 +74,5 @@
     <button bindtap="openFriends">伙伴</button>
     <button bindtap="openWords">单词卡</button>
   </view>
+  <button wx:if="{{showDevEntry}}" class="dev-entry" bindtap="openDevTools">DEV ONLY · 调试工具</button>
 </view>
