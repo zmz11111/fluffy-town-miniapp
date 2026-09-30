@@ -1,3 +1,4 @@
 {
-  "navigationBarTitleText": "树屋单词"
+  "navigationBarTitleText": "树屋单词",
+  "usingComponents": { "welcome-scene": "/components/welcome-scene/welcome-scene" }
 }

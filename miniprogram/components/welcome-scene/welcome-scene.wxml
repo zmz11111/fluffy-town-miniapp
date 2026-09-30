@@ -1,0 +1,22 @@
+<!-- 原生展示组件不提供推进按钮，挑战操作仍由原页面处理。 -->
+<view class="welcome-scene">
+  <view class="stage" wx:for="{{frames}}" wx:key="id">
+    <image wx:if="{{!backgroundFailed}}" class="background" src="{{backgroundSrc}}" mode="aspectFill" binderror="onBackgroundError" aria-label="毛茸茸树屋" />
+    <view wx:else class="background-placeholder">🌳 团团的树屋</view>
+    <view class="actor actor-tuantu">
+      <image wx:if="{{!tuantuanFailed}}" src="{{tuantuanVisual.src}}" mode="aspectFit" binderror="onTuantuanError" aria-label="{{tuantuanVisual.alt}}" />
+      <text wx:else class="actor-placeholder">团团</text>
+      <text class="actor-name">团团</text>
+    </view>
+    <view wx:if="{{showMimi}}" class="actor actor-mimi">
+      <image wx:if="{{!mimiFailed}}" src="{{mimiVisual.src}}" mode="aspectFit" binderror="onMimiError" aria-label="{{mimiVisual.alt}}" />
+      <text wx:else class="actor-placeholder">米米</text>
+      <text class="actor-name">米米</text>
+    </view>
+    <view wx:if="{{celebrating}}" class="reward-stars" aria-label="获得星星的庆祝效果"><text>★</text><text>★</text><text>★</text></view>
+  </view>
+  <view class="dialogue-box" role="status">
+    <text class="speaker">{{speaker}}</text>
+    <text class="dialogue">{{dialogue}}</text>
+  </view>
+</view>

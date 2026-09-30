@@ -1,0 +1,23 @@
+/* Welcome 的背景、角色和对话区分层，长对白不遮挡表情或操作区。 */
+.welcome-scene { margin-top: 20rpx; }
+.stage { position: relative; height: 320rpx; overflow: hidden; border-radius: 26rpx 26rpx 0 0; background: #cce4d5; animation: scene-arrive .3s ease-out both; }
+.background { position: absolute; width: 100%; height: 100%; }
+.background-placeholder { padding-top: 32rpx; text-align: center; color: #48664e; font-size: 28rpx; }
+.actor { position: absolute; bottom: 18rpx; width: 205rpx; height: 230rpx; display: flex; flex-direction: column; align-items: center; animation: character-arrive .45s ease-out both; }
+.actor-tuantu { left: 32rpx; }
+.actor-mimi { right: 32rpx; animation-delay: .1s; }
+.actor image { width: 100%; height: 205rpx; }
+.actor-name { padding: 3rpx 18rpx; border-radius: 20rpx; background: rgba(255,253,247,.96); color: #36553f; font-size: 24rpx; }
+.actor-placeholder { display: flex; justify-content: center; align-items: center; width: 175rpx; height: 190rpx; border-radius: 50%; background: #fff2d3; color: #765640; font-size: 32rpx; }
+.dialogue-box { display: flex; flex-direction: column; box-sizing: border-box; padding: 24rpx 26rpx; border: 3rpx solid #dce8d6; border-radius: 0 0 26rpx 26rpx; background: #fffdf7; }
+.speaker { color: #5b775c; font-size: 25rpx; font-weight: bold; }
+.dialogue { margin-top: 8rpx; color: #304d3c; font-size: 29rpx; line-height: 1.6; }
+/* 动画短暂且不锁定操作，结束后静止；奖励效果不调用领奖接口。 */
+.reward-stars { position: absolute; top: 15%; left: 35%; width: 30%; display: flex; justify-content: space-between; color: #ffe686; font-size: 48rpx; text-shadow: 0 0 12rpx #ab7930; pointer-events: none; }
+.reward-stars text { animation: reward-rise 1.2s ease-out both; }
+.reward-stars text:nth-child(2) { animation-delay: .12s; }
+.reward-stars text:nth-child(3) { animation-delay: .24s; }
+@keyframes scene-arrive { from { opacity: .2; } to { opacity: 1; } }
+@keyframes character-arrive { from { opacity: 0; transform: translateY(14rpx); } to { opacity: 1; transform: translateY(0); } }
+@keyframes reward-rise { from { opacity: 0; transform: translateY(100rpx) scale(.5); } 35% { opacity: 1; transform: translateY(0) scale(1.15); } to { opacity: 0; transform: translateY(-32rpx) scale(.85); } }
+@media (prefers-reduced-motion: reduce) { .stage, .actor, .reward-stars text { animation: none; } }

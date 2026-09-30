@@ -5,6 +5,7 @@ const { WELCOME_UNIT_ID, UNIT1_UNIT_ID } = require('../../english/learning-state
 const { getLearningState, isWelcomeCompleted } = require('../../english/learning-state');
 const { getGameState } = require('../../game/state');
 const { getTuantuanVisual, TREEHOUSE_BACKGROUND } = require('../../assets/visuals');
+const { getMimiVisual, getWelcomeCharacterVisuals } = require('../../assets/welcome-visuals');
 const {
   getWelcomeProgress,
   markCurrentAudioPlayed,
@@ -54,7 +55,8 @@ Page({
     welcomeRewardMessage: '',
     welcomeStars: 0,
     welcomeSceneBackground: TREEHOUSE_BACKGROUND,
-    welcomeStarImage: '/assets/pictures/star.png',
+    welcomeSceneKey: 'welcome',
+    mimiVisual: getMimiVisual('thinking'),
     tuantuanMessage: '',
     tuantuanVisual: getTuantuanVisual('thinking'),
     tuantuanImageFailed: false,
@@ -174,8 +176,10 @@ Page({
       const view = startWelcomeTask(this.requestedWelcomeTaskId);
       const interactionStatus = getDailyInteractionStatus();
       const adventure = view.adventure || {};
+      const visuals = getWelcomeCharacterVisuals(view.step && view.step.kind, companionEmotion || 'thinking', false);
       this.setData({
         welcomeMode: true,
+        welcomeSceneKey: `welcome:${view.sessionIndex}:${view.step ? view.step.id : 'completed'}`,
         welcomeStatus: view.status,
         welcomeTitle: view.title || '',
         welcomeStep: view.step || null,
@@ -192,7 +196,8 @@ Page({
         welcomeStars: getGameState().stars,
         tuantuanMessage: companionMessage || view.challengeTask && view.challengeTask.story.openingDialogue ||
           adventure.openingDialogue || '团团会陪你一起完成这段小冒险。',
-        tuantuanVisual: getTuantuanVisual(companionEmotion || 'thinking'),
+        tuantuanVisual: visuals.tuantuan,
+        mimiVisual: visuals.mimi,
         tuantuanImageFailed: false,
         interactionsRemaining: interactionStatus.remainingDailyInteractions,
         maxDailyInteractions: interactionStatus.maxDailyInteractions,
@@ -267,7 +272,8 @@ Page({
         this.setData({
           welcomeMessage: result.message,
           tuantuanMessage: result.companionMessage || '没关系，我们再看看线索。',
-          tuantuanVisual: getTuantuanVisual(result.companionEmotion || 'thinking')
+          tuantuanVisual: getTuantuanVisual(result.companionEmotion || 'thinking'),
+          mimiVisual: getMimiVisual('thinking')
         });
         this.releaseChoiceAfterDelay();
         return;
@@ -280,7 +286,8 @@ Page({
           welcomeRewardMessage: result.rewardMessage,
           welcomeStars: result.stars,
           tuantuanMessage: result.companionMessage,
-          tuantuanVisual: getTuantuanVisual('happy')
+          tuantuanVisual: getTuantuanVisual('happy'),
+          mimiVisual: getMimiVisual('surprise')
         });
         return;
       }
@@ -319,7 +326,8 @@ Page({
         this.setData({
           welcomeMessage: result.message,
           tuantuanMessage: result.companionMessage,
-          tuantuanVisual: getTuantuanVisual(result.companionEmotion || 'thinking')
+          tuantuanVisual: getTuantuanVisual(result.companionEmotion || 'thinking'),
+          mimiVisual: getMimiVisual('thinking')
         });
         this.releaseChoiceAfterDelay();
         return;
@@ -345,7 +353,8 @@ Page({
         this.setData({
           welcomeMessage: result.message,
           tuantuanMessage: result.companionMessage || '没关系，再看看词块的顺序。',
-          tuantuanVisual: getTuantuanVisual(result.companionEmotion || 'thinking')
+          tuantuanVisual: getTuantuanVisual(result.companionEmotion || 'thinking'),
+          mimiVisual: getMimiVisual('thinking')
         });
         this.releaseChoiceAfterDelay();
         return;
@@ -412,7 +421,8 @@ Page({
           welcomeRewardMessage: result.rewardMessage,
           welcomeStars: result.stars,
           tuantuanMessage: result.companionMessage,
-          tuantuanVisual: getTuantuanVisual('happy')
+          tuantuanVisual: getTuantuanVisual('happy'),
+          mimiVisual: getMimiVisual('surprise')
         });
         return;
       }
@@ -472,7 +482,8 @@ Page({
           welcomeRewardMessage: result.rewardMessage,
           welcomeStars: result.stars,
           tuantuanMessage: result.companionMessage,
-          tuantuanVisual: getTuantuanVisual('happy')
+          tuantuanVisual: getTuantuanVisual('happy'),
+          mimiVisual: getMimiVisual('surprise')
         });
         return;
       }

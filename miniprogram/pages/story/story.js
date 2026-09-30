@@ -2,6 +2,7 @@ const { CHAPTER_001 } = require('../../story/chapters/chapter_001');
 const { startChapter, getChapter, getCurrentStory, advanceStory } = require('../../story/story-manager');
 const { getGameState } = require('../../game/state');
 const { getStoryAvatar, TREEHOUSE_BACKGROUND } = require('../../assets/visuals');
+const { getMimiVisual } = require('../../assets/welcome-visuals');
 const { TASK_ID, REWARD_ID } = require('../../games/find-cookie/data');
 const { getRewardDefinition } = require('../../reward/reward-manager');
 const { UNIT1_PREVIEW } = require('../../curriculum/unit1/preview-content');
@@ -11,6 +12,11 @@ const { getNextCourseEntry } = require('../../english/learning-state');
 Page({
   data: {
     title: CHAPTER_001.title,
+    isWelcome: false,
+    welcomeSceneKey: 'welcome',
+    welcomeTuantuanVisual: null,
+    welcomeMimiVisual: getMimiVisual('idle'),
+    welcomeShowMimi: false,
     chapterLabel: '第一章',
     sceneTitle: '',
     sceneNumber: 0,
@@ -72,6 +78,8 @@ Page({
     const isWelcome = chapter.id === WELCOME_PREVIEW.chapterId;
     const chapterProgress = state.chapterProgress[chapter.id];
     const presentation = current && current.presentation;
+    const welcomeTuantuan = isWelcome && presentation && presentation.characters.find((actor) => actor.characterId === 'tuantuan');
+    const welcomeMimi = isWelcome && presentation && presentation.characters.find((actor) => actor.characterId === 'mimi');
     const completed = chapterProgress && chapterProgress.status === 'completed';
     const avatar = current
       ? getStoryAvatar(current.dialogue.speakerId, state.companions.tuantuan.emotion)
@@ -109,6 +117,11 @@ Page({
       ? chapterReward.amount : 0;
     this.setData({
       title: chapter.title,
+      isWelcome,
+      welcomeSceneKey: current ? current.scene.id : 'welcome-completed',
+      welcomeTuantuanVisual: welcomeTuantuan || null,
+      welcomeMimiVisual: getMimiVisual(welcomeMimi ? welcomeMimi.expression : 'idle'),
+      welcomeShowMimi: Boolean(welcomeMimi),
       chapterLabel: isWelcome ? 'Welcome 入门章节' : isUnit1 ? 'Unit 1 学习冒险' : '第一章',
       sceneTotal: chapter.sceneIds.length,
       completed: Boolean(completed),

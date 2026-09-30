@@ -4,6 +4,8 @@
   <view wx:if="{{!completed}}" class="story-card">
     <view class="scene-count">场景 {{sceneNumber}} / {{sceneTotal}}</view>
     <view class="scene-title">{{sceneTitle}}</view>
+    <welcome-scene wx:if="{{isWelcome}}" scene-key="{{welcomeSceneKey}}" background-src="{{sceneSrc}}" tuantuan-visual="{{welcomeTuantuanVisual}}" mimi-visual="{{welcomeMimiVisual}}" show-mimi="{{welcomeShowMimi}}" speaker="{{speaker}}" dialogue="{{dialogue}}" />
+    <block wx:else>
     <view class="scene-art">
       <image wx:if="{{!sceneImageFailed}}" class="scene-background" src="{{sceneSrc}}" mode="aspectFill" binderror="onSceneImageError" aria-label="{{sceneAlt}}" />
       <text wx:if="{{sceneImageFailed}}">🌳 毛茸茸树屋 ⭐</text>
@@ -20,6 +22,7 @@
       <view class="speaker">{{speaker}}</view>
     </view>
     <view class="dialogue">{{dialogue}}</view>
+    </block>
     <view class="task-status">{{taskStatus}}</view>
     <view class="next-step">{{nextStep}}</view>
     <button class="primary" bindtap="next" disabled="{{actionBusy}}">{{actionLabel}}</button>

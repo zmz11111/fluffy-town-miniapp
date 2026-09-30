@@ -1,1 +1,4 @@
-{ "navigationBarTitleText": "消失的星星饼干" }
+{
+  "navigationBarTitleText": "消失的星星饼干",
+  "usingComponents": { "welcome-scene": "/components/welcome-scene/welcome-scene" }
+}

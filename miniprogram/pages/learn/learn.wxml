@@ -60,18 +60,7 @@
       <text class="welcome-card-kicker">本节冒险目标</text>
       <text class="welcome-goal-text">{{welcomeAdventureGoal}}</text>
     </view>
-    <view class="welcome-scene-stage">
-      <image class="welcome-scene-background" src="{{welcomeSceneBackground}}" mode="aspectFill" aria-label="树屋旁的冒险场景" />
-      <image class="welcome-scene-star" src="{{welcomeStarImage}}" mode="aspectFit" aria-label="星星徽章线索" />
-      <view class="welcome-stage-character">
-        <image wx:if="{{!tuantuanImageFailed}}" class="welcome-stage-tuantu-image" src="{{tuantuanVisual.src}}" mode="aspectFit" binderror="onWelcomeTuantuanImageError" aria-label="{{tuantuanVisual.alt}}" />
-        <text wx:else class="welcome-stage-fallback">团团</text>
-      </view>
-      <view class="welcome-speech-bubble">
-        <text class="welcome-tuantu-name">团团</text>
-        <text class="welcome-tuantu-line">{{tuantuanMessage}}</text>
-      </view>
-    </view>
+    <welcome-scene scene-key="{{welcomeSceneKey}}" background-src="{{welcomeSceneBackground}}" tuantuan-visual="{{tuantuanVisual}}" mimi-visual="{{mimiVisual}}" dialogue="{{tuantuanMessage}}" celebrating="{{welcomeStatus === 'completed' && welcomeRewardMessage !== ''}}" />
     <text class="welcome-star-status">⭐ 当前星星：{{welcomeStars}}</text>
   </view>
 
@@ -122,16 +111,6 @@
       <text class="welcome-reward-icon">⭐</text>
       <text class="welcome-reward-copy">{{welcomeRewardMessage}}</text>
       <text class="welcome-star-count">现在有 {{welcomeStars}} 颗星星</text>
-    </view>
-    <view class="welcome-companion-row welcome-completion-companion">
-      <view class="welcome-tuantu-avatar">
-        <image wx:if="{{!tuantuanImageFailed}}" class="welcome-tuantu-image" src="{{tuantuanVisual.src}}" mode="aspectFit" binderror="onWelcomeTuantuanImageError" aria-label="{{tuantuanVisual.alt}}" />
-        <text wx:else class="welcome-tuantu-fallback">团团</text>
-      </view>
-      <view class="welcome-tuantu-copy">
-        <text class="welcome-tuantu-name">团团</text>
-        <text class="welcome-tuantu-line">{{tuantuanMessage}}</text>
-      </view>
     </view>
     <button class="back-button" bindtap="backToStory">带着星星继续冒险</button>
   </view>

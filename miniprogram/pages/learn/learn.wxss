@@ -90,17 +90,4 @@
 .welcome-star-count { margin-top: 8rpx; color: #917744; font-size: 23rpx; }
 .welcome-completion-companion { border: 2rpx solid #f0e3bf; }
 
-/* 用已有自制场景与角色图构成冒险舞台，让团团在课程里一直可见。 */
-.welcome-scene-stage { position: relative; height: 390rpx; overflow: hidden; margin-top: 20rpx; border: 3rpx solid #fffdf7; border-radius: 26rpx; background: #b8d9bd; box-shadow: 0 10rpx 24rpx rgba(77, 105, 79, .13); }
-.welcome-scene-background { position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; }
-.welcome-stage-character { position: absolute; z-index: 2; bottom: 18rpx; left: 18rpx; display: flex; align-items: flex-end; justify-content: center; width: 278rpx; height: 285rpx; animation: welcome-character-float 2.6s ease-in-out infinite; }
-.welcome-stage-tuantu-image { width: 100%; height: 100%; }
-.welcome-stage-fallback { display: flex; align-items: center; justify-content: center; width: 220rpx; height: 220rpx; border-radius: 50%; background: #fff3d5; color: #755b42; font-size: 36rpx; font-weight: 800; }
-.welcome-scene-star { position: absolute; z-index: 3; right: 28rpx; bottom: 32rpx; width: 88rpx; height: 88rpx; animation: welcome-star-glow 1.8s ease-in-out infinite; }
-.welcome-speech-bubble { position: absolute; z-index: 4; top: 26rpx; right: 20rpx; display: flex; flex-direction: column; box-sizing: border-box; width: 350rpx; min-height: 152rpx; padding: 18rpx 22rpx; border: 3rpx solid #e6eedf; border-radius: 26rpx; background: rgba(255, 253, 247, .96); box-shadow: 0 7rpx 16rpx rgba(59, 82, 61, .12); animation: welcome-bubble-in .35s ease-out both; }
-.welcome-speech-bubble::after { position: absolute; bottom: -18rpx; left: 52rpx; width: 28rpx; height: 28rpx; border-right: 3rpx solid #e6eedf; border-bottom: 3rpx solid #e6eedf; background: #fffdf7; content: ''; transform: rotate(45deg); }
-.welcome-tuantu-name { color: #56765d; font-size: 23rpx; font-weight: 700; }
-.welcome-tuantu-line { margin-top: 7rpx; color: #405b46; font-size: 23rpx; line-height: 1.42; }
-@keyframes welcome-character-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8rpx); } }
-@keyframes welcome-star-glow { 0%, 100% { transform: scale(.94) rotate(-5deg); opacity: .88; } 50% { transform: scale(1.08) rotate(5deg); opacity: 1; } }
-@keyframes welcome-bubble-in { from { opacity: 0; transform: translateY(9rpx); } to { opacity: 1; transform: translateY(0); } }
+/* Welcome 场景与短暂动画由独立展示组件管理，不使用持续循环动效。 */
