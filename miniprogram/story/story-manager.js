@@ -15,9 +15,10 @@ const { WELCOME_SCENE_002 } = require('./scenes/welcome_scene_002');
 const { getTuantuanDialogue } = require('../pets/tuantuan-dialogues');
 const { getGameState, updateGameState } = require('../game/state');
 const { isValidContentId } = require('../game/model');
-const { applyReward } = require('../reward/reward-manager');
+const { normalizeScene, getScenePresentation } = require('./scene-model');
+const { applyRewardToGameState } = require('../reward/reward-manager');
 const { UNIT1_PREVIEW } = require('../curriculum/unit1/preview-content');
-const { beginLearningChapter, setCurrentTask, completeLearningChapter } = require('../english/learning-state');
+const { beginLearningChapter, setCurrentTask, applyLearningChapterCompleted } = require('../english/learning-state');
 
 // 故事内容集中登记，章节定义与孩子的个人进度始终分离。
 const CHAPTERS = Object.create(null);
@@ -53,7 +54,7 @@ function getChapter(chapterId) {
 }
 
 function getScene(sceneId) {
-  return SCENES[sceneId] ? copy(SCENES[sceneId]) : null;
+  return SCENES[sceneId] ? normalizeScene(SCENES[sceneId]) : null;
 }
 
 // 团团对白从角色对话池解析，其他角色对白由场景提供。
@@ -63,17 +64,17 @@ function resolveDialogue(line) {
     if (!dialogue) {
       throw new Error('团团对白不存在');
     }
-    return { speakerId: 'tuantuan', text: dialogue.text };
+    return { speakerId: 'tuantuan', text: dialogue.text, expression: line.expression };
   }
   if (!isValidContentId(line.speakerId) || typeof line.text !== 'string' || !line.text.trim()) {
     throw new Error('角色对白数据无效');
   }
-  return { speakerId: line.speakerId, text: line.text };
+  return { speakerId: line.speakerId, text: line.text, expression: line.expression };
 }
 
 // 检查场景归属与转场 ID，避免错误内容包破坏进度。
 function requireScene(chapter, sceneId) {
-  const scene = SCENES[sceneId];
+  const scene = getScene(sceneId);
   if (!scene || scene.chapterId !== chapter.id || chapter.sceneIds.indexOf(sceneId) === -1 ||
       !Array.isArray(scene.dialogues) || scene.dialogues.length === 0 ||
       !Array.isArray(scene.taskTriggers) ||
@@ -158,6 +159,7 @@ function getCurrentStory() {
     scene: copy(scene),
     sceneIndex: chapter.sceneIds.indexOf(scene.id) + 1,
     dialogue: resolveDialogue(scene.dialogues[cursor.dialogueIndex]),
+    presentation: getScenePresentation(scene, resolveDialogue(scene.dialogues[cursor.dialogueIndex])),
     dialogueIndex: cursor.dialogueIndex,
     isLastDialogue: cursor.dialogueIndex === scene.dialogues.length - 1
   };
@@ -173,8 +175,9 @@ function ensureChapterRewards(chapterId) {
   if (!state.chapterProgress[chapterId] || state.chapterProgress[chapterId].status !== 'completed') {
     return state;
   }
-  rewardIds.forEach((rewardId) => applyReward(rewardId));
-  return getGameState();
+  return updateGameState((draft) => {
+    rewardIds.forEach((rewardId) => applyRewardToGameState(draft, rewardId));
+  });
 }
 
 // 推进对白；寻找线索场景必须先完成听音找图任务。
@@ -199,7 +202,7 @@ function advanceStory() {
   }
   const nextScene = scene.nextSceneId ? requireScene(chapter, scene.nextSceneId) : null;
 
-  const updated = updateGameState((draft) => {
+  const updated = updateGameState((draft, archive) => {
     if (!isLastDialogue) {
       draft.currentStory.dialogueIndex += 1;
       return;
@@ -215,13 +218,14 @@ function advanceStory() {
       currentNodeId: null,
       updatedAt: new Date().toISOString()
     };
+    // 章节完成、伙伴解锁与星星一起保存，失败时仍停留在最后一句对白。
+    if (chapter.learningUnitId) {
+      applyLearningChapterCompleted(archive.learningState, chapter.learningUnitId, chapter.id, new Date().toISOString());
+    }
+    CHAPTER_REWARD_IDS[chapter.id].forEach((rewardId) => applyRewardToGameState(draft, rewardId));
   });
 
   if (updated.chapterProgress[chapter.id].status === 'completed') {
-    if (chapter.learningUnitId) {
-      completeLearningChapter(chapter.learningUnitId, chapter.id);
-    }
-    ensureChapterRewards(chapter.id);
     return { status: 'chapter_completed' };
   }
   if (chapter.learningUnitId && nextScene && nextScene.requiredTaskId) {

@@ -5,6 +5,14 @@ const WELCOME_SCENE_002 = {
   id: CHAPTER_WELCOME.sceneIds[1],
   chapterId: CHAPTER_WELCOME.id,
   title: '星星徽章回来了',
+  sceneVersion: 1,
+  presentation: {
+    backgroundId: 'treehouse-day',
+    characters: [
+      { characterId: 'tuantuan', position: 'left', expression: 'happy' },
+      { characterId: 'mimi', position: 'right', expression: 'happy' }
+    ]
+  },
   dialogues: [
     { speakerId: 'tuantuan', text: 'Hello，米米！你听懂了我们的问候，还把星星徽章找回来啦！谢谢你陪我一起试着说英语。' },
     { speakerId: 'narrator', text: '星星徽章回到了团团手上。还有几节 Welcome 小冒险，等你们继续一起探索。' }

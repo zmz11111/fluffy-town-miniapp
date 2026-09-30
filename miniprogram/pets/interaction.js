@@ -76,6 +76,8 @@ function interactWithTuantuan() {
   const updated = updateState((draft) => {
     draft.petState.petId = TUANTUAN.id;
     draft.petState.mood = feedbackLevel === 'high' ? 'happy' : 'content';
+    // 当前展示情绪统一保存到伙伴状态，旧 mood 仅保留互动记录兼容。
+    draft.gameState.companions.tuantuan.emotion = 'happy';
     draft.petState.lastInteractedAt = now;
     draft.petState.dailyInteractionDate = usage.today;
     draft.petState.dailyInteractionCount = nextCount;

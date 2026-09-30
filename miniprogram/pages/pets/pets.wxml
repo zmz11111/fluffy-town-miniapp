@@ -1,16 +1,17 @@
 <!-- 团团是陪伴伙伴；米米在第一章完成后加入侦探小队。 -->
 <view class="pets-page">
   <view class="heading">我的伙伴</view>
+  <view class="detail">⭐ 和伙伴一起收集了 {{stars}} 颗星星</view>
   <view class="friend-card">
     <view class="avatar tuantuan">🐻</view>
     <view class="name">{{tuantuan.name}}</view>
-    <view class="description">和你一起探索的聪明伙伴</view>
-    <view class="detail">现在的心情：{{tuantuan.emotion}}</view>
+    <view class="description">陪你理解任务、尝试英语、分享发现</view>
+    <view class="detail">现在的心情：{{tuantuan.emotionLabel}}</view>
   </view>
   <view class="friend-card">
     <view class="avatar mimi">🐱</view>
     <view class="name">{{mimi.name}}</view>
-    <view class="description">橘色小猫 · 好奇的侦探伙伴</view>
+    <view class="description">橘色小猫 · 陪你观察线索、一起探索的侦探伙伴</view>
     <view wx:if="{{mimi.unlocked}}">
       <view class="mimi-greeting">{{mimiGreetingLine}}</view>
       <view class="detail">已加入 · 友谊 {{mimi.friendship}}</view>

@@ -1,5 +1,5 @@
-const { getGameState, updateGameState } = require('../../game/state');
-const { applyReward } = require('../../reward/reward-manager');
+const { getGameState, updateGameState, recordTaskCompletedInState } = require('../../game/state');
+const { applyReward, applyRewardToGameState } = require('../../reward/reward-manager');
 const { GAME_ID, TASK_ID, REWARD_ID, ROUND_DEFINITIONS, getRound } = require('./data');
 
 // 完成任务后补发星星；重复调用不会重复领奖。
@@ -76,16 +76,12 @@ function chooseImage(wordId) {
     draft.currentGame.correctCount += 1;
     if (isFinalRound) {
       draft.currentGame = null;
-      if (draft.completedTaskIds.indexOf(TASK_ID) === -1) {
-        draft.completedTaskIds.push(TASK_ID);
-      }
+      recordTaskCompletedInState(draft, TASK_ID);
+      applyRewardToGameState(draft, REWARD_ID);
     } else {
       draft.currentGame.roundIndex += 1;
     }
   });
-  if (isFinalRound) {
-    ensureGameReward();
-  }
   return {
     correct: true,
     completed: isFinalRound,

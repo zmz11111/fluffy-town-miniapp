@@ -4,6 +4,7 @@
     <text class="eyebrow">欢迎来到毛茸茸小镇</text>
     <text class="headline">团团的树屋</text>
     <text class="intro">和团团一起，认识树屋里的新朋友。</text>
+    <text class="intro">⭐ 我们一起收集了 {{stars}} 颗星星</text>
   </view>
 
   <view wx:if="{{showWelcome}}" class="welcome-card">

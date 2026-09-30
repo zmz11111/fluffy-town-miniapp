@@ -4,7 +4,14 @@
 .story-card { padding: 36rpx; border-radius: 32rpx; background: #fffdf7; box-shadow: 0 10rpx 22rpx rgba(63,78,55,.08); }
 .scene-count { color: #8e9e76; font-size: 24rpx; }
 .scene-title { margin-top: 14rpx; color: #304d3c; font-size: 44rpx; font-weight: 700; }
-.scene-art { display: flex; justify-content: center; align-items: center; gap: 28rpx; height: 280rpx; margin: 30rpx 0; border-radius: 28rpx; background: linear-gradient(#d9ece3,#e7dcb4); font-size: 60rpx; }
+.scene-art { position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; gap: 28rpx; height: 280rpx; margin: 30rpx 0; border-radius: 28rpx; background: linear-gradient(#d9ece3,#e7dcb4); font-size: 60rpx; }
+/* 角色站位由场景数据决定，讲话提示不影响游戏状态。 */
+.scene-character { position: absolute; bottom: 12rpx; display: flex; align-items: center; justify-content: center; width: 170rpx; height: 210rpx; border-radius: 26rpx; }
+.scene-character image { width: 100%; height: 100%; }
+.scene-character-left { left: 28rpx; }
+.scene-character-right { right: 28rpx; }
+.scene-character-center { left: 50%; transform: translateX(-50%); }
+.scene-character.is-speaking { background: rgba(255, 250, 218, .3); }
 .scene-background { width: 100%; height: 100%; border-radius: 28rpx; }
 .scene-art text { color: #53715a; font-size: 25rpx; }
 .speaker-row { display: flex; align-items: center; min-height: 100rpx; gap: 18rpx; }

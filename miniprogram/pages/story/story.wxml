@@ -5,8 +5,12 @@
     <view class="scene-count">场景 {{sceneNumber}} / {{sceneTotal}}</view>
     <view class="scene-title">{{sceneTitle}}</view>
     <view class="scene-art">
-      <image wx:if="{{!sceneImageFailed}}" class="scene-background" src="{{sceneSrc}}" mode="aspectFill" binderror="onSceneImageError" aria-label="毛茸茸树屋" />
+      <image wx:if="{{!sceneImageFailed}}" class="scene-background" src="{{sceneSrc}}" mode="aspectFill" binderror="onSceneImageError" aria-label="{{sceneAlt}}" />
       <text wx:if="{{sceneImageFailed}}">🌳 毛茸茸树屋 ⭐</text>
+      <view wx:for="{{sceneCharacters}}" wx:key="characterId" class="scene-character scene-character-{{item.position}} {{item.speaking ? 'is-speaking' : ''}}">
+        <image wx:if="{{!item.imageFailed}}" src="{{item.src}}" mode="aspectFit" data-character-id="{{item.characterId}}" binderror="onSceneCharacterError" aria-label="{{item.alt}}" />
+        <text wx:else>{{item.fallbackText}}</text>
+      </view>
     </view>
     <view class="speaker-row">
       <view wx:if="{{avatarSrc}}" class="speaker-avatar">
@@ -26,7 +30,7 @@
     <view class="dialogue">团团：{{completionMessage}}</view>
     <view wx:if="{{gameRewardStars > 0}}" class="reward-detail">线索任务：+{{gameRewardStars}} ⭐</view>
     <view wx:if="{{chapterRewardStars > 0}}" class="reward-detail">本章奖励：+{{chapterRewardStars}} ⭐</view>
-    <view wx:if="{{mimiUnlocked}}" class="reward-detail">新伙伴：米米加入啦！</view>
+    <view wx:if="{{showMimiUnlockReward}}" class="reward-detail">新伙伴：米米加入啦！</view>
     <view class="reward-total">现在共有 {{stars}} 颗星星</view>
     <view class="next-step">{{nextStep}}</view>
     <button class="primary" bindtap="finishAction" disabled="{{actionBusy}}">{{finishActionLabel}}</button>

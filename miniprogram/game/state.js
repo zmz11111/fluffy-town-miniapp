@@ -9,7 +9,8 @@ function getGameState() {
 // 所有游戏状态写入均经本地仓库和结构校验；仅供剧情、奖励等业务模块调用。
 function updateGameState(change) {
   const state = updateState((draft) => {
-    change(draft.gameState);
+    // 领域模块可在同一次保存中同步学习状态；页面不使用写入回调。
+    change(draft.gameState, draft);
     if (!isValidGameState(draft.gameState)) {
       throw new Error('游戏状态结构无效');
     }
@@ -50,14 +51,18 @@ function unlockMap(mapId) {
 }
 
 function completeTask(taskId) {
-  requireId(taskId);
   const now = new Date().toISOString();
-  return updateGameState((draft) => {
-    if (draft.completedTaskIds.indexOf(taskId) === -1) {
-      draft.completedTaskIds.push(taskId);
-    }
-    recordStudyDayInState(draft, now);
-  });
+  return updateGameState((draft) => { recordTaskCompletedInState(draft, taskId, now); });
+}
+
+// 任务完成事实与伙伴反应一起登记，重复完成不会再次改动伙伴情绪。
+function recordTaskCompletedInState(draft, taskId, timestamp) {
+  requireId(taskId);
+  if (draft.completedTaskIds.indexOf(taskId) === -1) {
+    draft.completedTaskIds.push(taskId);
+    draft.companions.tuantuan.emotion = 'happy';
+    recordStudyDayInState(draft, timestamp || new Date().toISOString());
+  }
 }
 
 // 日期格式兼容较旧的微信小程序运行环境。
@@ -106,5 +111,6 @@ module.exports = {
   unlockMap,
   setChapterProgress,
   completeTask,
+  recordTaskCompletedInState,
   recordStudyDayInState
 };

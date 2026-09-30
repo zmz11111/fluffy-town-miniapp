@@ -8,6 +8,7 @@ const { WELCOME_PREVIEW } = require('../../curriculum/welcome/preview-content');
 Page({
   data: {
     tuantuan: {},
+    stars: 0,
     mimi: {},
     welcomeCompleted: false,
     notice: '',
@@ -22,11 +23,13 @@ Page({
 
   refresh() {
     try {
-      const characters = getCharacterOverview();
+      const state = getGameState();
+      const characters = getCharacterOverview(state);
       const greeting = characters.mimi.unlocked ? getCompanionGreeting('mimi') : null;
       this.pendingMimiGreeting = greeting;
       this.setData({
         tuantuan: characters.tuantuan,
+        stars: state.stars,
         mimi: characters.mimi,
         welcomeCompleted: isWelcomeCompleted(),
         mimiGreetingLine: greeting ? greeting.text : '',

@@ -39,11 +39,15 @@ function getMimiGreetingStatus(mimi, timestamp) {
 }
 
 // 角色页读取静态设定与个人状态的合并视图，不直接访问本地存储。
-function getCharacterOverview() {
-  const companions = getGameState().companions;
+function getCharacterOverview(state) {
+  const companions = (state || getGameState()).companions;
   const mimiGreetingStatus = getMimiGreetingStatus(companions.mimi);
   return {
-    tuantuan: { ...TUANTUAN, emotion: companions.tuantuan.emotion },
+    tuantuan: {
+      ...TUANTUAN,
+      emotion: companions.tuantuan.emotion,
+      emotionLabel: { curious: '好奇地陪你探索', worried: '想和你一起想办法', happy: '开心地分享发现', excited: '为共同发现感到惊喜' }[companions.tuantuan.emotion]
+    },
     mimi: {
       ...MIMI,
       unlocked: companions.mimi.unlocked,

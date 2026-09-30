@@ -34,36 +34,39 @@ function requireReward(rewardId) {
 
 // 奖励按 ID 幂等应用；何时有资格获得奖励由后续规则层决定。
 function applyReward(rewardId) {
-  const reward = requireReward(rewardId);
-  return updateGameState((draft) => {
-    if (draft.rewards.claimedRewardIds.indexOf(reward.id) !== -1) {
-      return;
-    }
-
-    if (reward.type === 'star') {
-      const nextStars = draft.stars + reward.amount;
-      if (!Number.isSafeInteger(nextStars)) {
-        throw new Error('星星数量超出范围');
-      }
-      draft.stars = nextStars;
-    } else if (reward.type === 'item') {
-      addUnique(draft.inventory.itemIds, reward.targetId);
-    } else if (reward.type === 'furniture') {
-      addUnique(draft.inventory.furnitureIds, reward.targetId);
-    } else if (reward.type === 'clothing') {
-      addUnique(draft.inventory.clothingIds, reward.targetId);
-    } else if (reward.type === 'achievement') {
-      addUnique(draft.rewards.achievementIds, reward.targetId);
-    } else if (reward.targetId === 'mimi') {
-      draft.companions.mimi.unlocked = true;
-      draft.companions.mimi.storyProgress = 'joined';
-      draft.companions.mimi.friendship = Math.max(1, draft.companions.mimi.friendship);
-    } else {
-      throw new Error('未知伙伴奖励');
-    }
-
-    draft.rewards.claimedRewardIds.push(reward.id);
-  });
+  return updateGameState((draft) => { applyRewardToGameState(draft, rewardId); });
 }
 
-module.exports = { getRewardDefinition, applyReward };
+// 供任务与剧情管理器组合使用，奖励与完成状态在一个事务中保存。
+function applyRewardToGameState(draft, rewardId) {
+  const reward = requireReward(rewardId);
+  if (draft.rewards.claimedRewardIds.indexOf(reward.id) !== -1) {
+    return;
+  }
+
+  if (reward.type === 'star') {
+    const nextStars = draft.stars + reward.amount;
+    if (!Number.isSafeInteger(nextStars)) {
+      throw new Error('星星数量超出范围');
+    }
+    draft.stars = nextStars;
+  } else if (reward.type === 'item') {
+    addUnique(draft.inventory.itemIds, reward.targetId);
+  } else if (reward.type === 'furniture') {
+    addUnique(draft.inventory.furnitureIds, reward.targetId);
+  } else if (reward.type === 'clothing') {
+    addUnique(draft.inventory.clothingIds, reward.targetId);
+  } else if (reward.type === 'achievement') {
+    addUnique(draft.rewards.achievementIds, reward.targetId);
+  } else if (reward.targetId === 'mimi') {
+    draft.companions.mimi.unlocked = true;
+    draft.companions.mimi.storyProgress = 'joined';
+    draft.companions.mimi.friendship = Math.max(1, draft.companions.mimi.friendship);
+  } else {
+    throw new Error('未知伙伴奖励');
+  }
+
+  draft.rewards.claimedRewardIds.push(reward.id);
+}
+
+module.exports = { getRewardDefinition, applyReward, applyRewardToGameState };

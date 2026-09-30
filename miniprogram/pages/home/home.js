@@ -1,7 +1,7 @@
 const { TUANTUAN } = require('../../pets/pet');
 const { interactWithTuantuan, getDailyInteractionStatus } = require('../../pets/interaction');
 const { getTuantuanFeedback } = require('../../pets/companion-feedback');
-const { getTuantuanVisual, TREEHOUSE_BACKGROUND } = require('../../assets/visuals');
+const { getTuantuanVisual, getStoryAvatar, TREEHOUSE_BACKGROUND } = require('../../assets/visuals');
 const { getCompanionGreeting, recordCompanionGreeting } = require('../../pets/companion-greetings');
 const { getGameState } = require('../../game/state');
 const { UNIT1_PREVIEW } = require('../../curriculum/unit1/preview-content');
@@ -15,6 +15,7 @@ Page({
   data: {
     pet: TUANTUAN,
     completed: 0,
+    stars: 0,
     total: 3,
     taskTitle: '和团团一起认识树屋的新朋友',
     startLabel: '开始学习冒险',
@@ -90,9 +91,10 @@ Page({
     const showWelcome = needsWelcome();
     this.setData({
       completed,
+      stars: gameState.stars,
       total,
       progressPercent: Math.round((completed / total) * 100),
-      tuantuanVisual: getTuantuanVisual('idle'),
+      tuantuanVisual: getStoryAvatar('tuantuan', gameState.companions.tuantuan.emotion),
       showWelcome,
       companionMessage: companionGreeting.text,
       taskGuide,
@@ -177,7 +179,7 @@ Page({
       });
       if (firstToday) {
         this.visualTimer = setTimeout(() => {
-          this.setData({ tuantuanVisual: getTuantuanVisual('idle') });
+          this.setData({ tuantuanVisual: getStoryAvatar('tuantuan', getGameState().companions.tuantuan.emotion) });
           this.visualTimer = null;
         }, 1200);
       }

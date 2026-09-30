@@ -1,5 +1,5 @@
 const { loadState, updateState } = require('../storage/local');
-const { recordStudyDayInState } = require('../game/state');
+const { recordTaskCompletedInState } = require('../game/state');
 const {
   COURSE_ID,
   WELCOME_UNIT_ID,
@@ -167,12 +167,12 @@ function completeTask(taskId) {
   const now = new Date().toISOString();
   return updateState((draft) => {
     applyTaskCompleted(draft.learningState, taskId, now);
-    recordStudyDayInState(draft.gameState, now);
+    recordTaskCompletedInState(draft.gameState, taskId, now);
   }).learningState;
 }
 
 // Welcome 分课完成后只登记本课掌握目标；所有目标达成前课程仍保持进行中。
-function completeWelcomeSession(taskId, objectiveIds) {
+function completeWelcomeSession(taskId, objectiveIds, onCompleted) {
   if (WELCOME_SESSION_TASK_IDS.indexOf(taskId) === -1 || !Array.isArray(objectiveIds) ||
       !objectiveIds.every((objectiveId) => WELCOME_OBJECTIVE_IDS.indexOf(objectiveId) !== -1)) {
     throw new Error('Welcome 学习任务或目标无效');
@@ -185,10 +185,7 @@ function completeWelcomeSession(taskId, objectiveIds) {
       learning.objectiveProgressById = {};
     }
     applyTaskCompleted(learning, taskId, now);
-    recordStudyDayInState(draft.gameState, now);
-    if (draft.gameState.completedTaskIds.indexOf(taskId) === -1) {
-      draft.gameState.completedTaskIds.push(taskId);
-    }
+    recordTaskCompletedInState(draft.gameState, taskId, now);
     objectiveIds.forEach((objectiveId) => {
       const previous = learning.objectiveProgressById[objectiveId];
       if (previous && previous.status === 'completed') {
@@ -222,50 +219,56 @@ function completeWelcomeSession(taskId, objectiveIds) {
     learning.currentCourseId = COURSE_ID;
     learning.currentTaskId = null;
     learning.updatedAt = now;
+    // 课程模块组合奖励及好感变更；回调失败时整份档案不保存。
+    if (onCompleted) onCompleted(draft, newlyCompletedObjectiveIds);
   });
   return { learningState: updated.learningState, newlyCompletedObjectiveIds };
 }
 
 function completeLearningChapter(unitId, chapterId) {
+  const now = new Date().toISOString();
+  return updateState((draft) => {
+    applyLearningChapterCompleted(draft.learningState, unitId, chapterId, now);
+  }).learningState;
+}
+
+// 剧情管理器在同一事务中完成剧情与学习记录，Welcome 单课不等于整个单元。
+function applyLearningChapterCompleted(learning, unitId, chapterId, now) {
   if ([WELCOME_UNIT_ID, UNIT1_UNIT_ID].indexOf(unitId) === -1 ||
       [WELCOME_CHAPTER_ID, UNIT1_CHAPTER_ID].indexOf(chapterId) === -1) {
     throw new Error('课程章节不存在');
   }
   if (unitId === WELCOME_UNIT_ID) {
-    const taskProgress = getLearningState().taskProgressById[WELCOME_TASK_ID];
+    const taskProgress = learning.taskProgressById[WELCOME_TASK_ID];
     if (!taskProgress || taskProgress.status !== 'completed') {
       throw new Error('Welcome 学习任务尚未完成');
     }
   }
 
-  const now = new Date().toISOString();
-  return updateState((draft) => {
-    const learning = draft.learningState;
-    const unit = learning.unitProgressById[unitId];
-    unit.updatedAt = now;
-    if (unitId === WELCOME_UNIT_ID) {
-      const complete = areWelcomeObjectivesComplete(learning);
-      unit.status = complete ? 'completed' : 'in_progress';
-      learning.chapterProgressById[chapterId] = { status: complete ? 'completed' : 'in_progress', updatedAt: now };
-      if (complete) {
-        addUnique(learning.completedChapterIds, chapterId);
-        addUnique(learning.completedUnitIds, unitId);
-        learning.currentUnitId = UNIT1_UNIT_ID;
-        learning.currentChapterId = UNIT1_CHAPTER_ID;
-      } else {
-        learning.currentUnitId = WELCOME_UNIT_ID;
-        learning.currentChapterId = WELCOME_CHAPTER_ID;
-      }
-    } else {
-      // 当前 Unit 1 内容只是首个学习冒险，不能据此声称整册 Unit 1 已学完。
-      unit.status = 'in_progress';
-      learning.chapterProgressById[chapterId] = { status: 'completed', updatedAt: now };
+  const unit = learning.unitProgressById[unitId];
+  unit.updatedAt = now;
+  if (unitId === WELCOME_UNIT_ID) {
+    const complete = areWelcomeObjectivesComplete(learning);
+    unit.status = complete ? 'completed' : 'in_progress';
+    learning.chapterProgressById[chapterId] = { status: complete ? 'completed' : 'in_progress', updatedAt: now };
+    if (complete) {
       addUnique(learning.completedChapterIds, chapterId);
+      addUnique(learning.completedUnitIds, unitId);
+      learning.currentUnitId = UNIT1_UNIT_ID;
+      learning.currentChapterId = UNIT1_CHAPTER_ID;
+    } else {
+      learning.currentUnitId = WELCOME_UNIT_ID;
+      learning.currentChapterId = WELCOME_CHAPTER_ID;
     }
-    learning.currentCourseId = COURSE_ID;
-    learning.currentTaskId = null;
-    learning.updatedAt = now;
-  }).learningState;
+  } else {
+    // 当前 Unit 1 内容只是首个学习冒险，不能据此声称整册 Unit 1 已学完。
+    unit.status = 'in_progress';
+    learning.chapterProgressById[chapterId] = { status: 'completed', updatedAt: now };
+    addUnique(learning.completedChapterIds, chapterId);
+  }
+  learning.currentCourseId = COURSE_ID;
+  learning.currentTaskId = null;
+  learning.updatedAt = now;
 }
 
 module.exports = {
@@ -282,5 +285,6 @@ module.exports = {
   applyTaskCompleted,
   completeTask,
   completeWelcomeSession,
-  completeLearningChapter
+  completeLearningChapter,
+  applyLearningChapterCompleted
 };

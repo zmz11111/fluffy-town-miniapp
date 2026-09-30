@@ -15,8 +15,8 @@ const {
   completeWelcomeSession,
   getLearningState
 } = require('./learning-state');
-const { adjustTuantuanAffinity } = require('../pets/affinity');
-const { applyReward, getRewardDefinition } = require('../reward/reward-manager');
+const { applyTuantuanAffinityChange } = require('../pets/affinity');
+const { applyRewardToGameState, getRewardDefinition } = require('../reward/reward-manager');
 
 function copy(value) {
   return JSON.parse(JSON.stringify(value));
@@ -201,16 +201,17 @@ function startTask(requestedTaskId) {
 }
 
 function completeSession(session, message, audioSrc, companionMessage) {
-  const result = completeWelcomeSession(session.taskId, session.objectiveIdsToComplete || []);
-  if (result.newlyCompletedObjectiveIds.length) {
-    adjustTuantuanAffinity(2, `welcome-objectives:${result.newlyCompletedObjectiveIds.join(',')}`);
-  }
   const challengeRewardId = session.challengeTask ? session.challengeTask.reward.id : session.adventure.rewardId;
   const reward = getRewardDefinition(challengeRewardId);
   if (!reward) {
     throw new Error('Welcome 冒险奖励尚未登记');
   }
-  applyReward(reward.id);
+  completeWelcomeSession(session.taskId, session.objectiveIdsToComplete || [], (draft, objectiveIds) => {
+    if (objectiveIds.length) {
+      applyTuantuanAffinityChange(draft.petState, 2, `welcome-objectives:${objectiveIds.join(',')}`);
+    }
+    applyRewardToGameState(draft.gameState, reward.id);
+  });
   const overview = getWelcomeProgress();
   return {
     correct: true,

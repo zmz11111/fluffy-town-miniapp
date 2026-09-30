@@ -25,12 +25,15 @@ Page({
     gameRewardStars: 0,
     chapterRewardStars: 0,
     mimiUnlocked: false,
+    showMimiUnlockReward: false,
     completionTitle: '',
     completionMessage: '',
     finishActionLabel: '回到树屋',
     actionBusy: false,
     notice: '',
     sceneSrc: TREEHOUSE_BACKGROUND,
+    sceneAlt: '毛茸茸树屋',
+    sceneCharacters: [],
     sceneImageFailed: false,
     avatarSrc: '',
     avatarAlt: '',
@@ -68,6 +71,7 @@ Page({
     const isUnit1 = chapter.id === UNIT1_PREVIEW.chapterId;
     const isWelcome = chapter.id === WELCOME_PREVIEW.chapterId;
     const chapterProgress = state.chapterProgress[chapter.id];
+    const presentation = current && current.presentation;
     const completed = chapterProgress && chapterProgress.status === 'completed';
     const avatar = current
       ? getStoryAvatar(current.dialogue.speakerId, state.companions.tuantuan.emotion)
@@ -114,12 +118,21 @@ Page({
       actionLabel,
       gameRewardStars: !isUnit1 && !isWelcome && gameReward && claimed.indexOf(REWARD_ID) !== -1 ? gameReward.amount : 0,
       chapterRewardStars,
-      mimiUnlocked: !isUnit1 && !isWelcome && state.companions.mimi.unlocked,
+      mimiUnlocked: state.companions.mimi.unlocked,
+      showMimiUnlockReward: !isUnit1 && !isWelcome && state.companions.mimi.unlocked,
       completionTitle: chapter.completion ? chapter.completion.title : '星星饼干找到了！',
       completionMessage: chapter.completion ? chapter.completion.message : '我们一起找到了星星饼干！真开心！',
       finishActionLabel: chapter.completion ? chapter.completion.actionLabel : '去看看米米',
       actionBusy: this.actionBusy,
       sceneTitle: current ? current.scene.title : '',
+      sceneSrc: presentation ? presentation.background.src : TREEHOUSE_BACKGROUND,
+      sceneAlt: presentation ? presentation.background.alt : '毛茸茸树屋',
+      sceneImageFailed: this.data.sceneSrc === (presentation ? presentation.background.src : TREEHOUSE_BACKGROUND)
+        ? this.data.sceneImageFailed : false,
+      sceneCharacters: presentation ? presentation.characters.map((actor) => {
+        const previous = this.data.sceneCharacters.find((entry) => entry.characterId === actor.characterId && entry.src === actor.src);
+        return Object.assign({}, actor, { imageFailed: Boolean(previous && previous.imageFailed) });
+      }) : [],
       sceneNumber: current ? current.sceneIndex : chapter.sceneIds.length,
       speaker: current ? ({ tuantuan: '团团', mimi: '米米', narrator: '故事' }[current.dialogue.speakerId] || '伙伴') : '',
       dialogue: current ? current.dialogue.text : '',
@@ -138,6 +151,14 @@ Page({
 
   onSceneImageError() {
     this.setData({ sceneImageFailed: true });
+  },
+
+  // 单个角色图片失败时保留角色位和姓名，其余场景继续显示。
+  onSceneCharacterError(event) {
+    const characterId = event.currentTarget.dataset.characterId;
+    this.setData({ sceneCharacters: this.data.sceneCharacters.map((actor) =>
+      Object.assign({}, actor, { imageFailed: actor.imageFailed || actor.characterId === characterId })
+    ) });
   },
 
   // 剧情推进、任务门槛和章节奖励全部交给 story-manager。
