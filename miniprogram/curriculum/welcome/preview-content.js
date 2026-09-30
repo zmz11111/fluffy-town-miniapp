@@ -74,7 +74,7 @@ const FIRST_SESSION_STEPS = [
   {
     id: sentenceActivity.id + ':build-greeting',
     kind: 'sentence-build',
-    prompt: '团团想向米米介绍自己。按顺序拼出这句话，看看星星徽章藏在哪里。',
+    prompt: '米米想向团团介绍自己。按顺序拼出这句话，看看星星徽章藏在哪里。',
     sentenceIds: [imSentence.id],
     tiles: [
       { id: 'session-01-hi', label: 'Hi!' },

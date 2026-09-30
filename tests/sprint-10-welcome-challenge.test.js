@@ -65,6 +65,7 @@ test('Welcome 第1节按问候听读、听音辨认、句子拼组和团团互�
   assert.equal(view.step.kind, 'sentence-build');
   assert.equal(selectSentenceBuildTile('session-01-hello').correct, false, '错误词块不推进进度');
   assert.equal(getTaskView().step.kind, 'sentence-build');
+  assert.equal(getTaskView().step.prompt, '米米想向团团介绍自己。按顺序拼出这句话，看看星星徽章藏在哪里。');
   assert.equal(selectSentenceBuildTile('session-01-hi').correct, true);
   assert.equal(getTaskView().step.selectedTiles.length, 1, '拼句进度保存在本地档案');
   assert.equal(selectSentenceBuildTile('session-01-im').correct, true);
